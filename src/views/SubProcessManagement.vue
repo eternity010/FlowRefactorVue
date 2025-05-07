@@ -1,0 +1,473 @@
+<template>
+  <div class="sub-process-management">
+    <div class="page-header">
+      <span class="page-title">子流程数据</span>
+    </div>
+    <div class="content-container">
+      <div class="upper-section">
+        <!-- 上半部分内容 -->
+        <div class="info-blocks-container">
+          <el-card class="info-block" shadow="hover">
+            <div class="info-block-content">
+              <div class="card-title">子流程生产数量</div>
+              <div ref="productionChart" class="chart-container"></div>
+            </div>
+          </el-card>
+          
+          <el-card class="info-block" shadow="hover">
+            <div class="info-block-content">
+              <div class="card-title">当月目标完成百分比</div>
+              <div class="progress-container">
+                <div ref="progressChart" class="progress-chart"></div>
+                <div class="progress-compare">较昨日<span class="progress-up">+3%</span></div>
+              </div>
+            </div>
+          </el-card>
+          
+          <el-card class="info-block" shadow="hover">
+            <div class="info-block-content">
+              <div class="card-title">风险事项</div>
+              <div class="risk-items">
+                <div class="risk-item warning">
+                  <i class="el-icon-warning"></i>
+                  <span>工艺问题</span>
+                </div>
+                <div class="risk-item danger">
+                  <i class="el-icon-warning"></i>
+                  <span>质量检测异常</span>
+                </div>
+              </div>
+            </div>
+          </el-card>
+          
+          <el-card class="info-block" shadow="hover">
+            <div class="info-block-content">
+              <div class="card-title">子流程状态</div>
+              <div class="status-container">
+                <div class="status-item success">
+                  <i class="el-icon-success"></i>
+                  <span>运行正常</span>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="lower-section">
+        <sub-process-flow></sub-process-flow>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import * as echarts from 'echarts'
+import SubProcessFlow from '@/components/SubProcessFlow.vue'
+
+export default {
+  name: 'SubProcessManagement',
+  components: {
+    SubProcessFlow
+  },
+  data() {
+    return {
+      productionChart: null,
+      progressChart: null,
+      progressPercent: 55,
+      productionData: [
+        { month: '3月', value: 95 },
+        { month: '4月', value: 98 },
+        { month: '5月', value: 120 },
+        { month: '6月', value: 105 },
+        { month: '7月', value: 115 },
+        { month: '8月', value: 125 },
+        { month: '9月', value: 135 },
+        { month: '10月', value: 130 },
+        { month: '11月', value: 140 },
+      ]
+    }
+  },
+  mounted() {
+    this.initProductionChart()
+    this.initProgressChart()
+  },
+  methods: {
+    initProductionChart() {
+      this.productionChart = echarts.init(this.$refs.productionChart)
+      
+      const option = {
+        grid: {
+          top: 10,
+          right: 10,
+          bottom: 35,
+          left: 30
+        },
+        tooltip: {
+          trigger: 'axis',
+          formatter: '{b}: {c}台'
+        },
+        xAxis: {
+          type: 'category',
+          data: this.productionData.map(item => item.month),
+          axisLabel: {
+            show: true,
+            fontSize: 12,
+            color: '#333',
+            interval: 0,
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#666'
+            }
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '数量',
+          nameTextStyle: {
+            fontSize: 10,
+            color: '#666',
+          },
+          min: 80,
+          max: 150,
+          interval: 20,
+          axisLabel: {
+            fontSize: 10,
+          },
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: '#666'
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              type: 'dashed',
+              color: '#ddd'
+            }
+          }
+        },
+        series: [{
+          data: this.productionData.map(item => item.value),
+          type: 'line',
+          name: '生产数量',
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 8,
+          itemStyle: {
+            color: '#1890ff'
+          },
+          lineStyle: {
+            width: 3,
+            color: '#1890ff'
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [{
+                offset: 0, 
+                color: 'rgba(24, 144, 255, 0.3)'
+              }, {
+                offset: 1, 
+                color: 'rgba(24, 144, 255, 0.1)'
+              }]
+            }
+          }
+        }]
+      }
+      
+      // 应用选项
+      this.productionChart.setOption(option)
+      
+      // 添加窗口调整监听
+      window.addEventListener('resize', this.resizeChart)
+    },
+    
+    initProgressChart() {
+      // 创建ECharts实例
+      this.progressChart = echarts.init(this.$refs.progressChart)
+      
+      // 设置图表选项
+      const option = {
+        series: [
+          {
+            type: 'gauge',
+            startAngle: 90,
+            endAngle: -270,
+            radius: '100%',
+            center: ['50%', '50%'],
+            pointer: {
+              show: false
+            },
+            progress: {
+              show: true,
+              overlap: false,
+              roundCap: true,
+              clip: false,
+              itemStyle: {
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#1a98ff'
+                    },
+                    {
+                      offset: 1,
+                      color: '#6fdaff'
+                    }
+                  ]
+                }
+              }
+            },
+            axisLine: {
+              lineStyle: {
+                width: 12,
+                color: [
+                  [1, '#eee']
+                ]
+              }
+            },
+            splitLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              show: false
+            },
+            data: [
+              {
+                value: this.progressPercent,
+                name: '',
+                detail: {
+                  show: true,
+                  offsetCenter: ['0%', '0%'],
+                  width: 50,
+                  height: 14,
+                  fontSize: 28,
+                  color: '#1890ff',
+                  formatter: '{value}%'
+                }
+              }
+            ]
+          }
+        ]
+      }
+      
+      // 应用选项
+      this.progressChart.setOption(option)
+      
+      // 添加窗口调整监听
+      window.addEventListener('resize', this.resizeProgressChart)
+    },
+    
+    resizeChart() {
+      this.productionChart && this.productionChart.resize()
+    },
+    
+    resizeProgressChart() {
+      this.progressChart && this.progressChart.resize()
+    }
+  },
+  beforeDestroy() {
+    // 清除监听和图表实例
+    window.removeEventListener('resize', this.resizeChart)
+    window.removeEventListener('resize', this.resizeProgressChart)
+    this.productionChart && this.productionChart.dispose()
+    this.progressChart && this.progressChart.dispose()
+  }
+}
+</script>
+
+<style scoped>
+.sub-process-management {
+  padding: 0;
+  position: relative;
+  height: 100%;
+}
+
+.page-header {
+  text-align: left;
+  top: 0;
+  left: 0;
+}
+
+.page-title {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.content-container {
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+}
+
+.upper-section {
+  height: 25%;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  overflow: auto;
+}
+
+.info-blocks-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  padding: 0 15px;
+  gap: 15px;
+}
+
+.info-block {
+  width: 24%;
+  height: 200px;
+  margin: 0;
+  border-radius: 12px !important;
+  background-color: #e0f5e9 !important;
+  border: none !important;
+}
+
+/* 覆盖Element UI卡片的内部样式 */
+.info-block /deep/ .el-card__body {
+  padding: 15px;
+  height: 100%;
+  background-color: #e0f5e9;
+  border-radius: 12px;
+}
+
+.info-block-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+}
+
+.chart-container {
+  flex: 1;
+  width: 100%;
+}
+
+.lower-section {
+  height: 75%;
+  padding: 30px 0;
+  overflow: auto;
+}
+
+.divider {
+  height: 5px;
+  width: 100%;
+  background-color: #dcdfe6;
+  margin: 0;
+}
+
+h2 {
+  color: #303133;
+  margin: 0;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.progress-chart {
+  width: 120px;
+  height: 120px;
+}
+
+.progress-compare {
+  margin-top: 0px;
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-up {
+  color: #1a98ff;
+  font-weight: 500;
+}
+
+.risk-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 92%;
+  padding: 10px 0;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.risk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.risk-item i {
+  font-size: 16px;
+}
+
+.risk-item.warning {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.risk-item.danger {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+
+.status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 92%;
+  padding: 10px 0;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.status-item i {
+  font-size: 16px;
+}
+
+.status-item.success {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+</style> 
