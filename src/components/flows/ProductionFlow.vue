@@ -181,7 +181,16 @@ export default {
       // 监听节点点击事件
       this.lf.on('node:click', ({ data }) => {
         console.log('节点被点击:', data);
-        alert(`节点 ${data.id} 被点击！\n文本内容: ${data.text}\n自定义属性: ${JSON.stringify(data.properties)}`);
+        
+        // 对所有节点实现点击跳转到详情页面
+        this.$router.push({
+          path: '/node-detail',
+          query: {
+            id: data.id,
+            title: data.text,
+            type: 'production'
+          }
+        });
       });
     }
   },
