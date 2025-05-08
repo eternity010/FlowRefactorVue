@@ -1,132 +1,120 @@
 <template>
-    <div class="g6-container">
-      <h3>Vue2 G6 流程图示例</h3>
-      <div id="g6-canvas"></div>
-    </div>
-  </template>
-  
-  <script>
-  import G6 from '@antv/g6';
-  
+  <div class="container" ref="container"></div>
+</template>
+
+<script>
+  import LogicFlow from "@logicflow/core";
+  import "@logicflow/core/lib/style/index.css";
+
   export default {
-    name: 'G6Demo',
+    name: 'lf-Demo',
     data() {
       return {
-        graph: null
-      };
-    },
-    mounted() {
-      this.initGraph();
-      window.addEventListener('resize', this.handleResize);
-    },
-    beforeUnmount() {
-      if (this.graph) {
-        this.graph.destroy();
-      }
-      window.removeEventListener('resize', this.handleResize);
-    },
-    methods: {
-      initGraph() {
-        // 配置项
-        const config = {
-          container: 'g6-canvas',
-          width: document.getElementById('g6-canvas')?.clientWidth || 800,
-          height: document.getElementById('g6-canvas')?.clientHeight || 600,
-          fitView: true,
-          fitViewPadding: 30,
-          modes: {
-            default: ['drag-canvas', 'zoom-canvas', 'drag-node', 'click-select']
-          },
-          defaultNode: {
-            type: 'circle',
-            size: 40,
-            style: {
-              fill: '#6FB3D2',
-              stroke: '#3B7E9A',
-              lineWidth: 2
-            },
-            labelCfg: {
-              position: 'center',
-              style: {
-                fill: '#fff',
-                fontSize: 14
-              }
-            }
-          },
-          defaultEdge: {
-            type: 'line',
-            style: {
-              stroke: '#A3B1BF',
-              lineWidth: 2,
-              endArrow: {
-                path: 'M 0,0 L 8,4 L 8,-4 Z',
-                fill: '#A3B1BF'
-              }
-            }
-          },
-          layout: {
-            type: 'grid',
-            cols: 3,
-            preventOverlap: true,
-            nodeSize: 40
-          }
-        };
-  
-        // 初始化图表
-        this.graph = new G6.Graph(config);
-  
-        // 数据源
-        const data = {
+        renderData: {
+          // 节点数据
           nodes: [
-            { id: 'start', label: '开始' },
-            { id: 'process1', label: '流程1' },
-            { id: 'process2', label: '流程2' },
-            { id: 'decision', label: '判断' },
-            { id: 'process3', label: '流程3' },
-            { id: 'end', label: '结束' }
+            {
+              id: '101', // 节点ID，需要全局唯一，不传入内部会自动生成一个ID
+              type: 'rect', // 节点类型，可以传入LogicFlow内置的7种节点类型，也可以注册自定义节点后传入自定义类型
+              x: 100, // 节点形状中心在x轴位置
+              y: 100, // 节点形状中心在y轴的位置
+              text: '里程数周期性维护', // 节点文本
+              properties: { // 自定义属性，用于存储需要这个节点携带的信息，可以传入宽高以重设节点的宽高
+                width: 100,
+                height: 60,
+              }
+            },
+            {
+              id: '102',
+              type: 'rect',
+              x: 100,
+              y: 200,
+              text: '客户整改需求',
+              properties: {
+                width: 100,
+                height: 50,
+              }
+            },
+            {
+              id: '103',
+              type: 'rect',
+              x: 100,
+              y: 300,
+              text: '故障报警',
+              properties: {
+                width: 100,
+                height: 50,
+              }
+            },
+            {
+              id: '104',
+              type: 'rect',
+              x: 300,
+              y: 250,
+              text: '安排维修人员',
+              properties: {
+                width: 100,
+                height: 50,
+              }
+            }
           ],
+          // 边数据
           edges: [
-            { source: 'start', target: 'process1' },
-            { source: 'process1', target: 'process2' },
-            { source: 'process2', target: 'decision' },
-            { source: 'decision', target: 'process3', label: '是' },
-            { source: 'decision', target: 'end', label: '否' },
-            { source: 'process3', target: 'end' }
-          ]
-        };
-  
-        // 渲染图表
-        this.graph.data(data);
-        this.graph.render();
-        this.graph.fitView();
-      },
-      handleResize() {
-        if (this.graph) {
-          const container = document.getElementById('g6-canvas');
-          this.graph.changeSize(
-            container.clientWidth,
-            container.clientHeight
-          );
+            {
+              id: 'rect-2-circle', // 边ID，性质与节点ID一样
+              type: 'polyline', // 边类型
+              sourceNodeId: '102', // 起始节点Id
+              targetNodeId: '104', // 目标节点Id
+            },
+            {
+              id: 'rect-2-circle', // 边ID，性质与节点ID一样
+              type: 'polyline', // 边类型
+              sourceNodeId: '103', // 起始节点Id
+              targetNodeId: '104', // 目标节点Id
+            }
+          ],
         }
       }
-    }
+    },
+    mounted() {
+      this.lf = new LogicFlow({
+        container: this.$refs.container,
+        grid: true,
+        style: {
+          rect: {
+            fill: 'lightskyblue',
+            stroke: '#_000000_', // 您可以根据需要修改边框颜色
+            strokeWidth: 1,
+          },
+          // 如果您有其他类型的节点，也可以在这里为它们设置默认样式
+          // circle: {
+          //   fill: 'lightgreen',
+          //   stroke: '#_333333_',
+          // }
+        }
+      });
+      this.lf.render(this.renderData);
+
+      // 监听节点点击事件
+      this.lf.on('node:click', ({ data }) => {
+        // data 对象包含了被点击节点的信息
+        console.log('节点被点击:', data);
+        // 在这里实现您的弹窗逻辑
+        // 例如，显示一个简单的 alert
+        alert(`节点 ${data.id} 被点击！\n文本内容: ${data.text}\n自定义属性: ${JSON.stringify(data.properties)}`);
+
+        // 如果您使用UI库（如Element UI, Vuetify, Ant Design Vue等），
+        // 您可以在这里调用相应的弹窗组件API，并将节点数据传递给弹窗组件。
+        // 例如 (假设您有一个名为 myDialog 的弹窗组件的引用，并且它有一个 open 方法):
+        // this.$refs.myDialog.open(data);
+      });
+    },
   };
-  </script>
-  
-  <style scoped>
-  .g6-container {
-    padding: 20px;
-    height: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+</script>
+
+<style scoped>
+  .container {
+    width: 1000px;
+    height: 500px;
   }
-  
-  #g6-canvas {
-    flex: 1;
-    width: 100%;
-    border: 1px solid #ebedf0;
-    border-radius: 4px;
-    background: #fafafa;
-  }
-  </style>
+</style>
