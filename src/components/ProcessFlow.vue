@@ -4,29 +4,50 @@
       <div class="flow-step">
         <div class="parallelogram">
           <div class="step-content">
-            <span>采购环节</span>
-            <div class="progress-circle-container">
-              <div class="progress-circle">
-                <svg width="60" height="60" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="54" fill="none" stroke="#e6f7ff" stroke-width="12" />
-                  <circle cx="60" cy="60" r="54" fill="none" stroke="#1890ff" stroke-width="12"
-                    stroke-dasharray="339.3" stroke-dashoffset="135.7" transform="rotate(-90 60 60)" />
-                  <text x="60" y="60" font-size="30" text-anchor="middle" dominant-baseline="middle" fill="#1890ff" 
-                    transform="skew(40deg)">60%</text>
-                </svg>
+            <div class="step-title">采购环节</div>
+            <div class="content-wrapper">
+              <div class="data-panels">
+                <div class="data-item">
+                  <div class="data-label">当月采购总额</div>
+                  <div class="data-value">¥1,256,890</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">未处理申请</div>
+                  <div class="data-value">24<span class="data-unit">件</span></div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">合作供应商</div>
+                  <div class="data-value">78<span class="data-unit">家</span></div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">采购完成率</div>
+                  <div class="data-value">85.7%</div>
+                </div>
               </div>
+              <div class="chart-container" ref="purchaseChart"></div>
             </div>
           </div>
         </div>
       </div>
       <div class="flow-step">
         <div class="parallelogram">
-          <span>流程步骤二</span>
+          <div class="step-content">
+            <div class="step-title">生产环节</div>
+          </div>
         </div>
       </div>
       <div class="flow-step">
         <div class="parallelogram">
-          <span>流程步骤三</span>
+          <div class="step-content">
+            <div class="step-title">营销环节</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="parallelogram">
+          <div class="step-content">
+            <div class="step-title">运维环节</div>
+          </div>
         </div>
       </div>
     </div>
@@ -34,8 +55,116 @@
 </template>
 
 <script>
+import * as echarts from 'echarts'
+
 export default {
-  name: 'ProcessFlow'
+  name: 'ProcessFlow',
+  data() {
+    return {
+      purchaseChart: null,
+      purchaseData: [
+        { month: '1月', value: 920000 },
+        { month: '2月', value: 850000 },
+        { month: '3月', value: 1100000 },
+        { month: '4月', value: 980000 },
+        { month: '5月', value: 1050000 },
+        { month: '6月', value: 1256890 }
+      ]
+    }
+  },
+  mounted() {
+    this.initPurchaseChart()
+    window.addEventListener('resize', this.resizeChart)
+  },
+  methods: {
+    initPurchaseChart() {
+      if (this.$refs.purchaseChart) {
+        this.purchaseChart = echarts.init(this.$refs.purchaseChart)
+        
+        const option = {
+          grid: {
+            top: 30,
+            right: 10,
+            bottom: 20,
+            left: 50
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: '{b}: {c}元'
+          },
+          xAxis: {
+            type: 'category',
+            data: this.purchaseData.map(item => item.month),
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#ddd'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            axisLabel: {
+              fontSize: 10,
+              color: '#666',
+              formatter: function(value) {
+                return (value / 10000) + '万';
+              }
+            },
+            splitLine: {
+              lineStyle: {
+                type: 'dashed',
+                color: '#eee'
+              }
+            }
+          },
+          series: [{
+            data: this.purchaseData.map(item => item.value),
+            type: 'line',
+            name: '采购金额',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#1890ff'
+            },
+            lineStyle: {
+              width: 2,
+              color: '#1890ff'
+            },
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, 
+                  color: 'rgba(24, 144, 255, 0.3)'
+                }, {
+                  offset: 1, 
+                  color: 'rgba(24, 144, 255, 0.1)'
+                }]
+              }
+            }
+          }]
+        }
+        
+        this.purchaseChart.setOption(option)
+      }
+    },
+    resizeChart() {
+      this.purchaseChart && this.purchaseChart.resize()
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resizeChart)
+    this.purchaseChart && this.purchaseChart.dispose()
+  }
 }
 </script>
 
@@ -108,7 +237,7 @@ export default {
 /* 平行四边形基础样式 */
 .parallelogram {
   width: 90%;            /* 宽度 */
-  height: 120px;            /* 高度 */
+  height: 200px;            /* 高度 */
   background-color: #e6f7ff;
   border: 1px solid #91d5ff;
   color: #1890ff;
@@ -140,27 +269,73 @@ export default {
   align-items: center;
   transform: skew(40deg); /* 内容反向倾斜，抵消容器的倾斜效果 */
   width: 100%;
-  gap: 10px;
+  height: 100%;
+  position: relative;
 }
 
-/* 进度环容器 */
-.progress-circle-container {
+/* 内容包装容器 */
+.content-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5px;
+  width: 90%;
+  height: 70%;
+  margin-top: 40px;
 }
 
-/* 进度环样式 */
-.progress-circle {
-  width: 60px;
-  height: 60px;
+/* 环节标题样式 */
+.step-title {
+  position: absolute;
+  top: 15px;
+  left: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
 }
 
-/* 平行四边形内的文字样式：反向倾斜，保持正常显示 */
-.parallelogram span {
-  /* 文字反向倾斜，抵消容器的倾斜效果 */
-  display: inline-block;
+/* 数据面板样式 */
+.data-panels {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 60%;
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+
+/* 图表容器样式 */
+.chart-container {
+  width: 40%;
+  height: 100%;
+}
+
+/* 单个数据项样式 */
+.data-item {
+  margin: 3px;
+  padding: 6px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  text-align: center;
+  width: calc(40% - 10px);
+}
+
+/* 数据标签样式 */
+.data-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 1px;
+}
+
+/* 数据数值样式 */
+.data-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+/* 数据单位样式 */
+.data-unit {
+  font-size: 12px;
+  margin-left: 2px;
+  font-weight: normal;
 }
 
 /* 第一个流程步骤的样式：蓝色 */
@@ -184,11 +359,10 @@ export default {
   color: #fa8c16;            /* 橙色文字 */
 }
 
-/* 为第二个和第三个步骤保持原有布局 */
-.flow-step:nth-child(2) .parallelogram,
-.flow-step:nth-child(3) .parallelogram {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 第四个流程步骤的样式：青色 */
+.flow-step:nth-child(4) .parallelogram {
+  background-color: #e6fffb; /* 浅青色背景 */
+  border-color: #87e8de;     /* 青色边框 */
+  color: #13c2c2;            /* 青色文字 */
 }
 </style> 

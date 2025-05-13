@@ -8,6 +8,7 @@ import ResourceManagement from '@/views/ResourceManagement'
 import RiskMonitoring from '@/views/RiskMonitoring.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 import NodeDetailView from '../views/NodeDetailView.vue'
+import NodeResourceDetailView from '../views/NodeResourceDetailView.vue'
 
 Vue.use(Router)
 
@@ -58,6 +59,11 @@ export default new Router({
       path: '/node-detail',
       name: 'NodeDetail',
       component: NodeDetailView
+    },
+    {
+      path: '/node-resource-info',
+      name: 'NodeResourceDetailView',
+      component: NodeResourceDetailView
     }
   ]
 })

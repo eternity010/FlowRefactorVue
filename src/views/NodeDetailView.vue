@@ -26,24 +26,110 @@
             <span class="value">{{ getFlowTypeName() }}</span>
           </div>
           
+          <!-- 显示节点详细信息 -->
+          <template v-if="nodeDetails">
+            <div class="info-item">
+              <span class="label">节点描述：</span>
+              <span class="value">{{ nodeDetails.description }}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="label">负责部门：</span>
+              <span class="value">{{ nodeDetails.responsibleDept }}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="label">周期时间：</span>
+              <span class="value">{{ nodeDetails.cycleTime }}</span>
+            </div>
+            
+            <div class="info-item">
+              <span class="label">风险等级：</span>
+              <span class="value" :class="getRiskLevelClass(nodeDetails.riskLevel)">
+                {{ nodeDetails.riskLevel }}
+              </span>
+            </div>
+            
+            <!-- 如果有步骤信息，则显示步骤列表 -->
+            <div class="info-item steps-container" v-if="nodeDetails.steps && nodeDetails.steps.length">
+              <span class="label">执行步骤：</span>
+              <div class="steps-list">
+                <div v-for="(step, index) in nodeDetails.steps" :key="index" class="step-item">
+                  <div class="step-number">{{ index + 1 }}</div>
+                  <div class="step-text">{{ step }}</div>
+                </div>
+              </div>
+            </div>
+          </template>
+          
           <!-- 这里可以添加更多节点详细信息 -->
-          <div class="empty-content">
+          <div class="empty-content" v-if="!nodeDetails">
             <el-empty description="暂无更多详细信息" />
           </div>
         </div>
       </el-card>
     </div>
+    
+    <!-- 添加实现流程图区域 -->
+    <el-divider content-position="left">实现流程</el-divider>
+    
+    <div v-if="implementationData" class="flow-section">
+      <div class="flow-control">
+        <div v-if="hasBackupFlow" class="backup-flow-switch">
+          <span class="switch-label">{{ showBackupFlow ? '备用流程' : '主流程' }}</span>
+          <el-switch
+            v-model="showBackupFlow"
+            active-color="#13ce66"
+            inactive-color="#409EFF"
+            @change="handleFlowTypeChange"
+          ></el-switch>
+        </div>
+        <el-tag v-if="showBackupFlow" type="success" effect="dark" size="small" class="backup-tag">
+          <i class="el-icon-info"></i> 当前显示备用实现流程
+        </el-tag>
+      </div>
+      
+      <transition name="flow-fade" mode="out-in">
+        <implementation-flow-chart
+          :key="showBackupFlow ? 'backup' : 'main'"
+          :flowData="currentFlowData.flowData"
+          :stepsData="currentFlowData.steps"
+          :title="currentFlowData.title"
+          :description="currentFlowData.description"
+        />
+      </transition>
+    </div>
+    <div v-else class="empty-flow-section">
+      <el-empty description="该节点暂无实现流程图"></el-empty>
+    </div>
   </div>
 </template>
 
 <script>
+import { getNodeDetails } from '@/data/flowNodesData';
+import { getNodeImplementation, getNodeBackupImplementation, hasNodeBackupImplementation } from '@/data/implementations';
+import ImplementationFlowChart from '@/components/ImplementationFlowChart.vue';
+
 export default {
   name: 'NodeDetailView',
+  components: {
+    ImplementationFlowChart
+  },
   data() {
     return {
       nodeId: '',
       nodeTitle: '',
-      nodeType: ''
+      nodeType: '',
+      nodeDetails: null,
+      implementationData: null,
+      backupImplementationData: null,
+      showBackupFlow: false,
+      hasBackupFlow: false
+    }
+  },
+  computed: {
+    currentFlowData() {
+      return this.showBackupFlow ? this.backupImplementationData : this.implementationData;
     }
   },
   created() {
@@ -51,6 +137,17 @@ export default {
     this.nodeId = this.$route.query.id || '';
     this.nodeTitle = this.$route.query.title || '节点详情';
     this.nodeType = this.$route.query.type || '';
+    // 获取节点详细信息
+    this.nodeDetails = getNodeDetails(this.nodeType, this.nodeId);
+    
+    // 获取节点实现流程数据
+    this.implementationData = getNodeImplementation(this.nodeType, this.nodeId);
+    
+    // 检查并获取备用实现流程
+    this.hasBackupFlow = hasNodeBackupImplementation(this.nodeType, this.nodeId);
+    if (this.hasBackupFlow) {
+      this.backupImplementationData = getNodeBackupImplementation(this.nodeType, this.nodeId);
+    }
   },
   methods: {
     goBack() {
@@ -65,6 +162,19 @@ export default {
         'marketing': '营销环节'
       };
       return typeMap[this.nodeType] || '未知环节';
+    },
+    getRiskLevelClass(level) {
+      // 根据风险等级返回对应的CSS类名
+      const classMap = {
+        '高': 'risk-high',
+        '中': 'risk-medium',
+        '低': 'risk-low'
+      };
+      return classMap[level] || '';
+    },
+    handleFlowTypeChange(val) {
+      // 切换流程类型时的处理逻辑
+      console.log('切换到' + (val ? '备用流程' : '主流程'));
     }
   }
 }
@@ -118,5 +228,100 @@ export default {
   margin-top: 40px;
   display: flex;
   justify-content: center;
+}
+
+.risk-high {
+  color: #f56c6c;
+  font-weight: bold;
+}
+
+.risk-medium {
+  color: #e6a23c;
+  font-weight: bold;
+}
+
+.risk-low {
+  color: #67c23a;
+  font-weight: bold;
+}
+
+.steps-container {
+  display: block;
+  margin-top: 20px;
+}
+
+.steps-list {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.step-item {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.step-number {
+  width: 24px;
+  height: 24px;
+  background-color: #409eff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.step-text {
+  line-height: 24px;
+}
+
+.flow-section {
+  margin-top: 20px;
+}
+
+.empty-flow-section {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.flow-control {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backup-flow-switch {
+  display: flex;
+  align-items: center;
+}
+
+.switch-label {
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.backup-tag {
+  margin-left: 10px;
+}
+
+/* 流程图切换动画 */
+.flow-fade-enter-active,
+.flow-fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.flow-fade-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.flow-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style> 
