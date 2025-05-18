@@ -3,14 +3,16 @@
  */
 
 import { purchaseImplementation } from './purchaseImpl';
+import { productionImplementation } from './productionImpl';
+import { marketingImplementation } from './marketingImpl';
+import { operationImplementation } from './operationImpl';
 
 // 映射类型到对应的实现数据
 const implementationMap = {
   'purchase': purchaseImplementation,
-  // 其他环节将来添加
-  // 'operation': operationImplementation,
-  // 'production': productionImplementation,
-  // 'marketing': marketingImplementation
+  'operation': operationImplementation,
+  'production': productionImplementation,
+  'marketing': marketingImplementation
 };
 
 /**
@@ -107,9 +109,8 @@ export function getNodesWithBackupImplementation(type) {
 
 // 导出所有实现数据，便于需要时直接访问
 export {
-  purchaseImplementation
-  // 将来可以添加其他环节
-  // operationImplementation,
-  // productionImplementation,
-  // marketingImplementation
+  purchaseImplementation,
+  operationImplementation,
+  productionImplementation,
+  marketingImplementation
 }; 

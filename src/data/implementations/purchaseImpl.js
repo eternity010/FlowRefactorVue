@@ -69,6 +69,7 @@ export const purchaseImplementation = {
         outputs: ['采购申请单']
       }
     },
+    // 备用流程
     backupImplementation: {
       title: '采购需求备用实现流程',
       description: '紧急情况下的采购需求简化处理流程',
