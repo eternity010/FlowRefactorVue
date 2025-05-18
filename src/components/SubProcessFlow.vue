@@ -57,6 +57,8 @@ export default {
   methods: {
     switchProcess(processKey) {
       this.currentProcess = processKey;
+      // 触发事件通知父组件
+      this.$emit('process-changed', processKey);
     }
   }
 };

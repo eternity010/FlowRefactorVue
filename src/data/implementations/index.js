@@ -52,6 +52,44 @@ export function hasNodeBackupImplementation(type, nodeId) {
 }
 
 /**
+ * 更新节点的备用流程启用状态
+ * @param {string} type 流程类型：operation, purchase, production, marketing
+ * @param {string} nodeId 节点ID
+ * @param {boolean} enabled 是否启用备用流程
+ * @returns {boolean} 更新是否成功
+ */
+export function updateBackupFlowStatus(type, nodeId, enabled) {
+  const implementationData = implementationMap[type];
+  if (!implementationData || !implementationData[nodeId]) {
+    return false;
+  }
+  
+  // 检查是否有备用流程可切换
+  if (enabled && !implementationData[nodeId].backupImplementation) {
+    return false;
+  }
+  
+  // 更新状态
+  implementationData[nodeId].isBackupEnabled = enabled;
+  return true;
+}
+
+/**
+ * 获取节点的备用流程启用状态
+ * @param {string} type 流程类型：operation, purchase, production, marketing
+ * @param {string} nodeId 节点ID
+ * @returns {boolean} 是否启用了备用流程
+ */
+export function getBackupFlowStatus(type, nodeId) {
+  const implementationData = implementationMap[type];
+  if (!implementationData || !implementationData[nodeId]) {
+    return false;
+  }
+  
+  return !!implementationData[nodeId].isBackupEnabled;
+}
+
+/**
  * 获取指定环节中所有具有备用实现流程的节点ID列表
  * @param {string} type 流程类型：operation, purchase, production, marketing
  * @returns {Array<string>} 具有备用实现流程的节点ID列表

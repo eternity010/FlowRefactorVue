@@ -9,7 +9,7 @@
         <div class="info-blocks-container">
           <el-card class="info-block" shadow="hover">
             <div class="info-block-content">
-              <div class="card-title">子流程生产数量</div>
+              <div class="card-title">{{ currentData.productionTitle }}</div>
               <div ref="productionChart" class="chart-container"></div>
             </div>
           </el-card>
@@ -19,7 +19,7 @@
               <div class="card-title">当月目标完成百分比</div>
               <div class="progress-container">
                 <div ref="progressChart" class="progress-chart"></div>
-                <div class="progress-compare">较昨日<span class="progress-up">+3%</span></div>
+                <div class="progress-compare">较昨日<span class="progress-up">{{ currentData.progressChange }}</span></div>
               </div>
             </div>
           </el-card>
@@ -28,13 +28,13 @@
             <div class="info-block-content">
               <div class="card-title">风险事项</div>
               <div class="risk-items">
-                <div class="risk-item warning">
+                <div 
+                  v-for="(risk, index) in currentData.risks" 
+                  :key="index"
+                  :class="['risk-item', risk.level]"
+                >
                   <i class="el-icon-warning"></i>
-                  <span>工艺问题</span>
-                </div>
-                <div class="risk-item danger">
-                  <i class="el-icon-warning"></i>
-                  <span>质量检测异常</span>
+                  <span>{{ risk.text }}</span>
                 </div>
               </div>
             </div>
@@ -42,11 +42,17 @@
           
           <el-card class="info-block" shadow="hover">
             <div class="info-block-content">
-              <div class="card-title">子流程状态</div>
-              <div class="status-container">
-                <div class="status-item success">
-                  <i class="el-icon-success"></i>
-                  <span>运行正常</span>
+              <div class="card-title">{{ currentData.efficiency.title }}</div>
+              <div class="efficiency-container">
+                <div class="efficiency-metrics">
+                  <div class="metric-item" v-for="(metric, index) in currentData.efficiency.metrics" :key="index">
+                    <div class="metric-value">{{ metric.value }}<span class="metric-unit">{{ metric.unit }}</span></div>
+                    <div class="metric-label">{{ metric.label }}</div>
+                    <div class="metric-trend" :class="{ 'positive': metric.isPositive, 'negative': !metric.isPositive }">
+                      <i :class="metric.isPositive ? 'el-icon-top' : 'el-icon-bottom'"></i>
+                      {{ metric.trend }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -55,7 +61,7 @@
       </div>
       <div class="divider"></div>
       <div class="lower-section">
-        <sub-process-flow></sub-process-flow>
+        <sub-process-flow @process-changed="handleProcessChange"></sub-process-flow>
       </div>
     </div>
   </div>
@@ -64,6 +70,7 @@
 <script>
 import * as echarts from 'echarts'
 import SubProcessFlow from '@/components/SubProcessFlow.vue'
+import { processCardsData } from '@/data/subProcessCardsData'
 
 export default {
   name: 'SubProcessManagement',
@@ -72,27 +79,69 @@ export default {
   },
   data() {
     return {
+      currentProcess: 'purchase', // 默认选择采购环节
       productionChart: null,
       progressChart: null,
-      progressPercent: 55,
-      productionData: [
-        { month: '3月', value: 95 },
-        { month: '4月', value: 98 },
-        { month: '5月', value: 120 },
-        { month: '6月', value: 105 },
-        { month: '7月', value: 115 },
-        { month: '8月', value: 125 },
-        { month: '9月', value: 135 },
-        { month: '10月', value: 130 },
-        { month: '11月', value: 140 },
-      ]
+      
+      // 使用外部数据源
+      processData: processCardsData
+    }
+  },
+  computed: {
+    // 当前选中环节的数据
+    currentData() {
+      return this.processData[this.currentProcess] || this.processData.purchase;
     }
   },
   mounted() {
-    this.initProductionChart()
-    this.initProgressChart()
+    this.initCharts();
   },
   methods: {
+    // 处理子流程变化事件
+    handleProcessChange(processKey) {
+      this.currentProcess = processKey;
+      this.$nextTick(() => {
+        this.updateCharts();
+      });
+    },
+    
+    // 初始化所有图表
+    initCharts() {
+      this.initProductionChart();
+      this.initProgressChart();
+    },
+    
+    // 更新所有图表
+    updateCharts() {
+      // 更新进度图表
+      if (this.progressChart) {
+        const option = this.progressChart.getOption();
+        option.series[0].data[0].value = this.currentData.progressPercent;
+        this.progressChart.setOption(option);
+      }
+      
+      // 更新生产图表
+      if (this.productionChart) {
+        const option = this.productionChart.getOption();
+        option.xAxis[0].data = this.currentData.productionData.map(item => item.month);
+        option.series[0].data = this.currentData.productionData.map(item => item.value);
+        
+        // 根据不同环节调整Y轴
+        if (this.currentProcess === 'operation') {
+          option.yAxis[0].min = 10;
+          option.yAxis[0].max = 30;
+        } else if (this.currentProcess === 'marketing') {
+          option.yAxis[0].min = 60;
+          option.yAxis[0].max = 180;
+        } else {
+          option.yAxis[0].min = 80;
+          option.yAxis[0].max = 150;
+        }
+        
+        this.productionChart.setOption(option);
+      }
+    },
+    
     initProductionChart() {
       this.productionChart = echarts.init(this.$refs.productionChart)
       
@@ -109,7 +158,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: this.productionData.map(item => item.month),
+          data: this.currentData.productionData.map(item => item.month),
           axisLabel: {
             show: true,
             fontSize: 12,
@@ -149,9 +198,9 @@ export default {
           }
         },
         series: [{
-          data: this.productionData.map(item => item.value),
+          data: this.currentData.productionData.map(item => item.value),
           type: 'line',
-          name: '生产数量',
+          name: '数量',
           smooth: true,
           symbol: 'circle',
           symbolSize: 8,
@@ -248,7 +297,7 @@ export default {
             },
             data: [
               {
-                value: this.progressPercent,
+                value: this.currentData.progressPercent,
                 name: '',
                 detail: {
                   show: true,
@@ -335,17 +384,23 @@ export default {
   width: 24%;
   height: 200px;
   margin: 0;
-  border-radius: 12px !important;
-  background-color: #e0f5e9 !important;
-  border: none !important;
+  border-radius: 8px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #91d5ff !important;
+  transition: all 0.3s ease;
+}
+
+.info-block:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* 覆盖Element UI卡片的内部样式 */
 .info-block /deep/ .el-card__body {
   padding: 15px;
   height: 100%;
-  background-color: #e0f5e9;
-  border-radius: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
 }
 
 .info-block-content {
@@ -469,5 +524,75 @@ h2 {
 .status-item.success {
   background-color: #f6ffed;
   color: #52c41a;
+}
+
+.status-item.warning {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-item.error {
+  background-color: #fff1f0;
+  color: #f5222d;
+}
+
+/* 效率指标卡片样式 */
+.efficiency-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.efficiency-metrics {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1890ff;
+  line-height: 1.2;
+}
+
+.metric-unit {
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 2px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: #666;
+  margin: 6px 0;
+}
+
+.metric-trend {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-trend.positive {
+  color: #52c41a;
+}
+
+.metric-trend.negative {
+  color: #f5222d;
 }
 </style> 

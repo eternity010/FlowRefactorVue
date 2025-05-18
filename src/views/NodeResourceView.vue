@@ -124,7 +124,7 @@ import NodeResources from '@/components/NodeResources.vue';
 import { purchaseResources, getNodeResourceDetails } from '@/data/resource';
 
 export default {
-  name: 'ResourceManagement',
+  name: 'NodeResourceView',
   components: {
     NodeResources
   },
@@ -154,13 +154,6 @@ export default {
       this.loadNodeOptions(routeType);
       this.selectedNodeId = routeId;
       this.nodeTitle = routeTitle || routeId;
-      this.loadResourceDetails();
-    } else {
-      // 默认显示采购环节的第一个节点
-      this.selectedType = 'purchase';
-      this.loadNodeOptions('purchase');
-      this.selectedNodeId = 'p1';
-      this.nodeTitle = '采购需求';
       this.loadResourceDetails();
     }
   },

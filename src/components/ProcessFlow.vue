@@ -7,21 +7,9 @@
             <div class="step-title">采购环节</div>
             <div class="content-wrapper">
               <div class="data-panels">
-                <div class="data-item">
-                  <div class="data-label">当月采购总额</div>
-                  <div class="data-value">¥1,256,890</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">未处理申请</div>
-                  <div class="data-value">24<span class="data-unit">件</span></div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">合作供应商</div>
-                  <div class="data-value">78<span class="data-unit">家</span></div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">采购完成率</div>
-                  <div class="data-value">85.7%</div>
+                <div class="data-item" v-for="(item, index) in purchaseData.panels" :key="'purchase-'+index">
+                  <div class="data-label">{{ item.label }}</div>
+                  <div class="data-value">{{ item.value }}<span class="data-unit" v-if="item.unit">{{ item.unit }}</span></div>
                 </div>
               </div>
               <div class="chart-container" ref="purchaseChart"></div>
@@ -33,6 +21,15 @@
         <div class="parallelogram">
           <div class="step-content">
             <div class="step-title">生产环节</div>
+            <div class="content-wrapper">
+              <div class="data-panels">
+                <div class="data-item" v-for="(item, index) in productionData.panels" :key="'production-'+index">
+                  <div class="data-label">{{ item.label }}</div>
+                  <div class="data-value">{{ item.value }}<span class="data-unit" v-if="item.unit">{{ item.unit }}</span></div>
+                </div>
+              </div>
+              <div class="chart-container" ref="productionChart"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -40,6 +37,15 @@
         <div class="parallelogram">
           <div class="step-content">
             <div class="step-title">营销环节</div>
+            <div class="content-wrapper">
+              <div class="data-panels">
+                <div class="data-item" v-for="(item, index) in marketingData.panels" :key="'marketing-'+index">
+                  <div class="data-label">{{ item.label }}</div>
+                  <div class="data-value">{{ item.value }}<span class="data-unit" v-if="item.unit">{{ item.unit }}</span></div>
+                </div>
+              </div>
+              <div class="chart-container" ref="marketingChart"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -47,6 +53,15 @@
         <div class="parallelogram">
           <div class="step-content">
             <div class="step-title">运维环节</div>
+            <div class="content-wrapper">
+              <div class="data-panels">
+                <div class="data-item" v-for="(item, index) in maintenanceData.panels" :key="'maintenance-'+index">
+                  <div class="data-label">{{ item.label }}</div>
+                  <div class="data-value">{{ item.value }}<span class="data-unit" v-if="item.unit">{{ item.unit }}</span></div>
+                </div>
+              </div>
+              <div class="chart-container" ref="maintenanceChart"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -56,30 +71,38 @@
 
 <script>
 import * as echarts from 'echarts'
+import { 
+  purchaseData, 
+  productionData, 
+  marketingData, 
+  maintenanceData 
+} from '@/data/processFlowData'
 
 export default {
   name: 'ProcessFlow',
   data() {
     return {
-      purchaseChart: null,
-      purchaseData: [
-        { month: '1月', value: 920000 },
-        { month: '2月', value: 850000 },
-        { month: '3月', value: 1100000 },
-        { month: '4月', value: 980000 },
-        { month: '5月', value: 1050000 },
-        { month: '6月', value: 1256890 }
-      ]
+      purchaseData,
+      productionData,
+      marketingData,
+      maintenanceData,
+      charts: {}
     }
   },
   mounted() {
-    this.initPurchaseChart()
-    window.addEventListener('resize', this.resizeChart)
+    this.initCharts()
+    window.addEventListener('resize', this.resizeCharts)
   },
   methods: {
+    initCharts() {
+      this.initPurchaseChart()
+      this.initProductionChart()
+      this.initMarketingChart()
+      this.initMaintenanceChart()
+    },
     initPurchaseChart() {
       if (this.$refs.purchaseChart) {
-        this.purchaseChart = echarts.init(this.$refs.purchaseChart)
+        this.charts.purchase = echarts.init(this.$refs.purchaseChart)
         
         const option = {
           grid: {
@@ -94,7 +117,7 @@ export default {
           },
           xAxis: {
             type: 'category',
-            data: this.purchaseData.map(item => item.month),
+            data: this.purchaseData.chart.map(item => item.month),
             axisLabel: {
               fontSize: 10,
               color: '#666'
@@ -122,7 +145,7 @@ export default {
             }
           },
           series: [{
-            data: this.purchaseData.map(item => item.value),
+            data: this.purchaseData.chart.map(item => item.value),
             type: 'line',
             name: '采购金额',
             smooth: true,
@@ -154,16 +177,254 @@ export default {
           }]
         }
         
-        this.purchaseChart.setOption(option)
+        this.charts.purchase.setOption(option)
       }
     },
-    resizeChart() {
-      this.purchaseChart && this.purchaseChart.resize()
+    initProductionChart() {
+      if (this.$refs.productionChart) {
+        this.charts.production = echarts.init(this.$refs.productionChart)
+        
+        const option = {
+          grid: {
+            top: 30,
+            right: 10,
+            bottom: 20,
+            left: 40
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: '{b}: {c}件'
+          },
+          xAxis: {
+            type: 'category',
+            data: this.productionData.chart.map(item => item.month),
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#ddd'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            splitLine: {
+              lineStyle: {
+                type: 'dashed',
+                color: '#eee'
+              }
+            }
+          },
+          series: [{
+            data: this.productionData.chart.map(item => item.value),
+            type: 'line',
+            name: '生产量',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#52c41a'
+            },
+            lineStyle: {
+              width: 2,
+              color: '#52c41a'
+            },
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, 
+                  color: 'rgba(82, 196, 26, 0.3)'
+                }, {
+                  offset: 1, 
+                  color: 'rgba(82, 196, 26, 0.1)'
+                }]
+              }
+            }
+          }]
+        }
+        
+        this.charts.production.setOption(option)
+      }
+    },
+    initMarketingChart() {
+      if (this.$refs.marketingChart) {
+        this.charts.marketing = echarts.init(this.$refs.marketingChart)
+        
+        const option = {
+          grid: {
+            top: 30,
+            right: 10,
+            bottom: 20,
+            left: 50
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: '{b}: {c}元'
+          },
+          xAxis: {
+            type: 'category',
+            data: this.marketingData.chart.map(item => item.month),
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#ddd'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            axisLabel: {
+              fontSize: 10,
+              color: '#666',
+              formatter: function(value) {
+                return (value / 10000) + '万';
+              }
+            },
+            splitLine: {
+              lineStyle: {
+                type: 'dashed',
+                color: '#eee'
+              }
+            }
+          },
+          series: [{
+            data: this.marketingData.chart.map(item => item.value),
+            type: 'line',
+            name: '销售额',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#fa8c16'
+            },
+            lineStyle: {
+              width: 2,
+              color: '#fa8c16'
+            },
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, 
+                  color: 'rgba(250, 140, 22, 0.3)'
+                }, {
+                  offset: 1, 
+                  color: 'rgba(250, 140, 22, 0.1)'
+                }]
+              }
+            }
+          }]
+        }
+        
+        this.charts.marketing.setOption(option)
+      }
+    },
+    initMaintenanceChart() {
+      if (this.$refs.maintenanceChart) {
+        this.charts.maintenance = echarts.init(this.$refs.maintenanceChart)
+        
+        const option = {
+          grid: {
+            top: 30,
+            right: 10,
+            bottom: 20,
+            left: 40
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: '{b}: {c}起'
+          },
+          xAxis: {
+            type: 'category',
+            data: this.maintenanceData.chart.map(item => item.month),
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#ddd'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            axisLabel: {
+              fontSize: 10,
+              color: '#666'
+            },
+            splitLine: {
+              lineStyle: {
+                type: 'dashed',
+                color: '#eee'
+              }
+            }
+          },
+          series: [{
+            data: this.maintenanceData.chart.map(item => item.value),
+            type: 'line',
+            name: '故障数',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#13c2c2'
+            },
+            lineStyle: {
+              width: 2,
+              color: '#13c2c2'
+            },
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, 
+                  color: 'rgba(19, 194, 194, 0.3)'
+                }, {
+                  offset: 1, 
+                  color: 'rgba(19, 194, 194, 0.1)'
+                }]
+              }
+            }
+          }]
+        }
+        
+        this.charts.maintenance.setOption(option)
+      }
+    },
+    resizeCharts() {
+      Object.values(this.charts).forEach(chart => {
+        chart && chart.resize()
+      })
     }
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.resizeChart)
-    this.purchaseChart && this.purchaseChart.dispose()
+    window.removeEventListener('resize', this.resizeCharts)
+    Object.values(this.charts).forEach(chart => {
+      chart && chart.dispose()
+    })
   }
 }
 </script>

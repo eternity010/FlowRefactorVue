@@ -6,6 +6,7 @@ export const purchaseImplementation = {
   'p1': {  // 采购需求
     title: '采购需求实现流程',
     description: '从接收内部需求到生成采购申请的完整流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -138,6 +139,7 @@ export const purchaseImplementation = {
   'p2': {  // 供应商选择
     title: '供应商选择实现流程',
     description: '筛选和评估潜在供应商的完整流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -214,6 +216,7 @@ export const purchaseImplementation = {
   'p3': {  // 价格审批
     title: '价格审批实现流程',
     description: '对采购价格进行内部审批的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -280,6 +283,7 @@ export const purchaseImplementation = {
   'p4': {  // 签订合同
     title: '签订合同实现流程',
     description: '与供应商签订采购合同的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -335,6 +339,7 @@ export const purchaseImplementation = {
   'p5': {  // 货物接收
     title: '货物接收实现流程',
     description: '接收供应商送达货物的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -380,6 +385,7 @@ export const purchaseImplementation = {
   'p6': {  // 质量检验
     title: '质量检验实现流程',
     description: '对收到的货物进行质量检验的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -430,6 +436,7 @@ export const purchaseImplementation = {
   'p7': {  // 入库
     title: '入库实现流程',
     description: '将合格货物办理入库手续的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },
@@ -465,6 +472,7 @@ export const purchaseImplementation = {
   'p8': {  // 退回处理
     title: '退回处理实现流程',
     description: '处理不合格货物的退回流程的详细流程',
+    isBackupEnabled: false,
     flowData: {
       nodes: [
         { id: 'start', type: 'circle', x: 100, y: 150, text: '开始', properties: { width: 60, height: 60 } },

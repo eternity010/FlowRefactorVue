@@ -1,17 +1,35 @@
 /**
  * 资源数据索引文件 - 简化版
+ * 提供获取节点资源数据的工具函数
  */
 
 import { purchaseResources } from './purchaseResources';
+import { productionResources } from './productionResources';
+import { marketingResources } from './marketingResources';
+import { operationResources } from './operationResources';
+import purchaseResourceDetails from './purchaseResourceDetails';
+import productionResourceDetails from './productionResourceDetails';
+import marketingResourceDetails from './marketingResourceDetails';
+import operationResourceDetails from './operationResourceDetails';
 
-// 映射环节类型到对应资源数据
+// 映射环节类型到资源数据
 const resourcesMap = {
-  'purchase': purchaseResources
-  // 将来可添加其他环节
+  'purchase': purchaseResources,
+  'production': productionResources,
+  'marketing': marketingResources,
+  'operation': operationResources
+};
+
+// 映射环节类型到资源详情数据
+const resourceDetailsMap = {
+  'purchase': purchaseResourceDetails,
+  'production': productionResourceDetails,
+  'marketing': marketingResourceDetails,
+  'operation': operationResourceDetails
 };
 
 /**
- * 获取指定环节节点的资源数据
+ * 获取节点的资源数据
  * @param {string} type 环节类型: purchase, production, marketing, operation
  * @param {string} nodeId 节点ID
  * @returns {Object|null} 资源数据或null
@@ -24,32 +42,41 @@ export function getNodeResources(type, nodeId) {
 }
 
 /**
- * 获取指定节点的资源数量统计
- * @param {string} type 环节类型: purchase, production, marketing, operation
+ * 获取节点特定类型的资源
+ * @param {string} type 环节类型
  * @param {string} nodeId 节点ID
- * @returns {Object|null} 资源数量统计或null
+ * @param {string} resourceType 资源类型: documents, personnel, systems, equipment, others
+ * @returns {Object|null} 资源数据或null
  */
-export function getResourcesCount(type, nodeId) {
+export function getResourceType(type, nodeId, resourceType) {
   const resources = getNodeResources(type, nodeId);
-  if (!resources || !resources.resources) {
+  if (!resources || !resources[resourceType]) {
     return null;
   }
-  return resources.resources;
+  return resources[resourceType];
 }
 
 /**
- * 获取指定节点的属性列表
- * @param {string} type 环节类型: purchase, production, marketing, operation
+ * 获取节点资源详细信息
+ * @param {string} type 环节类型
  * @param {string} nodeId 节点ID
- * @returns {Array|null} 属性列表或null
+ * @returns {Object|null} 详细资源数据或null
  */
-export function getNodeAttributes(type, nodeId) {
-  const resources = getNodeResources(type, nodeId);
-  if (!resources || !resources.attributes) {
+export function getNodeResourceDetails(type, nodeId) {
+  if (!resourceDetailsMap[type] || !resourceDetailsMap[type][nodeId]) {
     return null;
   }
-  return resources.attributes;
+  return resourceDetailsMap[type][nodeId];
 }
 
 // 导出资源数据
-export { purchaseResources }; 
+export { 
+  purchaseResources,
+  productionResources,
+  marketingResources,
+  operationResources,
+  purchaseResourceDetails,
+  productionResourceDetails,
+  marketingResourceDetails,
+  operationResourceDetails 
+}; 

@@ -104,6 +104,11 @@ export default {
         isSilentMode: true,
         nodeTextEdit: false,
         edgeTextEdit: false,
+        // 禁用滚轮缩放
+        stopScrollGraph: true,
+        stopZoomGraph: true,
+        // 禁止拖动画布
+        stopMoveGraph: true,
         style: {
           circle: {
             fill: '#f6ffed',
@@ -139,51 +144,12 @@ export default {
         // 添加节点点击事件
         this.lf.on('node:click', ({ data }) => {
           const stepId = data.id;
-          
-          // 如果是实现流程图中的节点(不是start或end)，并且有步骤数据
-          if (stepId !== 'start' && stepId !== 'end' && this.stepsData && this.stepsData[stepId]) {
-            // 弹出选择对话框
-            this.$confirm('请选择要查看的内容', '节点操作', {
-              confirmButtonText: '资源详情',
-              cancelButtonText: '实现步骤',
-              distinguishCancelAndClose: true,
-              type: 'info'
-            }).then(() => {
-              // 查看资源详情 - 跳转到资源详情页面
-              this.$router.push({
-                path: '/node-resource-info',
-                query: {
-                  id: stepId,
-                  name: data.text,
-                  type: this.getNodeType()
-                }
-              });
-            }).catch(action => {
-              if (action === 'cancel') {
-                // 查看实现步骤 - 显示步骤详情对话框
-                this.currentStep = this.stepsData[stepId];
-                this.dialogVisible = true;
-              }
-            });
+          if (this.stepsData && this.stepsData[stepId]) {
+            this.currentStep = this.stepsData[stepId];
+            this.dialogVisible = true;
           }
         });
       }
-    },
-    
-    // 获取当前环节类型
-    getNodeType() {
-      // 根据流程图标题或其他特征判断环节类型
-      const title = this.title.toLowerCase();
-      if (title.includes('采购')) {
-        return 'purchase';
-      } else if (title.includes('生产')) {
-        return 'production';
-      } else if (title.includes('营销')) {
-        return 'marketing';
-      } else if (title.includes('运维')) {
-        return 'operation';
-      }
-      return 'purchase'; // 默认为采购环节
     },
     
     // 重新渲染流程图

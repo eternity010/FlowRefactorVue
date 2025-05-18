@@ -102,18 +102,42 @@
     <div v-else class="empty-flow-section">
       <el-empty description="该节点暂无实现流程图"></el-empty>
     </div>
+    
+    <!-- 添加节点资源区域 -->
+    <el-divider content-position="left">节点资源</el-divider>
+    <div class="resource-section">
+      <node-resources :type="nodeType" :nodeId="nodeId"></node-resources>
+      
+      <div class="view-more-resources">
+        <el-button 
+          type="primary" 
+          size="small" 
+          icon="el-icon-view" 
+          @click="viewDetailedResources">
+          查看详细资源信息
+        </el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { getNodeDetails } from '@/data/flowNodesData';
-import { getNodeImplementation, getNodeBackupImplementation, hasNodeBackupImplementation } from '@/data/implementations';
+import { 
+  getNodeImplementation, 
+  getNodeBackupImplementation, 
+  hasNodeBackupImplementation, 
+  updateBackupFlowStatus,
+  getBackupFlowStatus 
+} from '@/data/implementations';
 import ImplementationFlowChart from '@/components/ImplementationFlowChart.vue';
+import NodeResources from '@/components/NodeResources.vue';
 
 export default {
   name: 'NodeDetailView',
   components: {
-    ImplementationFlowChart
+    ImplementationFlowChart,
+    NodeResources
   },
   data() {
     return {
@@ -147,6 +171,11 @@ export default {
     this.hasBackupFlow = hasNodeBackupImplementation(this.nodeType, this.nodeId);
     if (this.hasBackupFlow) {
       this.backupImplementationData = getNodeBackupImplementation(this.nodeType, this.nodeId);
+      
+      // 根据当前数据状态设置开关状态
+      if (this.implementationData && this.implementationData.isBackupEnabled) {
+        this.showBackupFlow = true;
+      }
     }
   },
   methods: {
@@ -175,6 +204,35 @@ export default {
     handleFlowTypeChange(val) {
       // 切换流程类型时的处理逻辑
       console.log('切换到' + (val ? '备用流程' : '主流程'));
+      
+      // 更新数据模型中的备用流程状态
+      const success = updateBackupFlowStatus(this.nodeType, this.nodeId, val);
+      
+      if (success) {
+        // 提示用户
+        this.$message({
+          type: 'success',
+          message: '已' + (val ? '启用' : '禁用') + '备用流程'
+        });
+      } else {
+        // 如果更新失败，回滚UI状态
+        this.showBackupFlow = !val;
+        this.$message({
+          type: 'error',
+          message: '更新备用流程状态失败'
+        });
+      }
+    },
+    viewDetailedResources() {
+      // 跳转到资源详情页面
+      this.$router.push({
+        path: '/home/resource',
+        query: {
+          type: this.nodeType,
+          id: this.nodeId,
+          title: this.nodeTitle
+        }
+      });
     }
   }
 }
@@ -307,6 +365,16 @@ export default {
 
 .backup-tag {
   margin-left: 10px;
+}
+
+.resource-section {
+  position: relative;
+}
+
+.view-more-resources {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
 }
 
 /* 流程图切换动画 */

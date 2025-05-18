@@ -7,14 +7,14 @@
       <div class="upper-section">
         <!-- 上半部分内容 -->
         <div class="info-blocks-container">
-          <el-card class="info-block" shadow="hover">
+          <el-card class="info-block production-card" shadow="hover">
             <div class="info-block-content">
               <div class="card-title">设备生产数量</div>
               <div ref="productionChart" class="chart-container"></div>
             </div>
           </el-card>
           
-          <el-card class="info-block" shadow="hover">
+          <el-card class="info-block progress-card" shadow="hover">
             <div class="info-block-content">
               <div class="card-title">当月目标完成百分比</div>
               <div class="progress-container">
@@ -24,7 +24,7 @@
             </div>
           </el-card>
           
-          <el-card class="info-block" shadow="hover">
+          <el-card class="info-block risk-card" shadow="hover">
             <div class="info-block-content">
               <div class="card-title">风险事项</div>
               <div class="risk-items">
@@ -40,9 +40,26 @@
             </div>
           </el-card>
           
-          <el-card class="info-block" shadow="hover">
+          <el-card class="info-block efficiency-card" shadow="hover">
             <div class="info-block-content">
-              <!-- 第四个信息块内容 -->
+              <div class="card-title">流程效率指标</div>
+              <div class="efficiency-metrics">
+                <div class="metric-item">
+                  <div class="metric-value">93.2<span class="unit">%</span></div>
+                  <div class="metric-label">流程完成率</div>
+                  <div class="metric-trend up">
+                    <i class="el-icon-top"></i> 2.1%
+                  </div>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-item">
+                  <div class="metric-value">24.6<span class="unit">小时</span></div>
+                  <div class="metric-label">平均周转时间</div>
+                  <div class="metric-trend down">
+                    <i class="el-icon-bottom"></i> 1.8小时
+                  </div>
+                </div>
+              </div>
             </div>
           </el-card>
         </div>
@@ -79,7 +96,19 @@ export default {
         { month: '9月', value: 150 },
         { month: '10月', value: 160 },
         { month: '11月', value: 170 },
-      ]
+      ],
+      efficiencyData: {
+        completionRate: {
+          value: 93.2,
+          trend: 2.1,
+          isUp: true
+        },
+        turnaroundTime: {
+          value: 24.6,
+          trend: 1.8,
+          isUp: false
+        }
+      }
     }
   },
   mounted() {
@@ -343,17 +372,59 @@ export default {
   width: 24%;
   height: 200px;
   margin: 0;
-  border-radius: 12px !important;
-  background-color: #e0f5e9 !important;
-  border: none !important;
+  border-radius: 8px !important;
+  border: 1px solid #ebeef5 !important;
+  transition: all 0.3s ease;
+}
+
+.info-block:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 修改卡片样式，添加边框和不同背景色 */
+.info-block.production-card {
+  background-color: #ffffff !important;
+  border-color: #91d5ff !important;
+}
+
+.info-block.progress-card {
+  background-color: #ffffff !important;
+  border-color: #91d5ff !important;
+}
+
+.info-block.risk-card {
+  background-color: #ffffff !important;
+  border-color: #91d5ff !important;
+}
+
+.info-block.efficiency-card {
+  background-color: #ffffff !important;
+  border-color: #91d5ff !important;
 }
 
 /* 覆盖Element UI卡片的内部样式 */
+.info-block.production-card /deep/ .el-card__body {
+  background-color: #ffffff;
+}
+
+.info-block.progress-card /deep/ .el-card__body {
+  background-color: #ffffff;
+}
+
+.info-block.risk-card /deep/ .el-card__body {
+  background-color: #ffffff;
+}
+
+.info-block.efficiency-card /deep/ .el-card__body {
+  background-color: #ffffff;
+}
+
+/* 通用卡片内部样式 */
 .info-block /deep/ .el-card__body {
   padding: 15px;
   height: 100%;
-  background-color: #e0f5e9;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .info-block-content {
@@ -448,5 +519,63 @@ h2 {
 .risk-item.danger {
   background-color: #fff1f0;
   color: #f5222d;
+}
+
+/* 流程效率指标卡片样式 */
+.efficiency-metrics {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 45%;
+  height: 100%;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #722ed1;
+  line-height: 1.2;
+}
+
+.unit {
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 2px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #666;
+  margin: 6px 0;
+}
+
+.metric-trend {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-trend.up {
+  color: #52c41a;
+}
+
+.metric-trend.down {
+  color: #f5222d;
+}
+
+.metric-divider {
+  width: 1px;
+  height: 80%;
+  background-color: #d3adf7;
 }
 </style> 

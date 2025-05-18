@@ -6,9 +6,8 @@ import ProcessManagement from '@/views/ProcessManagement'
 import SubProcessManagement from '@/views/SubProcessManagement'
 import ResourceManagement from '@/views/ResourceManagement'
 import RiskMonitoring from '@/views/RiskMonitoring.vue';
-import HelloWorld from '@/components/HelloWorld.vue';
 import NodeDetailView from '../views/NodeDetailView.vue'
-import NodeResourceDetailView from '../views/NodeResourceDetailView.vue'
+import NodeResourceView from '@/views/NodeResourceView.vue'
 
 Vue.use(Router)
 
@@ -61,9 +60,14 @@ export default new Router({
       component: NodeDetailView
     },
     {
-      path: '/node-resource-info',
-      name: 'NodeResourceDetailView',
-      component: NodeResourceDetailView
+      path: '/node-resource',
+      name: 'NodeResourceView',
+      component: NodeResourceView
+    },
+    {
+      path: '/resource-management',
+      name: 'ResourceManagementPage',
+      component: ResourceManagement
     }
   ]
 })
