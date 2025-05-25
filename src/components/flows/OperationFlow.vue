@@ -15,7 +15,7 @@ export default {
         // 节点数据
         nodes: [
           {
-            id: '101', // 节点ID，需要全局唯一，不传入内部会自动生成一个ID
+            id: 'o1', // 节点ID，需要全局唯一，不传入内部会自动生成一个ID
             type: 'rect', // 节点类型，可以传入LogicFlow内置的7种节点类型，也可以注册自定义节点后传入自定义类型
             x: 100, // 节点形状中心在x轴位置
             y: 100, // 节点形状中心在y轴的位置
@@ -26,7 +26,7 @@ export default {
             }
           },
           {
-            id: '102',
+            id: 'o2',
             type: 'rect',
             x: 100,
             y: 200,
@@ -37,7 +37,7 @@ export default {
             }
           },
           {
-            id: '103',
+            id: 'o3',
             type: 'rect',
             x: 100,
             y: 300,
@@ -48,7 +48,7 @@ export default {
             }
           },
           {
-            id: '104',
+            id: 'o4',
             type: 'rect',
             x: 300,
             y: 250,
@@ -59,7 +59,7 @@ export default {
             }
           },
           {
-            id: '105',
+            id: 'o5',
             type: 'rect',
             x: 500,
             y: 250,
@@ -70,7 +70,7 @@ export default {
             }
           },
           {
-            id: '106',
+            id: 'o6',
             type: 'rect',
             x: 700,
             y: 250,
@@ -81,7 +81,7 @@ export default {
             }
           },
           {
-            id: '107',
+            id: 'o7',
             type: 'rect',
             x: 900,
             y: 100,
@@ -92,7 +92,7 @@ export default {
             }
           },
           {
-            id: '108',
+            id: 'o8',
             type: 'diamond',
             x: 900,
             y: 250,
@@ -103,7 +103,7 @@ export default {
             }
           },
           {
-            id: '109',
+            id: 'o9',
             type: 'diamond',
             x: 1100,
             y: 250,
@@ -114,7 +114,7 @@ export default {
             }
           },
           {
-            id: '110',
+            id: 'o10',
             type: 'rect',
             x: 1300,
             y: 100,
@@ -125,7 +125,7 @@ export default {
             }
           },
           {
-            id: '111',
+            id: 'o11',
             type: 'rect',
             x: 1300,
             y: 250, 
@@ -136,7 +136,7 @@ export default {
             }
           },
           {
-            id: '112',
+            id: 'o12',
             type: 'diamond',
             x: 100,
             y: 450,
@@ -152,84 +152,84 @@ export default {
           {
             id: 'rect-2-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '102', // 起始节点Id
-            targetNodeId: '104', // 目标节点Id
+            sourceNodeId: 'o2', // 起始节点Id
+            targetNodeId: 'o4', // 目标节点Id
           },
           {
             id: 'rect-3-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '103', // 起始节点Id
-            targetNodeId: '104', // 目标节点Id
+            sourceNodeId: 'o3', // 起始节点Id
+            targetNodeId: 'o4', // 目标节点Id
           },
           {
             id: 'rect-4-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '104', // 起始节点Id
-            targetNodeId: '105', // 目标节点Id
+            sourceNodeId: 'o4', // 起始节点Id
+            targetNodeId: 'o5', // 目标节点Id
           },
           {
             id: 'rect-5-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '105', // 起始节点Id
-            targetNodeId: '106', // 目标节点Id
+            sourceNodeId: 'o5', // 起始节点Id
+            targetNodeId: 'o6', // 目标节点Id
           },
           {
             id: 'rect-6-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '106', // 起始节点Id
-            targetNodeId: '108', // 目标节点Id
+            sourceNodeId: 'o6', // 起始节点Id
+            targetNodeId: 'o8', // 目标节点Id
           },
           {
             id: 'rect-7-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
             text: '否',
-            sourceNodeId: '108', // 起始节点Id
-            targetNodeId: '107', // 目标节点Id
+            sourceNodeId: 'o8', // 起始节点Id
+            targetNodeId: 'o7', // 目标节点Id
           },
           {
             id: 'rect-8-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '101', // 起始节点Id
-            targetNodeId: '107', // 目标节点Id
+            sourceNodeId: 'o1', // 起始节点Id
+            targetNodeId: 'o7', // 目标节点Id
           },
           {
             id: 'rect-9-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '107', // 起始节点Id
-            targetNodeId: '109', // 目标节点Id
+            sourceNodeId: 'o7', // 起始节点Id
+            targetNodeId: 'o9', // 目标节点Id
           },
           {
             id: 'rect-10-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
             text: '是',
-            sourceNodeId: '108', // 起始节点Id
-            targetNodeId: '109', // 目标节点Id
+            sourceNodeId: 'o8', // 起始节点Id
+            targetNodeId: 'o9', // 目标节点Id
           },
           {
             id: 'rect-11-circle', // 边ID，性质与节点ID一样
             type: 'line', // 边类型
             text: '否',
-            sourceNodeId: '109', // 起始节点Id
-            targetNodeId: '110', // 目标节点Id
+            sourceNodeId: 'o9', // 起始节点Id
+            targetNodeId: 'o10', // 目标节点Id
           },
           {
             id: 'rect-12-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
             text: '是',
-            sourceNodeId: '109', // 起始节点Id
-            targetNodeId: '111', // 目标节点Id
+            sourceNodeId: 'o9', // 起始节点Id
+            targetNodeId: 'o11', // 目标节点Id
           },
           {
             id: 'rect-13-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '110', // 起始节点Id
-            targetNodeId: '112', // 目标节点Id
+            sourceNodeId: 'o10', // 起始节点Id
+            targetNodeId: 'o12', // 目标节点Id
           },
           {
             id: 'rect-14-circle', // 边ID，性质与节点ID一样
             type: 'polyline', // 边类型
-            sourceNodeId: '111', // 起始节点Id
-            targetNodeId: '112', // 目标节点Id
+            sourceNodeId: 'o11', // 起始节点Id
+            targetNodeId: 'o12', // 目标节点Id
           },
         ],
       }

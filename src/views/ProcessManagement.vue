@@ -353,7 +353,7 @@ export default {
 }
 
 .upper-section {
-  height: 25%;
+  height: 30%;
   padding: 20px 0;
   display: flex;
   align-items: center;
@@ -446,7 +446,7 @@ export default {
 }
 
 .lower-section {
-  height: 75%;                /* 占据页面75%高度 */
+  height: 70%;                /* 占据页面75%高度 */
   padding: 30px 0;            /* 上下留出30px内边距，避免内容紧贴分隔线 */
   overflow: auto;             /* 内容过多时显示滚动条 */
 }

@@ -3,10 +3,10 @@
  * 提供获取节点资源数据的工具函数
  */
 
-import { purchaseResources } from './purchaseResources';
+import { purchaseResources, purchaseNodesMap } from './purchaseResources';
 import { productionResources } from './productionResources';
 import { marketingResources } from './marketingResources';
-import { operationResources } from './operationResources';
+import { operationResources, operationNodesMap } from './operationResources';
 import purchaseResourceDetails from './purchaseResourceDetails';
 import productionResourceDetails from './productionResourceDetails';
 import marketingResourceDetails from './marketingResourceDetails';
@@ -26,6 +26,12 @@ const resourceDetailsMap = {
   'production': productionResourceDetails,
   'marketing': marketingResourceDetails,
   'operation': operationResourceDetails
+};
+
+// 映射环节类型到节点ID和名称映射
+const nodesMap = {
+  'purchase': purchaseNodesMap,
+  'operation': operationNodesMap
 };
 
 /**
@@ -69,6 +75,32 @@ export function getNodeResourceDetails(type, nodeId) {
   return resourceDetailsMap[type][nodeId];
 }
 
+/**
+ * 获取环节的节点ID和名称映射
+ * @param {string} type 环节类型: purchase, production, marketing, operation
+ * @returns {Object|null} 节点映射或null
+ */
+export function getNodesMap(type) {
+  if (!nodesMap[type]) {
+    return null;
+  }
+  return nodesMap[type];
+}
+
+/**
+ * 获取节点名称
+ * @param {string} type 环节类型
+ * @param {string} nodeId 节点ID
+ * @returns {string|null} 节点名称或null
+ */
+export function getNodeName(type, nodeId) {
+  const map = getNodesMap(type);
+  if (!map || !map[nodeId]) {
+    return null;
+  }
+  return map[nodeId];
+}
+
 // 导出资源数据
 export { 
   purchaseResources,
@@ -78,5 +110,7 @@ export {
   purchaseResourceDetails,
   productionResourceDetails,
   marketingResourceDetails,
-  operationResourceDetails 
+  operationResourceDetails,
+  purchaseNodesMap,
+  operationNodesMap
 }; 

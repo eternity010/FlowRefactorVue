@@ -58,6 +58,19 @@
             <i class="el-icon-folder menu-icon"></i>
             <span>资源管理</span>
           </el-menu-item>
+
+          <!-- 重构时机判断 (独立菜单项) -->
+          <el-menu-item index="4">
+            <i class="el-icon-time menu-icon"></i>
+            <span>重构时机判断</span>
+          </el-menu-item>
+
+          <!-- 流程重构优化 (独立菜单项) -->
+          <el-menu-item index="5">
+            <i class="el-icon-refresh menu-icon"></i>
+            <span>流程重构优化</span>
+          </el-menu-item>
+          
         </el-menu>
       </el-aside>
 
@@ -98,6 +111,12 @@ export default {
           break
         case '3':
           this.$router.push('/home/resource')
+          break
+        case '4':
+          this.$router.push('/home/refactor-timing')
+          break
+        case '5':
+          this.$router.push('/home/process-optimization')
           break
         // 其他菜单项的路由可以在这里添加
       }

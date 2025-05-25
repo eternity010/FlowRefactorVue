@@ -7,7 +7,8 @@ import SubProcessManagement from '@/views/SubProcessManagement'
 import ResourceManagement from '@/views/ResourceManagement'
 import RiskMonitoring from '@/views/RiskMonitoring.vue';
 import NodeDetailView from '../views/NodeDetailView.vue'
-import NodeResourceView from '@/views/NodeResourceView.vue'
+import RefactorTimingView from '@/views/RefactorTimingView'
+import ProcessOptimizationView from '@/views/ProcessOptimizationView'
 
 Vue.use(Router)
 
@@ -46,6 +47,16 @@ export default new Router({
           path: 'risk',
           name: 'RiskMonitoring',
           component: RiskMonitoring
+        },
+        {
+          path: 'refactor-timing',
+          name: 'RefactorTimingView',
+          component: RefactorTimingView
+        },
+        {
+          path: 'process-optimization',
+          name: 'ProcessOptimizationView',
+          component: ProcessOptimizationView
         }
       ]
     },
@@ -53,11 +64,6 @@ export default new Router({
       path: '/node-detail',
       name: 'NodeDetail',
       component: NodeDetailView
-    },
-    {
-      path: '/node-resource',
-      name: 'NodeResourceView',
-      component: NodeResourceView
     },
     {
       path: '/resource-management',

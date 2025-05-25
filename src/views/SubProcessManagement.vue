@@ -365,7 +365,7 @@ export default {
 }
 
 .upper-section {
-  height: 25%;
+  height: 30%;
   padding: 20px 0;
   display: flex;
   align-items: center;
@@ -422,7 +422,7 @@ export default {
 }
 
 .lower-section {
-  height: 75%;
+  height: 70%;
   padding: 30px 0;
   overflow: auto;
 }
