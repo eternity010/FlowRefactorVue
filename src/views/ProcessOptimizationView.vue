@@ -1,138 +1,182 @@
 <template>
   <div class="process-optimization-container">
-    <!-- 简单Mermaid示例卡片 -->
-    <el-card class="simple-example-card">
-      <div slot="header" class="card-header">
-        <span>Mermaid简单示例</span>
-        <el-tag size="small" type="success">基础演示</el-tag>
-      </div>
-      
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <div class="code-section">
-            <h4>示例代码</h4>
-            <el-input
-              type="textarea"
-              :rows="10"
-              v-model="simpleMermaidCode">
-            </el-input>
-            <div class="code-controls">
-              <el-button size="small" type="primary" @click="refreshSimpleExample">渲染图表</el-button>
-              <el-button size="small" @click="resetSimpleExample">重置代码</el-button>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="12">
-          <div class="preview-section">
-            <h4>渲染预览</h4>
-            <div class="simple-chart-container">
-              <MermaidChart :code="simpleMermaidCode" v-if="showSimpleChart" />
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
+    <!-- 前置页面 -->
+    <div v-if="!showMainContent && !showLoading" class="pre-page">
+      <!-- 主要操作卡片 -->
+      <el-card class="pre-card">
+        <div slot="header" class="pre-card-header">
+          <span>流程重构优化系统</span>
+          <el-tag size="small" type="primary">版本 1.0</el-tag>
+        </div>
+        <div class="pre-content">
+          <h2 class="pre-title">流程重构优化系统</h2>
+          <p class="pre-description">点击下方按钮开始流程重构分析</p>
+          <el-button 
+            type="primary" 
+            size="large"
+            @click="startRefactoring"
+            class="refactor-button">
+            点击重构
+          </el-button>
+        </div>
+      </el-card>
 
-    <el-card class="main-card">
-      <div slot="header" class="card-header">
-        <span>流程重构优化</span>
-        <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
-      </div>
+      <!-- 系统状态卡片 -->
+      <SystemStatusCard />
+    </div>
+
+    <!-- 加载动画页面 -->
+    <div v-if="showLoading" class="loading-page">
+      <el-card class="loading-card">
+        <div class="loading-content">
+          <div class="neural-network">
+            <div class="node-layer">
+              <div class="node" v-for="i in 4" :key="'input-' + i"></div>
+            </div>
+            <div class="connection-layer">
+              <div class="connection" v-for="i in 12" :key="'conn1-' + i"></div>
+            </div>
+            <div class="node-layer">
+              <div class="node" v-for="i in 6" :key="'hidden1-' + i"></div>
+            </div>
+            <div class="connection-layer">
+              <div class="connection" v-for="i in 18" :key="'conn2-' + i"></div>
+            </div>
+            <div class="node-layer">
+              <div class="node" v-for="i in 6" :key="'hidden2-' + i"></div>
+            </div>
+            <div class="connection-layer">
+              <div class="connection" v-for="i in 12" :key="'conn3-' + i"></div>
+            </div>
+            <div class="node-layer">
+              <div class="node" v-for="i in 3" :key="'output-' + i"></div>
+            </div>
+          </div>
+          <h3 class="loading-title">神经网络分析中</h3>
+          <p class="loading-description">正在分析流程数据，识别优化点...</p>
+          <div class="progress-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </el-card>
+    </div>
+
+    <!-- 主要内容 -->
+    <div v-if="showMainContent && !showLoading">
+      <el-card class="main-card">
+        <div slot="header" class="card-header">
+          <span>流程重构优化</span>
+          <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
+        </div>
       
       <!-- Mermaid图表区域 -->
       <div class="mermaid-container">
-        <h3 class="section-title">流程优化示例</h3>
-        
-        <el-tabs v-model="activeTab" type="border-card">
-          <el-tab-pane label="优化前流程" name="before">
-            <div class="chart-container">
-              <MermaidChart :code="beforeProcessChart" v-if="activeTab==='before'" />
+        <h3 class="section-title">流程优化</h3>
+        <el-tabs v-model="activeOptTab" type="border-card">
+          <el-tab-pane 
+            v-for="(flowData, key) in optPoints" 
+            :key="key"
+            :label="flowData.title" 
+            :name="key"
+          >
+            <!-- 优化策略描述 -->
+            <div class="strategy-description">
+              <el-alert
+                :title="flowData.title"
+                :description="flowData.description"
+                type="info"
+                :closable="false"
+                show-icon>
+              </el-alert>
             </div>
-          </el-tab-pane>
-          
-          <el-tab-pane label="优化后流程" name="after">
-            <div class="chart-container">
-              <MermaidChart :code="afterProcessChart" v-if="activeTab==='after'" />
+            
+            <div class="opt-chart-group">
+              <!-- 优化前后流程图 -->
+              <div class="opt-chart-block">
+                <div class="opt-chart-title">重构前流程</div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.before" />
+                </div>
+              </div>
+              <div class="opt-chart-block">
+                <div class="opt-chart-title">重构后流程</div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.after" />
+                </div>
+              </div>
             </div>
-          </el-tab-pane>
-          
-          <el-tab-pane label="效益对比" name="comparison">
-            <div class="chart-container">
-              <MermaidChart :code="comparisonChart" v-if="activeTab==='comparison'" />
+
+            <!-- 新增操作按钮 -->
+            <div class="operation-buttons">
+              <el-button 
+                type="success" 
+                size="small"
+                @click="acceptChange(key)">
+                接受优化方案
+              </el-button>
+              <el-button 
+                type="danger" 
+                size="small"
+                @click="rejectChange(key)">
+                拒绝优化方案
+              </el-button>
             </div>
           </el-tab-pane>
         </el-tabs>
-        
-        <div class="chart-controls">
-          <el-button size="small" type="primary" @click="refreshCharts">刷新图表</el-button>
-          <el-button size="small" @click="exportImage">导出为图片</el-button>
-        </div>
       </div>
-      
-      <!-- 优化策略区域 -->
-      <div class="strategy-section">
-        <h3 class="section-title">重构优化策略</h3>
-        <el-collapse v-model="activeStrategy">
-          <el-collapse-item title="并行化处理" name="1">
-            <div class="strategy-content">
-              <p>将串行流程改为并行处理，减少等待时间，提高整体流程效率。</p>
-            </div>
-          </el-collapse-item>
-          <el-collapse-item title="冗余环节消除" name="2">
-            <div class="strategy-content">
-              <p>识别并消除流程中的冗余步骤和重复审批环节，简化流程结构。</p>
-            </div>
-          </el-collapse-item>
-          <el-collapse-item title="自动化替代" name="3">
-            <div class="strategy-content">
-              <p>用自动化系统替代手动操作环节，提高准确性并减少人为干预。</p>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-      </div>
-    </el-card>
+
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script>
 import MermaidChart from '@/components/MermaidChart.vue'
+import SystemStatusCard from '@/components/SystemStatusCard.vue'
+import processOptimizationFlowData from '@/data/processOptimizationFlowData.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { MermaidChart },
+  components: { MermaidChart, SystemStatusCard },
   data() {
     return {
-      simpleMermaidCode: `graph TD\n    A[开始] --> B[流程1]\n    B --> C[流程2]\n    C --> D{判断条件}\n    D -->|是| E[流程3]\n    D -->|否| F[流程4]\n    E --> G[结束]\n    F --> G`,
-      defaultSimpleMermaidCode: `graph TD\n    A[开始] --> B[流程1]\n    B --> C[流程2]\n    C --> D{判断条件}\n    D -->|是| E[流程3]\n    D -->|否| F[流程4]\n    E --> G[结束]\n    F --> G`,
-      showSimpleChart: true,
-      activeTab: 'before',
-      activeStrategy: ['1'],
-      beforeProcessChart: `graph TB\n          A[开始] --> B[需求收集]\n          B --> C[需求分析]\n          C --> D{需求评审}\n          D -->|通过| E[设计方案]\n          D -->|不通过| B\n          E --> F[方案评审]\n          F -->|通过| G[开发实施]\n          F -->|不通过| E\n          G --> H[测试验收]\n          H -->|通过| I[完成部署]\n          H -->|不通过| G\n          I --> J[结束]\n      `,
-      afterProcessChart: `graph TB\n          A[开始] --> B[需求收集与分析]\n          B --> C{需求评审}\n          C -->|通过| D[设计与开发]\n          C -->|调整| B\n          D --> E[集成测试]\n          E -->|通过| F[完成部署]\n          E -->|不通过| D\n          F --> G[结束]\n          \n          style D fill:#bbf,stroke:#33f,stroke-width:2px\n          style B fill:#bfb,stroke:#3f3,stroke-width:2px\n      `,
-      comparisonChart: `pie title \"流程优化效益对比\"\n          \"时间节省\" : 45\n          \"资源节约\" : 30\n          \"错误减少\" : 15\n          \"用户体验提升\" : 10\n      `
+      showMainContent: false, // 控制是否显示主要内容
+      showLoading: false, // 控制是否显示加载动画
+      activeOptTab: 'Optimization1',
+      optPoints: processOptimizationFlowData
     }
   },
+
   methods: {
-    refreshSimpleExample() {
-      // 通过切换showSimpleChart强制MermaidChart重新渲染
-      this.showSimpleChart = false;
-      this.$nextTick(() => {
-        this.showSimpleChart = true;
-      });
+    startRefactoring() {
+      this.showLoading = true;
+      // 模拟神经网络分析过程
+      setTimeout(() => {
+        this.showLoading = false;
+        this.showMainContent = true;
+      }, 3000); // 3秒加载时间
     },
-    resetSimpleExample() {
-      this.simpleMermaidCode = this.defaultSimpleMermaidCode;
-      this.refreshSimpleExample();
+    acceptChange(optimizationKey) {
+      this.$confirm('确认采用该优化方案吗？', '操作确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message.success('优化方案已应用')
+        // 这里可添加实际业务逻辑
+      })
     },
-    refreshCharts() {
-      // 选项卡内MermaidChart会自动响应activeTab和code变化，无需手动刷新
-      this.activeTab = this.activeTab; // 触发watch
-    },
-    exportImage() {
-      this.$message({
-        message: '导出功能待实现',
-        type: 'info'
-      });
+    rejectChange(optimizationKey) {
+      this.$confirm('确认拒绝该优化方案吗？', '操作确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message.info('优化方案已拒绝')
+        // 这里可添加实际业务逻辑
+      })
     }
   }
 }
@@ -143,42 +187,186 @@ export default {
   padding: 20px;
 }
 
-/* 简单示例卡片样式 */
-.simple-example-card {
+/* 前置页面样式 */
+.pre-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-height: 70vh;
+  padding: 20px 0;
+}
+
+.pre-card {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.pre-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.pre-content {
+  padding: 40px 20px;
+}
+
+.pre-title {
+  font-size: 28px;
+  color: #303133;
   margin-bottom: 20px;
+  font-weight: bold;
 }
 
-.code-section, 
-.preview-section {
-  height: 100%;
-  padding: 10px;
-}
-
-.code-section h4,
-.preview-section h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
+.pre-description {
+  font-size: 16px;
   color: #606266;
-  border-left: 3px solid #409EFF;
-  padding-left: 10px;
+  margin-bottom: 40px;
+  line-height: 1.6;
 }
 
-.code-controls {
-  margin-top: 10px;
-  text-align: right;
+.refactor-button {
+  padding: 15px 40px;
+  font-size: 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
 }
 
-.simple-chart-container,
-.chart-container { /* 合并样式 */
-  min-height: 250px; /* 保证最小高度 */
-  padding: 15px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  border: 1px dashed #dcdfe6;
-  display: flex; /* 用于居中 */
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中，如果内容较小 */
-  overflow: auto; /* 如果图表过大，允许滚动 */
+.refactor-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+/* 加载动画页面样式 */
+.loading-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.loading-card {
+  width: 100%;
+  max-width: 700px;
+  text-align: center;
+}
+
+.loading-content {
+  padding: 50px 20px;
+}
+
+.neural-network {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+  height: 200px;
+}
+
+.node-layer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+  margin: 0 20px;
+}
+
+.node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #409EFF, #67C23A);
+  animation: pulse 2s infinite;
+  margin: 5px 0;
+}
+
+.connection-layer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+  width: 40px;
+}
+
+.connection {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #409EFF, transparent);
+  animation: flow 1.5s infinite;
+  margin: 2px 0;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes flow {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+.loading-title {
+  font-size: 24px;
+  color: #303133;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.loading-description {
+  font-size: 16px;
+  color: #606266;
+  margin-bottom: 30px;
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #409EFF;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
 }
 
 .main-card {
@@ -223,18 +411,41 @@ export default {
   white-space: pre-wrap;
 }
 
-.chart-controls {
-  margin-top: 20px;
-  text-align: right;
+
+
+.strategy-description {
+  margin-bottom: 20px;
 }
 
-.strategy-section {
-  margin-top: 30px;
+.strategy-description .el-alert {
+  border-radius: 8px;
+  text-align: center;
 }
 
-.strategy-content {
-  padding: 10px;
-  background-color: #f9f9f9;
+.strategy-description .el-alert__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #409EFF;
+  text-align: center !important;
+}
+
+.strategy-description .el-alert__description {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 8px;
+  text-align: center !important;
+}
+
+.strategy-description :deep(.el-alert__content) {
+  text-align: center;
+}
+
+.strategy-description :deep(.el-alert__title) {
+  text-align: center !important;
+}
+
+.strategy-description :deep(.el-alert__description) {
+  text-align: center !important;
 }
 
 /* Mermaid图表通用样式 (使用 :deep() 穿透scoped CSS) */
@@ -264,4 +475,42 @@ export default {
   font-size: 13px !important; /* 调整字体大小 */
   color: #333 !important;
 }
-</style> 
+
+.opt-chart-group {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 10px;
+}
+.opt-chart-block {
+  width: 100%;
+}
+.opt-chart-title {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #3572b0;
+  padding-left: 2px;
+}
+@media (min-width: 900px) {
+  .opt-chart-group {
+    flex-direction: row;
+    gap: 40px;
+  }
+  .opt-chart-block {
+    flex: 1;
+  }
+}
+ /* 新增样式 */
+.operation-buttons {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px 0;
+  border-top: 1px solid #ebeef5;
+  
+  .el-button {
+    margin: 0 8px;
+    min-width: 120px;
+  }
+}
+</style>

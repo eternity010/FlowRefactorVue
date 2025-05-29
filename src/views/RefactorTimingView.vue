@@ -10,7 +10,7 @@
       <el-row :gutter="20" class="info-cards">
         <!-- 风险数据卡片 -->
         <el-col :span="8">
-          <div class="data-panel risk-panel clickable" @click="goToRiskMonitoring">
+          <div class="data-panel risk-panel clickable" @click="showRiskDialog">
             <div class="card-header">
               <i class="el-icon-warning"></i>
               <span>风险监控</span>
@@ -188,10 +188,11 @@
           </el-col>
           
           <el-col :span="8">
-            <div class="network-recommendation-panel">
+            <div class="network-recommendation-panel clickable" @click="goToProcessOptimization">
               <div class="panel-header">
                 <i class="el-icon-s-claim"></i>
                 <span>重构建议</span>
+                <i class="el-icon-right header-arrow"></i>
               </div>
               <div class="panel-content">
                 <div class="recommendation-list">
@@ -206,6 +207,11 @@
                     {{ overallRecommendation }}
                   </div>
                 </div>
+              </div>
+              <!-- 添加点击提示 -->
+              <div class="click-hint">
+                <i class="el-icon-right"></i>
+                <span>点击查看流程重构优化</span>
               </div>
             </div>
           </el-col>
@@ -222,15 +228,26 @@
         导出分析报告
       </el-button>
     </div>
+
+    <!-- 风险监控弹窗组件 -->
+    <RiskMonitoringDialog
+      :visible.sync="riskDialogVisible"
+      :risk-data="riskData"
+      @view-details="goToRiskMonitoring"
+      @close="handleCloseRiskDialog" />
   </div>
 </template>
 
 <script>
 import moment1Data from '@/data/RefactorTimingData';
 import { moment2Data } from '@/data/RefactorTimingData';
+import RiskMonitoringDialog from '@/components/RiskMonitoringDialog.vue';
 
 export default {
   name: 'RefactorTimingView',
+  components: {
+    RiskMonitoringDialog
+  },
   data() {
     return {
       currentDate: new Date().toLocaleString('zh-CN', {
@@ -247,15 +264,30 @@ export default {
       modelStatus: moment1Data.modelStatus,
       analysisResults: moment1Data.analysisResults,
       recommendations: moment1Data.recommendations,
-      overallRecommendation: moment1Data.overallRecommendation
+      overallRecommendation: moment1Data.overallRecommendation,
+      // 弹窗相关
+      riskDialogVisible: false
     }
   },
   methods: {
+    // 显示风险弹窗
+    showRiskDialog() {
+      this.riskDialogVisible = true;
+    },
+    // 关闭风险弹窗
+    handleCloseRiskDialog() {
+      this.riskDialogVisible = false;
+    },
+    // 跳转到风险监控页面
     goToRiskMonitoring() {
       this.$router.push('/home/risk');
     },
     goToSubProcessManagement() {
       this.$router.push('/home/sub-process');
+    },
+    // 跳转到流程重构优化页面
+    goToProcessOptimization() {
+      this.$router.push('/home/process-optimization');
     },
     handleManualAnalysis() {
       this.$message({
@@ -550,14 +582,61 @@ export default {
 
 .network-recommendation-panel {
   border-left-color: #67C23A;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.network-recommendation-panel.clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(103, 194, 58, 0.15);
+  cursor: pointer;
+}
+
+.click-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #67C23A;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.network-recommendation-panel.clickable:hover .click-hint {
+  opacity: 1;
+}
+
+.click-hint i {
+  font-size: 10px;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 15px;
   font-size: 16px;
   font-weight: bold;
+}
+
+.panel-header > span {
+  margin-left: 8px;
+  flex: 1;
+}
+
+.header-arrow {
+  color: #67C23A;
+  font-size: 14px;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.network-recommendation-panel.clickable:hover .header-arrow {
+  opacity: 1;
+  transform: translateX(3px);
 }
 
 .panel-header i {
@@ -668,4 +747,6 @@ export default {
   padding: 20px 0;
   border-top: 1px dashed #DCDFE6;
 }
+
+
 </style> 
