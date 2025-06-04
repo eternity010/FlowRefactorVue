@@ -145,7 +145,40 @@ export default {
               width: 100,
               height: 50,
             }
-          }
+          },
+          {
+            id: 'o13',
+            type: 'rect',
+            x: 200,
+            y: 550,
+            text: '选择已有方案',
+            properties: {
+              width: 100,
+              height: 50,
+            }
+          },
+          {
+            id: 'o14',
+            type: 'rect',
+            x: 200,
+            y: 650,
+            text: '设计部门支持',
+            properties: {
+              width: 100,
+              height: 50,
+            }
+          },
+          {
+            id: 'o15',
+            type: 'rect',
+            x: 200,
+            y: 750,
+            text: '工艺部门支持',
+            properties: {
+              width: 100,
+              height: 50,
+            }
+          },
         ],
         // 边数据
         edges: [
@@ -230,6 +263,24 @@ export default {
             type: 'polyline', // 边类型
             sourceNodeId: 'o11', // 起始节点Id
             targetNodeId: 'o12', // 目标节点Id
+          },
+          {
+            id: 'rect-15-circle', // 边ID，性质与节点ID一样
+            type: 'polyline', // 边类型
+            sourceNodeId: 'o12', // 起始节点Id
+            targetNodeId: 'o13', // 目标节点Id
+          },
+          {
+            id: 'rect-16-circle', // 边ID，性质与节点ID一样
+            type: 'polyline', // 边类型
+            sourceNodeId: 'o12', // 起始节点Id
+            targetNodeId: 'o14', // 目标节点Id
+          },
+          {
+            id: 'rect-17-circle', // 边ID，性质与节点ID一样
+            type: 'polyline', // 边类型
+            sourceNodeId: 'o12', // 起始节点Id
+            targetNodeId: 'o15', // 目标节点Id
           },
         ],
       }

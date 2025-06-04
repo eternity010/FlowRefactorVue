@@ -45,7 +45,7 @@
               <div class="card-title">流程效率指标</div>
               <div class="efficiency-metrics">
                 <div class="metric-item">
-                  <div class="metric-value">93.2<span class="unit">%</span></div>
+                  <div class="metric-value">98.2<span class="unit">%</span></div>
                   <div class="metric-label">流程完成率</div>
                   <div class="metric-trend up">
                     <i class="el-icon-top"></i> 2.1%

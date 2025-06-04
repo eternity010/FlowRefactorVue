@@ -118,12 +118,22 @@ export const moment1Data = {
     marketingCount: 7
   },
   
-  // 重构复杂度数据
-  complexityData: {
-    overallScore: 7.2,
-    codeComplexity: 6.5,
-    businessCoupling: 8.3,
-    resourceUsage: 6.8
+  // 预测运行时间数据
+  predictionData: {
+    planTime: 268,
+    actualTime: 254.91,
+    schemeA: {
+      time: 252.92,
+      error: "-0.78%"
+    },
+    schemeB: {
+      time: 253.20,
+      error: "-0.67%"  
+    },
+    schemeC: {
+      time: 294.75,
+      error: "15.63%"
+    }
   },
 
   // 模型运行状态
@@ -263,12 +273,22 @@ export const moment2Data = {
     marketingCount: 6
   },
   
-  // 重构复杂度数据 - 复杂度低
-  complexityData: {
-    overallScore: 3.5,
-    codeComplexity: 3.2,
-    businessCoupling: 3.8,
-    resourceUsage: 3.6
+  // 预测运行时间数据 - 优化后的数据
+  predictionData: {
+    planTime: 268,
+    actualTime: 264.71,
+    schemeA: {
+      time: 262.84,
+      error: "-0.78%"
+    },
+    schemeB: {
+      time: 263.14,
+      error: "-0.67%"  
+    },
+    schemeC: {
+      time: 306.31,
+      error: "15.63%"
+    }
   },
 
   // 模型运行状态 - 状态良好
@@ -317,4 +337,4 @@ export const moment2Data = {
 };
 
 // 导出默认当前数据
-export default moment1Data;
+export default moment1Data; 

@@ -4,7 +4,7 @@
     <el-header class="header">
       <div class="header-left">
         <img src="../assets/logo.png" alt="Logo" class="logo">
-        <span class="title">后台管理系统</span>
+        <span class="title">流程重构可视化平台</span>
       </div>
       <div class="header-right">
         <el-dropdown>

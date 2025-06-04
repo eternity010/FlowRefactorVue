@@ -63,9 +63,6 @@
           </template>
           
           <!-- 这里可以添加更多节点详细信息 -->
-          <div class="empty-content" v-if="!nodeDetails">
-            <el-empty description="暂无更多详细信息" />
-          </div>
         </div>
       </el-card>
     </div>
@@ -103,6 +100,15 @@
       <el-empty description="该节点暂无实现流程图"></el-empty>
     </div>
     
+    <!-- 添加甘特图区域 -->
+    <el-divider content-position="left">项目计划甘特图</el-divider>
+    <div v-if="ganttData" class="gantt-section">
+      <gantt-chart :ganttData="ganttData" />
+    </div>
+    <div v-else class="empty-gantt-section">
+      <el-empty description="该节点暂无甘特图数据"></el-empty>
+    </div>
+    
     <!-- 添加节点资源区域 -->
     <el-divider content-position="left">节点资源</el-divider>
     <div class="resource-section">
@@ -132,12 +138,14 @@ import {
 } from '@/data/implementations';
 import ImplementationFlowChart from '@/components/ImplementationFlowChart.vue';
 import NodeResources from '@/components/NodeResources.vue';
+import GanttChart from '@/components/GanttChart.vue';
 
 export default {
   name: 'NodeDetailView',
   components: {
     ImplementationFlowChart,
-    NodeResources
+    NodeResources,
+    GanttChart
   },
   data() {
     return {
@@ -148,7 +156,8 @@ export default {
       implementationData: null,
       backupImplementationData: null,
       showBackupFlow: false,
-      hasBackupFlow: false
+      hasBackupFlow: false,
+      ganttData: null
     }
   },
   computed: {
@@ -166,6 +175,11 @@ export default {
     
     // 获取节点实现流程数据
     this.implementationData = getNodeImplementation(this.nodeType, this.nodeId);
+    
+    // 获取甘特图数据
+    if (this.implementationData && this.implementationData.ganttData) {
+      this.ganttData = this.implementationData.ganttData;
+    }
     
     // 检查并获取备用实现流程
     this.hasBackupFlow = hasNodeBackupImplementation(this.nodeType, this.nodeId);
@@ -391,5 +405,15 @@ export default {
 .flow-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+.gantt-section {
+  margin-top: 20px;
+}
+
+.empty-gantt-section {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
 }
 </style> 

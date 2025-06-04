@@ -2,8 +2,31 @@
   <div class="process-optimization-container">
     <!-- 前置页面 -->
     <div v-if="!showMainContent && !showLoading" class="pre-page">
+      <!-- 数据加载状态提示 -->
+      <div v-if="dataLoading" class="data-loading-indicator">
+        <el-card class="loading-indicator-card">
+          <div class="loading-indicator-content">
+            <i class="el-icon-loading" style="font-size: 24px; color: #409EFF;"></i>
+            <p>正在加载流程优化数据...</p>
+          </div>
+        </el-card>
+      </div>
+
+      <!-- 数据加载错误提示 -->
+      <div v-if="dataError && !dataLoading" class="data-error-indicator">
+        <el-card class="error-indicator-card">
+          <div class="error-indicator-content">
+            <i class="el-icon-warning" style="font-size: 24px; color: #F56C6C;"></i>
+            <p>数据加载失败: {{ dataError }}</p>
+            <el-button type="primary" @click="reloadData" size="small">
+              重新加载
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+
       <!-- 主要操作卡片 -->
-      <el-card class="pre-card">
+      <el-card class="pre-card" :class="{ 'disabled': dataLoading || dataError }">
         <div slot="header" class="pre-card-header">
           <span>流程重构优化系统</span>
           <el-tag size="small" type="primary">版本 1.0</el-tag>
@@ -15,8 +38,12 @@
             type="primary" 
             size="large"
             @click="startRefactoring"
+            :disabled="dataLoading || dataError || Object.keys(optPoints).length === 0"
             class="refactor-button">
-            点击重构
+            <span v-if="dataLoading">数据加载中...</span>
+            <span v-else-if="dataError">数据加载失败</span>
+            <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
+            <span v-else>点击重构</span>
           </el-button>
         </div>
       </el-card>
@@ -65,10 +92,30 @@
 
     <!-- 主要内容 -->
     <div v-if="showMainContent && !showLoading">
-      <el-card class="main-card">
+      <!-- 数据检查 -->
+      <div v-if="Object.keys(optPoints).length === 0" class="no-data-warning">
+        <el-card>
+          <div class="no-data-content">
+            <i class="el-icon-warning" style="font-size: 48px; color: #E6A23C;"></i>
+            <h3>数据未加载</h3>
+            <p>流程优化数据尚未加载完成，请返回重新加载数据。</p>
+            <el-button type="primary" @click="goBackAndReload">
+              返回并重新加载
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+
+      <!-- 正常内容 -->
+      <el-card v-else class="main-card">
         <div slot="header" class="card-header">
           <span>流程重构优化</span>
-          <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
+          <div class="header-actions">
+            <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
+            <el-button size="mini" @click="reloadData" :loading="dataLoading">
+              <i class="el-icon-refresh"></i> 刷新数据
+            </el-button>
+          </div>
         </div>
       
       <!-- Mermaid图表区域 -->
@@ -128,6 +175,15 @@
       </div>
 
       </el-card>
+      
+      <!-- 资源变化确认对话框 -->
+      <ResourceChangeConfirmation
+        :visible.sync="showResourceDialog"
+        :resource-data="currentResourceData"
+        :optimization-key="currentOptimizationKey"
+        @confirm="handleResourceConfirm"
+        @cancel="handleResourceCancel"
+      />
     </div>
   </div>
 </template>
@@ -135,22 +191,95 @@
 <script>
 import MermaidChart from '@/components/MermaidChart.vue'
 import SystemStatusCard from '@/components/SystemStatusCard.vue'
-import processOptimizationFlowData from '@/data/processOptimizationFlowData.js'
+import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
+import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { MermaidChart, SystemStatusCard },
+  components: { MermaidChart, SystemStatusCard, ResourceChangeConfirmation },
   data() {
     return {
       showMainContent: false, // 控制是否显示主要内容
       showLoading: false, // 控制是否显示加载动画
       activeOptTab: 'Optimization1',
-      optPoints: processOptimizationFlowData
+      optPoints: {}, // 改为空对象，通过API获取
+      showResourceDialog: false,
+      currentOptimizationKey: null,
+      dataLoading: false, // API数据加载状态
+      dataError: null // API数据加载错误
     }
   },
 
+  computed: {
+    currentResourceData() {
+      if (!this.currentOptimizationKey || !this.optPoints[this.currentOptimizationKey]) {
+        return {};
+      }
+      return this.optPoints[this.currentOptimizationKey].resourceChanges || {};
+    }
+  },
+
+  async mounted() {
+    // 组件挂载时自动加载数据
+    await this.loadOptimizationData();
+  },
+
   methods: {
+    // 新增：加载优化数据的方法
+    async loadOptimizationData() {
+      this.dataLoading = true;
+      this.dataError = null;
+      
+      try {
+        const response = await processOptimizationApi.getAllOptimizations();
+        
+        // 输出完整的response让用户查看
+        console.log('=== API Response 完整数据 ===');
+        console.log('完整 Response:', response);
+        console.log('Response Status:', response.status);
+        console.log('Response StatusText:', response.statusText);
+        console.log('Response Data:', response.data);
+        console.log('Response Data Code:', response.data.code);
+        console.log('Response Data Message:', response.data.message);
+        console.log('Response Data (业务数据):', response.data.data);
+        console.log('业务数据类型:', typeof response.data.data);
+        console.log('业务数据键数量:', Object.keys(response.data.data).length);
+        console.log('业务数据所有键:', Object.keys(response.data.data));
+        
+        // 输出每个优化项目的详细信息
+        Object.keys(response.data.data).forEach(key => {
+          console.log(`=== ${key} 详细数据 ===`);
+          console.log(`标题: ${response.data.data[key].title}`);
+          console.log(`描述: ${response.data.data[key].description}`);
+          console.log(`是否有资源变化数据: ${!!response.data.data[key].resourceChanges}`);
+          if (response.data.data[key].resourceChanges) {
+            console.log(`资源变化摘要:`, response.data.data[key].resourceChanges.summary);
+          }
+        });
+        console.log('=== API Response 数据输出结束 ===');
+        
+        if (response.data.code === 200) {
+          this.optPoints = response.data.data;
+          console.log('流程优化数据加载成功:', this.optPoints);
+        } else {
+          throw new Error(response.data.message || '数据加载失败');
+        }
+      } catch (error) {
+        this.dataError = error.message || '数据加载失败';
+        console.error('加载流程优化数据失败:', error);
+        this.$message.error('数据加载失败，请稍后重试');
+      } finally {
+        this.dataLoading = false;
+      }
+    },
+
     startRefactoring() {
+      // 检查数据是否已加载
+      if (Object.keys(this.optPoints).length === 0) {
+        this.$message.warning('数据尚未加载完成，请稍候');
+        return;
+      }
+      
       this.showLoading = true;
       // 模拟神经网络分析过程
       setTimeout(() => {
@@ -158,17 +287,43 @@ export default {
         this.showMainContent = true;
       }, 3000); // 3秒加载时间
     },
-    acceptChange(optimizationKey) {
-      this.$confirm('确认采用该优化方案吗？', '操作确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message.success('优化方案已应用')
-        // 这里可添加实际业务逻辑
-      })
+
+    async acceptChange(optimizationKey) {
+      // 检查数据是否存在
+      if (!this.optPoints[optimizationKey]) {
+        this.$message.error('优化数据不存在');
+        return;
+      }
+
+      // 检查是否有资源变化数据
+      const hasResourceChanges = this.optPoints[optimizationKey] && this.optPoints[optimizationKey].resourceChanges;
+      
+      if (hasResourceChanges) {
+        // 有资源变化数据，显示详细的资源变化确认对话框
+        this.currentOptimizationKey = optimizationKey;
+        this.showResourceDialog = true;
+      } else {
+        // 没有资源变化数据，使用简单的确认对话框
+        this.$confirm('确认采用该优化方案吗？', '操作确认', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message.success('优化方案已应用');
+          // 这里可添加实际业务逻辑
+        }).catch(() => {
+          this.$message.info('已取消操作');
+        });
+      }
     },
+
     rejectChange(optimizationKey) {
+      // 检查数据是否存在
+      if (!this.optPoints[optimizationKey]) {
+        this.$message.error('优化数据不存在');
+        return;
+      }
+
       this.$confirm('确认拒绝该优化方案吗？', '操作确认', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -177,6 +332,27 @@ export default {
         this.$message.info('优化方案已拒绝')
         // 这里可添加实际业务逻辑
       })
+    },
+
+    handleResourceConfirm() {
+      this.$message.success('资源变化已确认')
+      // 这里可添加实际业务逻辑
+    },
+
+    handleResourceCancel() {
+      this.$message.info('资源变化取消')
+      // 这里可添加实际业务逻辑
+    },
+
+    // 新增：重新加载数据的方法
+    async reloadData() {
+      await this.loadOptimizationData();
+    },
+
+    goBackAndReload() {
+      this.showMainContent = false;
+      this.showLoading = false;
+      this.loadOptimizationData();
     }
   }
 }
@@ -197,10 +373,48 @@ export default {
   padding: 20px 0;
 }
 
+/* 数据加载状态样式 */
+.data-loading-indicator,
+.data-error-indicator {
+  width: 100%;
+  max-width: 500px;
+}
+
+.loading-indicator-card,
+.error-indicator-card {
+  text-align: center;
+}
+
+.loading-indicator-content,
+.error-indicator-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.loading-indicator-content p,
+.error-indicator-content p {
+  margin: 0;
+  font-size: 14px;
+  color: #606266;
+}
+
+.error-indicator-content p {
+  color: #F56C6C;
+}
+
 .pre-card {
   width: 100%;
   max-width: 600px;
   text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.pre-card.disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .pre-card-header {
@@ -379,6 +593,12 @@ export default {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .section-title {
   font-size: 18px;
   color: #303133;
@@ -512,5 +732,46 @@ export default {
     margin: 0 8px;
     min-width: 120px;
   }
+}
+
+.no-data-warning {
+  text-align: center;
+  padding: 20px;
+}
+
+.no-data-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.no-data-content i {
+  font-size: 48px;
+  color: #E6A23C;
+}
+
+.no-data-content h3 {
+  font-size: 24px;
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.no-data-content p {
+  font-size: 16px;
+  color: #606266;
+}
+
+.no-data-content .el-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.no-data-content .el-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
 }
 </style>

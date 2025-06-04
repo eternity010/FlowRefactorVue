@@ -66,27 +66,31 @@
           </div>
         </el-col>
         
-        <!-- 重构复杂度数据卡片 -->
+        <!-- 规划完成时间数据卡片 -->
         <el-col :span="8">
-          <div class="data-panel complexity-panel">
+          <div class="data-panel prediction-panel">
             <div class="card-header">
-              <i class="el-icon-time"></i>
-              <span>重构复杂度</span>
+              <i class="el-icon-stopwatch"></i>
+              <span>规划完成时间</span>
             </div>
             <div class="card-content">
-              <div class="main-value">{{ complexityData.overallScore }}/10</div>
+              <div class="main-value">{{ predictionData.planTime }}s</div>
               <div class="sub-info">
                 <div class="info-item">
-                  <span class="label">代码复杂度:</span>
-                  <span class="value">{{ complexityData.codeComplexity }}/10</span>
+                  <span class="label">上一轮实际运行时间:</span>
+                  <span class="value">{{ predictionData.actualTime }}s</span>
                 </div>
                 <div class="info-item">
-                  <span class="label">业务耦合度:</span>
-                  <span class="value">{{ complexityData.businessCoupling }}/10</span>
+                  <span class="label">方案A-LR预测本轮时间:</span>
+                  <span class="value prediction-good">{{ predictionData.schemeA.time }}s ({{ predictionData.schemeA.error }})</span>
                 </div>
                 <div class="info-item">
-                  <span class="label">资源消耗:</span>
-                  <span class="value">{{ complexityData.resourceUsage }}/10</span>
+                  <span class="label">方案B-XGB预测本轮时间:</span>
+                  <span class="value prediction-good">{{ predictionData.schemeB.time }}s ({{ predictionData.schemeB.error }})</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">方案C-GCN预测本轮时间:</span>
+                  <span class="value prediction-poor">{{ predictionData.schemeC.time }}s ({{ predictionData.schemeC.error }})</span>
                 </div>
               </div>
             </div>
@@ -108,7 +112,7 @@
     <el-card class="neural-network-card">
       <div slot="header" class="neural-header">
         <span>神经网络分析结果</span>
-        <el-tag size="small" type="success">算法版本: v2.5.1</el-tag>
+        <el-tag size="small" type="success">算法版本: v0.3.0</el-tag>
       </div>
       
       <div class="neural-content">
@@ -260,7 +264,7 @@ export default {
       // 从数据文件中导入时刻1数据
       riskData: moment1Data.riskData,
       subprocessData: moment1Data.subprocessData,
-      complexityData: moment1Data.complexityData,
+      predictionData: moment1Data.predictionData,
       modelStatus: moment1Data.modelStatus,
       analysisResults: moment1Data.analysisResults,
       recommendations: moment1Data.recommendations,
@@ -309,7 +313,7 @@ export default {
         // 更新为时刻2数据
         this.riskData = moment2Data.riskData;
         this.subprocessData = moment2Data.subprocessData;
-        this.complexityData = moment2Data.complexityData;
+        this.predictionData = moment2Data.predictionData;
         this.modelStatus = moment2Data.modelStatus;
         this.analysisResults = moment2Data.analysisResults;
         this.recommendations = moment2Data.recommendations;
@@ -375,7 +379,7 @@ export default {
   border-left-color: #409EFF;
 }
 
-.complexity-panel {
+.prediction-panel {
   border-left-color: #E6A23C;
 }
 
@@ -434,6 +438,14 @@ export default {
   color: #67C23A;
 }
 
+.prediction-good {
+  color: #67C23A;
+}
+
+.prediction-poor {
+  color: #F56C6C;
+}
+
 /* 卡片主题颜色 */
 .risk-panel .card-header i {
   color: #F56C6C;
@@ -443,7 +455,7 @@ export default {
   color: #409EFF;
 }
 
-.complexity-panel .card-header i {
+.prediction-panel .card-header i {
   color: #E6A23C;
 }
 

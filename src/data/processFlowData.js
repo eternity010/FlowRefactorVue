@@ -14,7 +14,7 @@ export const purchaseData = {
     { label: '当月采购总额', value: '¥1,256,890', unit: '' },
     { label: '未处理申请', value: '24', unit: '件' },
     { label: '合作供应商', value: '78', unit: '家' },
-    { label: '采购完成率', value: '85.7', unit: '%' }
+    { label: '采购完成率', value: '99.7', unit: '%' }
   ]
 }
 
@@ -30,7 +30,7 @@ export const productionData = {
   ],
   panels: [
     { label: '当月产量', value: '1,200', unit: '件' },
-    { label: '生产计划达成率', value: '92.5', unit: '%' },
+    { label: '生产计划达成率', value: '100', unit: '%' },
     { label: '产品合格率', value: '98.3', unit: '%' },
     { label: '设备利用率', value: '86.7', unit: '%' }
   ]
@@ -50,7 +50,7 @@ export const marketingData = {
     { label: '当月销售额', value: '¥1,450,000', unit: '' },
     { label: '新增客户数', value: '12', unit: '家' },
     { label: '销售增长率', value: '16.0', unit: '%' },
-    { label: '销售目标完成率', value: '93.5', unit: '%' }
+    { label: '销售目标完成率', value: '102.5', unit: '%' }
   ]
 }
 
