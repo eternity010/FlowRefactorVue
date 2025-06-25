@@ -6,12 +6,6 @@ export const riskFactors = [
   { id: 'UUE03', name: '地缘政治紧张', category: '不稳定不确定环境', enCategory: 'Unstable Environment' },
   { id: 'UUE04', name: '宏观经济恶化', category: '不稳定不确定环境', enCategory: 'Unstable Environment' },
   
-  // R&D Risk (研发风险)
-  { id: 'RDR01', name: '高端装备研发人才流失', category: '研发风险', enCategory: 'R&D Risk' },
-  { id: 'RDR02', name: '重大技术路线决策失误', category: '研发风险', enCategory: 'R&D Risk' },
-  { id: 'RDR03', name: '关键研发设备投入不足', category: '研发风险', enCategory: 'R&D Risk' },
-  { id: 'RDR04', name: '重大装备研发周期超期', category: '研发风险', enCategory: 'R&D Risk' },
-  
   // Procurement Risk (采购风险)
   { id: 'PCR01', name: '核心零部件断供', category: '采购风险', enCategory: 'Procurement Risk' },
   { id: 'PCR02', name: '关键原材料依赖进口', category: '采购风险', enCategory: 'Procurement Risk' },
@@ -151,34 +145,6 @@ export const businessActivities = [
     process: '运维', 
     enProcess: 'Maintenance',
     relatedRiskFactors: ['OMR03', 'OMR04'] 
-  },
-  { 
-    id: 'BA015', 
-    name: '研发投入管理', 
-    process: '研发', 
-    enProcess: 'R&D',
-    relatedRiskFactors: ['RDR03'] 
-  },
-  { 
-    id: 'BA016', 
-    name: '技术路线决策', 
-    process: '研发', 
-    enProcess: 'R&D',
-    relatedRiskFactors: ['RDR02'] 
-  },
-  { 
-    id: 'BA017', 
-    name: '研发人才管理', 
-    process: '研发', 
-    enProcess: 'R&D',
-    relatedRiskFactors: ['RDR01'] 
-  },
-  { 
-    id: 'BA018', 
-    name: '项目研发管理', 
-    process: '研发', 
-    enProcess: 'R&D',
-    relatedRiskFactors: ['RDR04'] 
   }
 ];
 
@@ -202,8 +168,7 @@ export const riskNetwork = [
   { source: 'PDR03', target: 'OMR01', weight: 0.67 },
   { source: 'MKR01', target: 'MKR04', weight: 0.78 },
   { source: 'MKR03', target: 'MKR04', weight: 0.81 },
-  { source: 'OMR03', target: 'OMR04', weight: 0.73 },
-  { source: 'RDR01', target: 'RDR04', weight: 0.69 }
+  { source: 'OMR03', target: 'OMR04', weight: 0.73 }
 ];
 
 // Sample risk monitoring data
@@ -329,21 +294,6 @@ export const riskMonitoringData = [
     threshold: { warning: 0.70, alert: 0.85 }
   },
   {
-    riskFactorId: 'RDR01',
-    timestamp: '2024-05-01T08:00:00',
-    confidenceLevel: 0.61,
-    trend: 'down',
-    alertStatus: 'normal',
-    relatedBusinessActivities: ['BA017'],
-    historicalData: [
-      { date: '2024-04-30', value: 0.64 },
-      { date: '2024-04-29', value: 0.67 },
-      { date: '2024-04-28', value: 0.70 }
-    ],
-    cvarValue: 3.82,
-    threshold: { warning: 0.65, alert: 0.80 }
-  },
-  {
     riskFactorId: 'PCR03',
     timestamp: '2024-05-01T08:00:00',
     confidenceLevel: 0.66,
@@ -398,7 +348,7 @@ export const riskReportData = {
   riskDistribution: {
     red: 3,
     yellow: 5,
-    normal: 2
+    normal: 1
   },
   topRisks: [
     {
@@ -428,7 +378,6 @@ export const riskReportData = {
     '生产': { red: 0, yellow: 1, normal: 0 },
     '营销': { red: 0, yellow: 1, normal: 0 },
     '运维': { red: 0, yellow: 1, normal: 0 },
-    '研发': { red: 0, yellow: 0, normal: 1 },
     '环境': { red: 1, yellow: 0, normal: 0 }
   }
 }; 

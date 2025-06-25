@@ -4,14 +4,14 @@
     :visible.sync="visible"
     width="70%"
     :before-close="handleClose"
-    class="resource-dialog">
+    :class="['resource-dialog', { 'minimal-mode': isMinimalMode() }]">
     
     <!-- 顶部警告提示 -->
     <div class="warning-banner">
       <el-alert
-        title="重要提示"
-        description="以下资源变化将在您确认后立即生效，请仔细审核所有资源需求"
-        type="warning"
+        :title="getAlertTitle()"
+        :description="getAlertDescription()"
+        :type="isMinimalMode() ? 'info' : 'warning'"
         :closable="false"
         show-icon>
       </el-alert>
@@ -19,7 +19,7 @@
 
     <!-- 总体变化概览 -->
     <div class="summary-section">
-      <h3 class="section-title">总体变化概览</h3>
+      <h3 class="section-title">{{ getSectionTitle() }}</h3>
       <el-row :gutter="16">
         <el-col :span="6">
           <div class="summary-card">
@@ -48,9 +48,17 @@
       </el-row>
     </div>
 
+    <!-- 项目实施计划甘特图 -->
+    <div class="gantt-section" v-if="getGanttData()">
+      <h3 class="section-title">项目实施计划</h3>
+      <div class="gantt-wrapper">
+        <GanttChart :gantt-data="getGanttData()" />
+      </div>
+    </div>
+
     <!-- 资源需求详情 -->
     <div class="details-section">
-      <h3 class="section-title">新增资源需求</h3>
+      <h3 class="section-title">{{ getResourceSectionTitle() }}</h3>
       
       <el-row :gutter="20">
         <!-- 人员资源 -->
@@ -162,7 +170,7 @@
     <!-- 确认区域 -->
     <div class="confirmation-section">
       <el-checkbox v-model="userConfirmed" size="large">
-        我已仔细阅读并理解上述所有资源变化内容，确认实施此重构方案
+        {{ getConfirmationText() }}
       </el-checkbox>
     </div>
 
@@ -176,15 +184,20 @@
         @click="handleConfirm" 
         :disabled="!userConfirmed"
         size="large">
-        确认实施重构
+        {{ getConfirmButtonText() }}
       </el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import GanttChart from '@/components/GanttChart.vue';
+
 export default {
   name: 'ResourceChangeConfirmation',
+  components: {
+    GanttChart
+  },
   props: {
     visible: {
       type: Boolean,
@@ -227,6 +240,17 @@ export default {
       this.$emit('confirm', this.optimizationKey)
       this.$emit('update:visible', false)
     },
+    
+    // 检测当前数据模式
+    isMinimalMode() {
+      return !!this.resourceData.minimalResourceChanges;
+    },
+    
+    // 获取基础资源路径
+    getResourceBasePath() {
+      return this.isMinimalMode() ? 'minimalResourceChanges' : 'newResourceTypes';
+    },
+    
     getSummaryData(key) {
       if (!this.resourceData.summary) return '';
       
@@ -244,43 +268,110 @@ export default {
           return this.resourceData.summary[key] || '';
       }
     },
+    
     getPersonnelEstimate() {
-      return this.getNestedValue(['newResourceTypes', 'personnel', 'totalEstimate']) || '';
+      const basePath = this.getResourceBasePath();
+      return this.getNestedValue([basePath, 'personnel', 'totalEstimate']) || '';
     },
+    
     getPersonnelDepartments() {
-      const departments = this.getNestedValue(['newResourceTypes', 'personnel', 'departments']);
-      return departments ? departments.join('、') : '';
+      const basePath = this.getResourceBasePath();
+      const departments = this.getNestedValue([basePath, 'personnel', 'departments']);
+      if (departments && Array.isArray(departments)) {
+        return departments.join('、');
+      }
+      // 对于资源优先模式，可能没有departments字段
+      return this.isMinimalMode() ? '现有部门' : '';
     },
+    
     getPersonnelCategories() {
-      return this.getNestedValue(['newResourceTypes', 'personnel', 'categories']) || [];
+      const basePath = this.getResourceBasePath();
+      return this.getNestedValue([basePath, 'personnel', 'categories']) || [];
     },
+    
     getSystemsImplementation() {
-      return this.getNestedValue(['newResourceTypes', 'systems', 'implementation']) || '';
+      const basePath = this.getResourceBasePath();
+      return this.getNestedValue([basePath, 'systems', 'implementation']) || '';
     },
+    
     getSystemsIntegration() {
-      return this.getNestedValue(['newResourceTypes', 'systems', 'integration']) || '';
+      const basePath = this.getResourceBasePath();
+      const integration = this.getNestedValue([basePath, 'systems', 'integration']);
+      if (integration) return integration;
+      
+      // 对于资源优先模式，可能使用不同的字段名
+      if (this.isMinimalMode()) {
+        return this.getNestedValue([basePath, 'systems', 'approach']) || '';
+      }
+      return '';
     },
+    
     getSystemsCategories() {
-      return this.getNestedValue(['newResourceTypes', 'systems', 'categories']) || [];
+      const basePath = this.getResourceBasePath();
+      const categories = this.getNestedValue([basePath, 'systems', 'categories']);
+      if (categories && Array.isArray(categories)) {
+        return categories;
+      }
+      
+      // 对于资源优先模式，可能使用modifications字段
+      if (this.isMinimalMode()) {
+        return this.getNestedValue([basePath, 'systems', 'modifications']) || [];
+      }
+      return [];
     },
+    
     getDocumentsEstimate() {
-      return this.getNestedValue(['newResourceTypes', 'documents', 'totalEstimate']) || '';
+      const basePath = this.getResourceBasePath();
+      return this.getNestedValue([basePath, 'documents', 'totalEstimate']) || '';
     },
+    
     getDocumentsCategories() {
-      return this.getNestedValue(['newResourceTypes', 'documents', 'categories']) || [];
+      const basePath = this.getResourceBasePath();
+      return this.getNestedValue([basePath, 'documents', 'categories']) || [];
     },
+    
     getEquipmentPurpose() {
-      return this.getNestedValue(['newResourceTypes', 'equipment', 'purpose']) || '';
+      const basePath = this.getResourceBasePath();
+      const purpose = this.getNestedValue([basePath, 'equipment', 'purpose']);
+      if (purpose) return purpose;
+      
+      // 对于资源优先模式，可能使用approach字段
+      if (this.isMinimalMode()) {
+        return this.getNestedValue([basePath, 'equipment', 'approach']) || 
+               this.getNestedValue([basePath, 'equipment', 'requirement']) || '';
+      }
+      return '';
     },
+    
     getEquipmentCategories() {
-      return this.getNestedValue(['newResourceTypes', 'equipment', 'categories']) || [];
+      const basePath = this.getResourceBasePath();
+      const categories = this.getNestedValue([basePath, 'equipment', 'categories']);
+      if (categories && Array.isArray(categories)) {
+        return categories;
+      }
+      
+      // 对于资源优先模式，可能没有设备需求
+      if (this.isMinimalMode()) {
+        const requirement = this.getNestedValue([basePath, 'equipment', 'requirement']);
+        if (requirement) {
+          return [requirement];
+        }
+      }
+      return [];
     },
+    
     getImplementationImpact() {
+      // 检查是否有minimalEnhancements.implementationImpact（资源优先模式）
+      if (this.isMinimalMode() && this.resourceData.implementationImpact) {
+        return this.resourceData.implementationImpact;
+      }
       return this.resourceData.implementationImpact || {};
     },
+    
     getExpectedBenefits() {
       return this.resourceData.expectedBenefits || {};
     },
+    
     getNestedValue(path) {
       let value = this.resourceData;
       for (let key of path) {
@@ -292,6 +383,7 @@ export default {
       }
       return value;
     },
+    
     getImpactTitle(key) {
       const titles = {
         organizationalChange: '组织变革',
@@ -302,15 +394,50 @@ export default {
       }
       return titles[key] || key
     },
+    
     getBenefitIcon(key) {
       const icons = {
         resilience: 'el-icon-shield',
         continuity: 'el-icon-connection',
         efficiency: 'el-icon-timer',
         standardization: 'el-icon-document',
-        sustainability: 'el-icon-refresh'
+        sustainability: 'el-icon-refresh',
+        costEffectiveness: 'el-icon-money',
+        quickImplementation: 'el-icon-time'
       }
       return icons[key] || 'el-icon-check'
+    },
+    
+    getGanttData() {
+      return this.resourceData.ganttData || null;
+    },
+    
+    getAlertTitle() {
+      return this.isMinimalMode() ? '资源优先方案确认' : '重要提示';
+    },
+    
+    getAlertDescription() {
+      return this.isMinimalMode() ? 
+        '以下是资源优先的简化重构方案，将最大化利用现有资源，请仔细审核变化内容' : 
+        '以下资源变化将在您确认后立即生效，请仔细审核所有资源需求';
+    },
+    
+    getSectionTitle() {
+      return this.isMinimalMode() ? '资源变化概览（最小化投入）' : '总体变化概览';
+    },
+    
+    getResourceSectionTitle() {
+      return this.isMinimalMode() ? '新增资源需求（最小化投入）' : '新增资源需求';
+    },
+    
+    getConfirmationText() {
+      return this.isMinimalMode() ? 
+        '我已仔细阅读并理解上述资源变化内容，确认实施此资源优先的简化重构方案' : 
+        '我已仔细阅读并理解上述所有资源变化内容，确认实施此重构方案';
+    },
+    
+    getConfirmButtonText() {
+      return this.isMinimalMode() ? '确认实施简化重构' : '确认实施重构';
     }
   }
 }
@@ -499,5 +626,54 @@ export default {
   .summary-card {
     margin-bottom: 10px;
   }
+}
+
+/* 甘特图样式 */
+.gantt-section {
+  margin-bottom: 25px;
+}
+
+.gantt-wrapper {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+/* 资源优先模式特殊样式 */
+.minimal-mode.resource-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #67B26F, #4ca2cd);
+  color: white;
+  margin: 0;
+  padding: 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.minimal-mode.resource-dialog :deep(.el-dialog__title) {
+  color: white;
+  font-weight: bold;
+}
+
+.minimal-mode .summary-card {
+  background: linear-gradient(135deg, #67B26F 0%, #4ca2cd 100%);
+}
+
+.minimal-mode .confirmation-section {
+  background-color: #f0f9ff;
+  border-color: #67B26F;
+}
+
+.minimal-mode .confirmation-section :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+  background-color: #67B26F;
+  border-color: #67B26F;
+}
+
+.minimal-mode .dialog-footer .el-button--primary {
+  background-color: #67B26F;
+  border-color: #67B26F;
+}
+
+.minimal-mode .dialog-footer .el-button--primary:hover {
+  background-color: #5a9c63;
+  border-color: #5a9c63;
 }
 </style> 

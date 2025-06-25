@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      currentProcess: 'purchase',
+      currentProcess: 'operation',
       processTabs: [
         { key: 'purchase', label: '采购环节' },
         { key: 'production', label: '生产环节' },
@@ -53,6 +53,10 @@ export default {
         { key: 'operation', label: '运维环节' }
       ]
     }
+  },
+  mounted() {
+    // 组件挂载时通知父组件当前选中的环节
+    this.$emit('process-changed', this.currentProcess);
   },
   methods: {
     switchProcess(processKey) {

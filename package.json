@@ -7,7 +7,11 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "import-data": "node scripts/import-to-mongodb.js",
+    "test-db": "node scripts/test-mongodb-queries.js",
+    "import-optimization": "node scripts/import-process-optimization-to-mongodb.js",
+    "test-optimization": "node scripts/test-process-optimization-queries.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",
@@ -19,6 +23,7 @@
     "jsplumb": "^2.15.6",
     "mermaid": "^8.14.0",
     "metaeditor-mxgraph": "^2.0.7",
+    "mongodb": "^6.17.0",
     "mxgraph": "^4.2.2",
     "vue": "^2.5.2",
     "vue-flowchart": "^0.1.1",

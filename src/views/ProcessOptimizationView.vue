@@ -112,15 +112,44 @@
           <span>流程重构优化</span>
           <div class="header-actions">
             <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
-            <el-button size="mini" @click="reloadData" :loading="dataLoading">
-              <i class="el-icon-refresh"></i> 刷新数据
-            </el-button>
           </div>
         </div>
       
       <!-- Mermaid图表区域 -->
       <div class="mermaid-container">
         <h3 class="section-title">流程优化</h3>
+        
+        <!-- 方案选择器 -->
+        <div class="solution-selector">
+          <div class="selector-header">
+            <h4 class="selector-title">选择优化方案</h4>
+            <p class="selector-description">
+              选择不同的优化策略来查看对应的重构方案和资源配置
+            </p>
+          </div>
+          <el-select 
+            v-model="selectedSolution" 
+            placeholder="选择优化方案"
+            @change="handleSolutionChange"
+            size="medium"
+            class="solution-select">
+            <el-option
+              label="平衡方案"
+              value="balanced"
+              :disabled="false">
+              <span>平衡方案</span>
+              <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
+            </el-option>
+            <el-option
+              label="资源优先"
+              value="resource-first"
+              :disabled="false">
+              <span>资源优先</span>
+              <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
+            </el-option>
+          </el-select>
+        </div>
+        
         <el-tabs v-model="activeOptTab" type="border-card">
           <el-tab-pane 
             v-for="(flowData, key) in optPoints" 
@@ -131,8 +160,8 @@
             <!-- 优化策略描述 -->
             <div class="strategy-description">
               <el-alert
-                :title="flowData.title"
-                :description="flowData.description"
+                :title="getFlowTitle(key)"
+                :description="getFlowDescription(key)"
                 type="info"
                 :closable="false"
                 show-icon>
@@ -148,9 +177,9 @@
                 </div>
               </div>
               <div class="opt-chart-block">
-                <div class="opt-chart-title">重构后流程</div>
+                <div class="opt-chart-title">{{ getAfterTitle() }}</div>
                 <div class="chart-container">
-                  <MermaidChart :code="flowData.after" />
+                  <MermaidChart :code="getAfterFlowData(key)" />
                 </div>
               </div>
             </div>
@@ -206,7 +235,8 @@ export default {
       showResourceDialog: false,
       currentOptimizationKey: null,
       dataLoading: false, // API数据加载状态
-      dataError: null // API数据加载错误
+      dataError: null, // API数据加载错误
+      selectedSolution: null
     }
   },
 
@@ -215,13 +245,34 @@ export default {
       if (!this.currentOptimizationKey || !this.optPoints[this.currentOptimizationKey]) {
         return {};
       }
-      return this.optPoints[this.currentOptimizationKey].resourceChanges || {};
+      // 根据选择的方案返回对应的资源数据
+      const optimizationData = this.optPoints[this.currentOptimizationKey];
+      
+      if (this.selectedSolution === 'balanced') {
+        return {
+          ...optimizationData.resourceChanges,
+          ganttData: optimizationData.ganttData
+        };
+      } else if (this.selectedSolution === 'resource-first') {
+        return {
+          ...optimizationData.resourceChanges2,
+          ganttData: optimizationData.ganttData2
+        };
+      }
+      
+      // 默认返回平衡方案
+      return {
+        ...optimizationData.resourceChanges,
+        ganttData: optimizationData.ganttData
+      };
     }
   },
 
   async mounted() {
     // 组件挂载时自动加载数据
     await this.loadOptimizationData();
+    // 设置默认方案为平衡方案
+    this.selectedSolution = 'balanced';
   },
 
   methods: {
@@ -285,7 +336,7 @@ export default {
       setTimeout(() => {
         this.showLoading = false;
         this.showMainContent = true;
-      }, 3000); // 3秒加载时间
+      }, 5000); // 3秒加载时间
     },
 
     async acceptChange(optimizationKey) {
@@ -353,6 +404,43 @@ export default {
       this.showMainContent = false;
       this.showLoading = false;
       this.loadOptimizationData();
+    },
+
+    handleSolutionChange(value) {
+      // 处理方案选择的逻辑
+      console.log('Selected solution:', value);
+    },
+
+    getFlowTitle(key) {
+      if (this.optPoints[key]) {
+        return this.optPoints[key].title;
+      }
+      return '未命名流程';
+    },
+
+    getFlowDescription(key) {
+      if (this.optPoints[key]) {
+        return this.optPoints[key].description;
+      }
+      return '该流程没有描述';
+    },
+
+    getAfterTitle() {
+      if (this.selectedSolution === 'balanced') {
+        return '平衡方案后的流程';
+      } else if (this.selectedSolution === 'resource-first') {
+        return '资源优先方案后的流程';
+      }
+      return '未选择方案后的流程';
+    },
+
+    getAfterFlowData(key) {
+      if (this.selectedSolution === 'balanced') {
+        return this.optPoints[key].after;
+      } else if (this.selectedSolution === 'resource-first') {
+        return this.optPoints[key].after2;
+      }
+      return this.optPoints[key].before;
     }
   }
 }
@@ -631,8 +719,6 @@ export default {
   white-space: pre-wrap;
 }
 
-
-
 .strategy-description {
   margin-bottom: 20px;
 }
@@ -711,7 +797,19 @@ export default {
   margin-bottom: 8px;
   color: #3572b0;
   padding-left: 2px;
+  display: flex;
+  align-items: center;
 }
+
+.opt-chart-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background-color: #409EFF;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
 @media (min-width: 900px) {
   .opt-chart-group {
     flex-direction: row;
@@ -773,5 +871,49 @@ export default {
 .no-data-content .el-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+.solution-selector {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.solution-select {
+  width: 100%;
+  max-width: 400px;
+}
+
+.solution-selector ::v-deep .el-select .el-input__inner {
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+}
+
+.solution-selector ::v-deep .el-select-dropdown__item {
+  height: auto;
+  line-height: 1.5;
+  padding: 12px 15px;
+}
+
+.solution-selector ::v-deep .el-select-dropdown__item span:first-child {
+  font-weight: 600;
+}
+
+.selector-header {
+  margin-bottom: 10px;
+}
+
+.selector-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.selector-description {
+  font-size: 14px;
+  color: #606266;
 }
 </style>

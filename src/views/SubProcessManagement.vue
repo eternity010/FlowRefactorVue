@@ -79,7 +79,7 @@ export default {
   },
   data() {
     return {
-      currentProcess: 'purchase', // 默认选择采购环节
+      currentProcess: 'operation', // 默认选择运维环节
       productionChart: null,
       progressChart: null,
       
@@ -90,7 +90,7 @@ export default {
   computed: {
     // 当前选中环节的数据
     currentData() {
-      return this.processData[this.currentProcess] || this.processData.purchase;
+      return this.processData[this.currentProcess] || this.processData.operation;
     }
   },
   mounted() {

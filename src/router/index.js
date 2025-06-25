@@ -9,6 +9,7 @@ import RiskMonitoring from '@/views/RiskMonitoring.vue';
 import NodeDetailView from '../views/NodeDetailView.vue'
 import RefactorTimingView from '@/views/RefactorTimingView'
 import ProcessOptimizationView from '@/views/ProcessOptimizationView'
+import PlanningTimeView from '@/views/PlanningTimeView'
 
 Vue.use(Router)
 
@@ -57,6 +58,11 @@ export default new Router({
           path: 'process-optimization',
           name: 'ProcessOptimizationView',
           component: ProcessOptimizationView
+        },
+        {
+          path: 'planning-time',
+          name: 'PlanningTimeView',
+          component: PlanningTimeView
         }
       ]
     },

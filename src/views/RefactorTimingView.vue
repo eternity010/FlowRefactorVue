@@ -68,7 +68,7 @@
         
         <!-- 规划完成时间数据卡片 -->
         <el-col :span="8">
-          <div class="data-panel prediction-panel">
+          <div class="data-panel prediction-panel clickable" @click="goToPlanningTime">
             <div class="card-header">
               <i class="el-icon-stopwatch"></i>
               <span>规划完成时间</span>
@@ -334,6 +334,10 @@ export default {
         message: '分析报告已导出',
         type: 'success'
       });
+    },
+    // 跳转到规划完成时间页面
+    goToPlanningTime() {
+      this.$router.push('/home/planning-time');
     }
   }
 }

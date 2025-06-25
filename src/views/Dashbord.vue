@@ -47,16 +47,16 @@
             </el-menu-item>
           </el-submenu>
 
-          <!-- 风险监控 (独立菜单项) -->
-          <el-menu-item index="2">
-            <i class="el-icon-warning menu-icon"></i>
-            <span>风险监控</span>
-          </el-menu-item>
-
           <!-- 资源管理 (独立菜单项) -->
-          <el-menu-item index="3">
+          <el-menu-item index="2">
             <i class="el-icon-folder menu-icon"></i>
             <span>资源管理</span>
+          </el-menu-item>
+
+          <!-- 风险监控 (独立菜单项) -->
+          <el-menu-item index="3">
+            <i class="el-icon-warning menu-icon"></i>
+            <span>风险监控</span>
           </el-menu-item>
 
           <!-- 重构时机判断 (独立菜单项) -->
@@ -106,11 +106,11 @@ export default {
         case '1-2':
           this.$router.push('/home/sub-process')
           break
-        case '2': // 风险监控菜单项的index为2
-          this.$router.push('/home/risk')
+        case '2':
+          this.$router.push('/home/resource')
           break
         case '3':
-          this.$router.push('/home/resource')
+          this.$router.push('/home/risk')
           break
         case '4':
           this.$router.push('/home/refactor-timing')

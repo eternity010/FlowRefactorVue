@@ -984,7 +984,9 @@ export default {
         }
       });
       
-      const processNames = Object.keys(processData);
+      // 定义固定的显示顺序，运维在其他之前
+      const orderedProcessNames = ['采购', '生产', '营销', '运维', '其他'];
+      const processNames = orderedProcessNames.filter(name => processData[name]);
       const redData = processNames.map(name => processData[name].red);
       const yellowData = processNames.map(name => processData[name].yellow);
       const normalData = processNames.map(name => processData[name].normal);
