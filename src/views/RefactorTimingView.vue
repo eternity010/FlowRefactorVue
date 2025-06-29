@@ -8,8 +8,39 @@
         <el-tag size="small" type="info">更新时间: {{ currentDate }}</el-tag>
       </div>
       <el-row :gutter="20" class="info-cards">
+        <!-- 大模型联网状态卡片 -->
+        <el-col :span="6">
+          <div class="data-panel ai-status-panel clickable" @click="handleAIDataCollection">
+            <div class="card-header">
+              <i class="el-icon-connection"></i>
+              <span>大模型联网状态</span>
+            </div>
+            <div class="card-content">
+              <div class="main-value">
+                <el-tag :type="aiCollectionStatus.enabled ? 'success' : 'info'" size="medium">
+                  {{ aiCollectionStatus.enabled ? '已启用' : '未启用' }}
+                </el-tag>
+              </div>
+              <div class="sub-info">
+                <div class="info-item">
+                  <span class="label">最后收集时间:</span>
+                  <span class="value">{{ aiCollectionStatus.lastCollectionTime }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">收集的信息源:</span>
+                  <span class="value">{{ aiCollectionStatus.collectedSources }}个</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">数据状态:</span>
+                  <span class="value" :class="aiCollectionStatus.dataFreshness === '最新' ? 'prediction-good' : 'prediction-poor'">{{ aiCollectionStatus.dataFreshness }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
+        
         <!-- 风险数据卡片 -->
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="data-panel risk-panel clickable" @click="showRiskDialog">
             <div class="card-header">
               <i class="el-icon-warning"></i>
@@ -36,7 +67,7 @@
         </el-col>
         
         <!-- 子流程数据卡片 -->
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="data-panel subprocess-panel clickable" @click="goToSubProcessManagement">
             <div class="card-header">
               <i class="el-icon-s-operation"></i>
@@ -67,7 +98,7 @@
         </el-col>
         
         <!-- 规划完成时间数据卡片 -->
-        <el-col :span="8">
+        <el-col :span="6">
           <div class="data-panel prediction-panel clickable" @click="goToPlanningTime">
             <div class="card-header">
               <i class="el-icon-stopwatch"></i>
@@ -225,11 +256,14 @@
     
     <!-- 底部按钮区域 -->
     <div class="action-footer">
+      <el-button type="success" size="large" icon="el-icon-connection" @click="handleAIDataCollection">
+        大模型联网收集信息
+      </el-button>
       <el-button type="primary" size="large" icon="el-icon-refresh" @click="handleManualAnalysis">
         手动分析重构时机
       </el-button>
-      <el-button size="large" icon="el-icon-document" @click="exportAnalysisReport">
-        导出分析报告
+      <el-button size="large" icon="el-icon-view" @click="showModelOutput">
+        显示模型输出
       </el-button>
     </div>
 
@@ -239,6 +273,27 @@
       :risk-data="riskData"
       @view-details="goToRiskMonitoring"
       @close="handleCloseRiskDialog" />
+      
+    <!-- 模型输出弹窗 -->
+    <el-dialog
+      title="流程智能分析报告"
+      :visible.sync="modelOutputDialogVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="85%"
+      class="model-output-dialog"
+      @close="stopAnimation"
+    >
+      <div class="model-output-content">
+        <pre class="output-text">{{ displayedContent }}</pre>
+        <div v-if="isAnimating" class="typing-cursor">|</div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">关闭</el-button>
+        <el-button type="primary" @click="copyToClipboard" :disabled="isAnimating">复制到剪贴板</el-button>
+        <el-button v-if="isAnimating" type="warning" @click="skipAnimation">跳过动画</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -269,11 +324,102 @@ export default {
       analysisResults: moment1Data.analysisResults,
       recommendations: moment1Data.recommendations,
       overallRecommendation: moment1Data.overallRecommendation,
+      // 大模型联网状态
+      aiCollectionStatus: {
+        enabled: false,
+        lastCollectionTime: '未收集',
+        collectedSources: 0,
+        dataFreshness: '需要更新'
+      },
       // 弹窗相关
-      riskDialogVisible: false
+      riskDialogVisible: false,
+      modelOutputDialogVisible: false,
+      displayedContent: '',
+      isAnimating: false,
+      animationTimer: null,
+      contentLines: [],
+      modelOutputContent: `==================== 流程智能分析报告 ====================  
+当前待执行流程：弹性资源规划 ➜ 预测性补给模型 ➜ 需求波动预测 ➜ 贝叶斯网络建模 ➜ 安全库存计算 ➜ 补给路径仿真 ➜ 动态补给路线  
+流程实例 ID      ：proc_run_20250701_XYZ123
+
+📌 一、外部环境智能感知（大模型实时检索）
+🔍 关联新闻事件（影响需求波动预测节点）：
+• [BBC] 红海航运危机持续（2024-07-01）：全球30%集装箱船改道好望角，亚欧航线补给周期延长12-15天
+• [Reuters] 中国制造业PMI超预期回升至51.8（2024-06-30），原材料进口需求激增
+• [Al Jazeera] 中东地缘政治紧张升级，原油价格单周上涨8%（影响路径仿真燃料成本）
+
+📊 关键市场指标（影响安全库存计算）：
+┌──────────┬────────────┬──────────┬────────────┐
+│ 数据源 │ 指标 │ 当前值 │ 72h波动率 │
+├──────────┼────────────┼──────────┼────────────┤
+│ NYSE │ 零售业ETF(XRT) │ $78.42 │ +3.2% ▲ │
+│ LME │ 铜期货价格 │ $9,842/吨 │ +5.7% ▲ │
+│ Forex │ 美元指数(DXY) │ 104.85 │ -0.8% ▼ │
+│ Oil │ 布伦特原油 │ $89.12/桶 │ +8.1% ▲ │
+└──────────┴────────────┴──────────┴────────────┘
+
+📌 二、相似历史流程检索（基于路径、上下文变量、风险因子向量）  
+┌────┬──────────────────────────┬──────────────┬──────────┬────────────┐  
+│Rank│ 历史流程 ID               │ 路径匹配度   │ 风险向量相似度 │ 综合相似度 │  
+├────┼──────────────────────────┼──────────────┼──────────┼────────────┤  
+│ 1  │ proc_run_20250628_0f3925 │   0.95       │  0.91    │  0.93 ★    │  
+│ 2  │ proc_run_20250628_144c4a │   0.95       │  0.79    │  0.87      │  
+│ 3  │ proc_run_20250628_ce6dce │   0.95       │  0.76    │  0.85      │  
+└────┴──────────────────────────┴──────────────┴──────────┴────────────┘  
+（★ 作为最相似参考流程）
+
+★ 参考流程总耗时：2 249 s（≈ 37 min 29 s）  
+
+📌 三、节点级风险评估 & 耗时预测  
+┌────┬────────────────┬──────────────┬──────────────────────────────┬────────────┐  
+│序号│ 节点名称         │ 主要风险因子 │ 风险得分 (0-1)              │ 预测耗时(s) │  
+├────┼────────────────┼──────────────┼──────────────────────────────┼────────────┤  
+│ 1  │ 弹性资源规划     │ risk_02_cpu_pressure=0.62                │      260 │  
+│ 2  │ 预测性补给模型   │ risk_06_config_drift=0.41                │      380 │  
+│ 3  │ 需求波动预测     │ risk_07_source_api_latency=0.85, …       │      560 │  
+│ 4  │ 贝叶斯网络建模   │ （低风险）                               │      490 │  
+│ 5  │ 安全库存计算     │ risk_01_high_data_volume=0.48            │      300 │  
+│ 6  │ 补给路径仿真     │ risk_03_memory_leak=0.70                 │      120 │  
+│ 7  │ 动态补给路线     │ risk_05_network_latency=0.55             │      240 │  
+└────┴────────────────┴──────────────┴──────────────────────────────┴────────────┘  
+
+📌 四、流程总耗时预测  
+• 节点耗时合计（风险加权）： 2 350 s  
+• 统计置信区间 (95% CI)： 2 200 s  –  2 500 s  
+• 相对最相似历史流程差异： +101 s (+4.5 %)
+
+===========================================================  
+⚠️ 建议  
+1. 对 "需求波动预测" 节点（风险值最高 0.85）提前准备备用计算资源。  
+2. 若"补给路径仿真" 出现持续内存泄漏，可考虑拆分子任务或采用动态扩缩容。  
+3. 当总耗时超过 2 500 s 时触发告警并重评资源分配策略。`
     }
   },
+  mounted() {
+    this.checkAICollectionStatus();
+  },
+  activated() {
+    // 页面激活时检查AI收集状态
+    this.checkAICollectionStatus();
+  },
+  beforeDestroy() {
+    // 清理定时器
+    this.stopAnimation();
+  },
   methods: {
+    // 检查AI收集状态
+    checkAICollectionStatus() {
+      const aiData = localStorage.getItem('aiCollectionData');
+      if (aiData) {
+        const data = JSON.parse(aiData);
+        this.aiCollectionStatus = {
+          enabled: true,
+          lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
+          collectedSources: data.collectedSources || 0,
+          dataFreshness: '最新'
+        };
+      }
+    },
     // 显示风险弹窗
     showRiskDialog() {
       this.riskDialogVisible = true;
@@ -292,6 +438,10 @@ export default {
     // 跳转到流程重构优化页面
     goToProcessOptimization() {
       this.$router.push('/home/process-optimization');
+    },
+    // 大模型联网收集信息
+    handleAIDataCollection() {
+      this.$router.push('/home/ai-data-collection');
     },
     handleManualAnalysis() {
       this.$message({
@@ -327,13 +477,90 @@ export default {
           message: '重构时机分析完成',
           type: 'success'
         });
-      }, 2000);
+      }, 1000);
     },
-    exportAnalysisReport() {
+    // 显示模型输出
+    showModelOutput() {
+      this.modelOutputDialogVisible = true;
+      this.displayedContent = '';
+      this.isAnimating = true;
+      
+      // 将内容按行分割
+      this.contentLines = this.modelOutputContent.split('\n');
+      
+      // 开始逐行显示动画
+      this.startAnimation();
+    },
+    // 开始逐行显示动画
+    startAnimation() {
+      let currentLine = 0;
+      this.displayedContent = '';
+      
+      this.animationTimer = setInterval(() => {
+        if (currentLine < this.contentLines.length) {
+          // 添加当前行
+          if (currentLine === 0) {
+            this.displayedContent = this.contentLines[currentLine];
+          } else {
+            this.displayedContent += '\n' + this.contentLines[currentLine];
+          }
+          currentLine++;
+        } else {
+          // 动画完成
+          this.stopAnimation();
+        }
+      }, 150); // 每150毫秒显示一行
+    },
+    // 停止动画
+    stopAnimation() {
+      if (this.animationTimer) {
+        clearInterval(this.animationTimer);
+        this.animationTimer = null;
+      }
+      this.isAnimating = false;
+      this.displayedContent = this.modelOutputContent; // 确保显示完整内容
+    },
+    // 跳过动画
+    skipAnimation() {
+      this.stopAnimation();
+    },
+    // 关闭弹窗
+    closeDialog() {
+      this.stopAnimation();
+      this.modelOutputDialogVisible = false;
+    },
+    // 复制到剪贴板
+    copyToClipboard() {
+      if (this.isAnimating) {
       this.$message({
-        message: '分析报告已导出',
+          message: '请等待动画完成后再复制',
+          type: 'warning'
+        });
+        return;
+      }
+      
+      // 创建临时textarea元素
+      const textarea = document.createElement('textarea');
+      textarea.value = this.modelOutputContent;
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        // 复制到剪贴板
+        document.execCommand('copy');
+        this.$message({
+          message: '模型输出已复制到剪贴板',
         type: 'success'
       });
+      } catch (err) {
+        this.$message({
+          message: '复制失败，请手动复制',
+          type: 'error'
+        });
+      } finally {
+        // 移除临时元素
+        document.body.removeChild(textarea);
+      }
     },
     // 跳转到规划完成时间页面
     goToPlanningTime() {
@@ -385,6 +612,10 @@ export default {
 
 .prediction-panel {
   border-left-color: #E6A23C;
+}
+
+.ai-status-panel {
+  border-left-color: #67C23A;
 }
 
 .card-header {
@@ -461,6 +692,22 @@ export default {
 
 .prediction-panel .card-header i {
   color: #E6A23C;
+}
+
+.ai-status-panel .card-header i {
+  color: #67C23A;
+}
+
+.ai-status-panel .main-value {
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ai-status-panel .main-value .el-tag {
+  font-size: 16px;
+  padding: 8px 16px;
 }
 
 .content-area {
@@ -762,6 +1009,65 @@ export default {
   text-align: center;
   padding: 20px 0;
   border-top: 1px dashed #DCDFE6;
+}
+
+/* 模型输出弹窗样式 */
+.model-output-dialog .el-dialog__body {
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.model-output-content {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+
+.output-text {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2c3e50;
+  margin: 0;
+  padding: 25px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow-x: auto;
+  min-height: 400px;
+}
+
+.dialog-footer {
+  text-align: right;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.dialog-footer .el-button {
+  margin-left: 10px;
+}
+
+/* 打字机光标样式 */
+.typing-cursor {
+  display: inline-block;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 16px;
+  color: #409EFF;
+  font-weight: bold;
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
 }
 
 

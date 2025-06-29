@@ -2,6 +2,151 @@
 
 // 时刻1数据
 export const moment1Data = {
+  // 风险数据 - 风险较少
+  riskData: {
+    totalRisks: 12,
+    highRisks: 1,
+    mediumRisks: 4,
+    lowRisks: 7,
+    // 时刻1的风险事项列表 - 风险较少且等级较低
+    riskDetails: [
+      {
+        id: 'R001',
+        name: '供应商备件库存不足',
+        level: 'high',
+        type: '采购风险',
+        description: '部分备件供应商库存水平偏低，需要关注补充',
+        impact: '可能影响设备维护时效，预计影响轻微',
+        probability: '45%',
+        detectionTime: '2024-01-18 09:15',
+        responsibleDept: '采购部',
+        status: '已制定补充计划'
+      },
+      {
+        id: 'R002',
+        name: '市场竞争加剧',
+        level: 'medium',
+        type: '营销风险',
+        description: '竞争对手推出新产品，市场竞争程度有所加剧',
+        impact: '可能影响市场份额，需要关注产品竞争力',
+        probability: '55%',
+        detectionTime: '2024-01-17 14:30',
+        responsibleDept: '市场部',
+        status: '制定应对策略'
+      },
+      {
+        id: 'R003',
+        name: '运维人员技能更新需求',
+        level: 'medium',
+        type: '运维风险',
+        description: '随着设备智能化升级，运维人员需要技能培训',
+        impact: '短期内可能影响运维效率，需要培训支持',
+        probability: '60%',
+        detectionTime: '2024-01-16 11:20',
+        responsibleDept: '人力资源部',
+        status: '安排培训计划'
+      },
+      {
+        id: 'R004',
+        name: '季节性需求波动',
+        level: 'medium',
+        type: '生产风险',
+        description: '预计下季度订单可能出现季节性波动',
+        impact: '需要调整生产计划以适应需求变化',
+        probability: '50%',
+        detectionTime: '2024-01-15 16:00',
+        responsibleDept: '生产计划部',
+        status: '制定弹性生产方案'
+      },
+      {
+        id: 'R005',
+        name: '新产品研发进度',
+        level: 'low',
+        type: '研发风险',
+        description: '新产品研发项目进度正常，需要定期跟踪',
+        impact: '进度正常，按计划推进即可',
+        probability: '30%',
+        detectionTime: '2024-01-14 10:45',
+        responsibleDept: '研发部',
+        status: '正常跟踪'
+      }
+    ]
+  },
+  
+  // 子流程数据 - 数量合理
+  subprocessData: {
+    totalSubprocesses: 28,
+    operationCount: 7,
+    purchaseCount: 6,
+    productionCount: 9,
+    marketingCount: 6
+  },
+  
+  // 预测运行时间数据 - 优化后的数据
+  predictionData: {
+    planTime: 268,
+    actualTime: 264.71,
+    schemeA: {
+      time: 262.84,
+      error: "-0.78%"
+    },
+    schemeB: {
+      time: 263.14,
+      error: "-0.67%"  
+    },
+    schemeC: {
+      time: 306.31,
+      error: "15.63%"
+    }
+  },
+
+  // 模型运行状态 - 状态良好
+  modelStatus: {
+    isRunning: true,
+    runningTime: "8小时15分钟",
+    cpuUsage: 42,
+    memoryUsage: "3.1GB / 8GB",
+    processingSpeed: "168流程/秒"
+  },
+
+  // 分析结果 - 无需重构
+  analysisResults: {
+    refactorNecessity: 25,
+    recommendedPriority: 22,
+    resourceRequirement: 30,
+    implementationDifficulty: 45
+  },
+
+  // 重构建议 - 只有小优化
+  recommendations: [
+    {
+      priority: "建议",
+      type: "info",
+      content: "定期检查采购流程性能"
+    },
+    {
+      priority: "建议",
+      type: "info",
+      content: "优化资源分配策略"
+    },
+    {
+      priority: "可选",
+      type: "success",
+      content: "文档更新与维护"
+    },
+    {
+      priority: "可选",
+      type: "success",
+      content: "考虑增加新业务场景支持"
+    }
+  ],
+
+  // 总体建议 - 系统状态良好
+  overallRecommendation: "当前流程运行良好，各指标均在正常范围内。暂不需要进行重构，可考虑针对性能和维护性进行小幅优化。建议6个月后重新评估。"
+};
+
+// 时刻2数据 - 系统状态良好
+export const moment2Data = {
   // 风险数据
   riskData: {
     totalRisks: 24,
@@ -189,151 +334,6 @@ export const moment1Data = {
 
   // 总体建议
   overallRecommendation: "当前流程存在明显优化空间，建议在3个月内完成重构。优先解决采购流程人员风险管控和供应链多元化问题，引入AI智能分析提升故障处理效率，加强政策合规检查机制。预计重构后可提升整体效率35%，降低风险事件发生率40%。"
-};
-
-// 时刻2数据 - 系统状态良好
-export const moment2Data = {
-  // 风险数据 - 风险较少
-  riskData: {
-    totalRisks: 12,
-    highRisks: 1,
-    mediumRisks: 4,
-    lowRisks: 7,
-    // 时刻2的风险事项列表 - 风险较少且等级较低
-    riskDetails: [
-      {
-        id: 'R001',
-        name: '供应商备件库存不足',
-        level: 'high',
-        type: '采购风险',
-        description: '部分备件供应商库存水平偏低，需要关注补充',
-        impact: '可能影响设备维护时效，预计影响轻微',
-        probability: '45%',
-        detectionTime: '2024-01-18 09:15',
-        responsibleDept: '采购部',
-        status: '已制定补充计划'
-      },
-      {
-        id: 'R002',
-        name: '市场竞争加剧',
-        level: 'medium',
-        type: '营销风险',
-        description: '竞争对手推出新产品，市场竞争程度有所加剧',
-        impact: '可能影响市场份额，需要关注产品竞争力',
-        probability: '55%',
-        detectionTime: '2024-01-17 14:30',
-        responsibleDept: '市场部',
-        status: '制定应对策略'
-      },
-      {
-        id: 'R003',
-        name: '运维人员技能更新需求',
-        level: 'medium',
-        type: '运维风险',
-        description: '随着设备智能化升级，运维人员需要技能培训',
-        impact: '短期内可能影响运维效率，需要培训支持',
-        probability: '60%',
-        detectionTime: '2024-01-16 11:20',
-        responsibleDept: '人力资源部',
-        status: '安排培训计划'
-      },
-      {
-        id: 'R004',
-        name: '季节性需求波动',
-        level: 'medium',
-        type: '生产风险',
-        description: '预计下季度订单可能出现季节性波动',
-        impact: '需要调整生产计划以适应需求变化',
-        probability: '50%',
-        detectionTime: '2024-01-15 16:00',
-        responsibleDept: '生产计划部',
-        status: '制定弹性生产方案'
-      },
-      {
-        id: 'R005',
-        name: '新产品研发进度',
-        level: 'low',
-        type: '研发风险',
-        description: '新产品研发项目进度正常，需要定期跟踪',
-        impact: '进度正常，按计划推进即可',
-        probability: '30%',
-        detectionTime: '2024-01-14 10:45',
-        responsibleDept: '研发部',
-        status: '正常跟踪'
-      }
-    ]
-  },
-  
-  // 子流程数据 - 数量合理
-  subprocessData: {
-    totalSubprocesses: 28,
-    operationCount: 7,
-    purchaseCount: 6,
-    productionCount: 9,
-    marketingCount: 6
-  },
-  
-  // 预测运行时间数据 - 优化后的数据
-  predictionData: {
-    planTime: 268,
-    actualTime: 264.71,
-    schemeA: {
-      time: 262.84,
-      error: "-0.78%"
-    },
-    schemeB: {
-      time: 263.14,
-      error: "-0.67%"  
-    },
-    schemeC: {
-      time: 306.31,
-      error: "15.63%"
-    }
-  },
-
-  // 模型运行状态 - 状态良好
-  modelStatus: {
-    isRunning: true,
-    runningTime: "8小时15分钟",
-    cpuUsage: 42,
-    memoryUsage: "3.1GB / 8GB",
-    processingSpeed: "168流程/秒"
-  },
-
-  // 分析结果 - 无需重构
-  analysisResults: {
-    refactorNecessity: 25,
-    recommendedPriority: 22,
-    resourceRequirement: 30,
-    implementationDifficulty: 45
-  },
-
-  // 重构建议 - 只有小优化
-  recommendations: [
-    {
-      priority: "建议",
-      type: "info",
-      content: "定期检查采购流程性能"
-    },
-    {
-      priority: "建议",
-      type: "info",
-      content: "优化资源分配策略"
-    },
-    {
-      priority: "可选",
-      type: "success",
-      content: "文档更新与维护"
-    },
-    {
-      priority: "可选",
-      type: "success",
-      content: "考虑增加新业务场景支持"
-    }
-  ],
-
-  // 总体建议 - 系统状态良好
-  overallRecommendation: "当前流程运行良好，各指标均在正常范围内。暂不需要进行重构，可考虑针对性能和维护性进行小幅优化。建议6个月后重新评估。"
 };
 
 // 导出默认当前数据

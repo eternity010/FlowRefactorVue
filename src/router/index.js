@@ -10,6 +10,8 @@ import NodeDetailView from '../views/NodeDetailView.vue'
 import RefactorTimingView from '@/views/RefactorTimingView'
 import ProcessOptimizationView from '@/views/ProcessOptimizationView'
 import PlanningTimeView from '@/views/PlanningTimeView'
+import AIDataCollectionView from '@/views/AIDataCollectionView'
+import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 
 Vue.use(Router)
 
@@ -63,6 +65,16 @@ export default new Router({
           path: 'planning-time',
           name: 'PlanningTimeView',
           component: PlanningTimeView
+        },
+        {
+          path: 'ai-data-collection',
+          name: 'AIDataCollectionView',
+          component: AIDataCollectionView
+        },
+        {
+          path: 'neural-network-settings',
+          name: 'NeuralNetworkSettingsView',
+          component: NeuralNetworkSettingsView
         }
       ]
     },

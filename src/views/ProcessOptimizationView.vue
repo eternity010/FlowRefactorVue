@@ -2,18 +2,8 @@
   <div class="process-optimization-container">
     <!-- 前置页面 -->
     <div v-if="!showMainContent && !showLoading" class="pre-page">
-      <!-- 数据加载状态提示 -->
-      <div v-if="dataLoading" class="data-loading-indicator">
-        <el-card class="loading-indicator-card">
-          <div class="loading-indicator-content">
-            <i class="el-icon-loading" style="font-size: 24px; color: #409EFF;"></i>
-            <p>正在加载流程优化数据...</p>
-          </div>
-        </el-card>
-      </div>
-
       <!-- 数据加载错误提示 -->
-      <div v-if="dataError && !dataLoading" class="data-error-indicator">
+      <div v-if="dataError" class="data-error-indicator">
         <el-card class="error-indicator-card">
           <div class="error-indicator-content">
             <i class="el-icon-warning" style="font-size: 24px; color: #F56C6C;"></i>
@@ -26,7 +16,7 @@
       </div>
 
       <!-- 主要操作卡片 -->
-      <el-card class="pre-card" :class="{ 'disabled': dataLoading || dataError }">
+      <el-card class="pre-card" :class="{ 'disabled': dataError }">
         <div slot="header" class="pre-card-header">
           <span>流程重构优化系统</span>
           <el-tag size="small" type="primary">版本 1.0</el-tag>
@@ -34,17 +24,50 @@
         <div class="pre-content">
           <h2 class="pre-title">流程重构优化系统</h2>
           <p class="pre-description">点击下方按钮开始流程重构分析</p>
-          <el-button 
-            type="primary" 
-            size="large"
-            @click="startRefactoring"
-            :disabled="dataLoading || dataError || Object.keys(optPoints).length === 0"
-            class="refactor-button">
-            <span v-if="dataLoading">数据加载中...</span>
-            <span v-else-if="dataError">数据加载失败</span>
-            <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
-            <span v-else>点击重构</span>
-          </el-button>
+          
+          <div class="action-buttons">
+            <el-button 
+              type="primary" 
+              size="large"
+              @click="startRefactoring"
+              :disabled="dataError || Object.keys(optPoints).length === 0"
+              class="refactor-button">
+              <i class="el-icon-cpu"></i>
+              <span v-if="dataError">数据加载失败</span>
+              <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
+              <span v-else>开始重构分析</span>
+            </el-button>
+            
+            <el-button 
+              type="warning" 
+              size="medium"
+              @click="showNeuralNetworkSettings"
+              class="settings-button">
+              <i class="el-icon-setting"></i>
+              设置神经网络参数
+            </el-button>
+          </div>
+          
+          <div class="parameter-summary" v-if="showParameterSummary">
+            <el-alert
+              title="当前神经网络参数配置"
+              type="info"
+              :closable="false"
+              show-icon>
+              <template slot="title">
+                <span style="font-size: 14px; font-weight: bold;">当前神经网络参数配置</span>
+              </template>
+              <div class="param-summary-content">
+                <span class="param-item">地缘政治影响: {{ neuralNetworkParams.geoPoliticalWeight }}</span>
+                <span class="param-item">价格波动敏感度: {{ neuralNetworkParams.marketVolatilityFactor }}</span>
+                <span class="param-item">备用供应商覆盖: {{ (neuralNetworkParams.backupSupplierRatio * 100).toFixed(0) }}%</span>
+                <span class="param-item">路径重评估: {{ neuralNetworkParams.routeReevalFrequency }}天</span>
+                <span class="param-item">成本延误权衡: {{ neuralNetworkParams.costDelayTradeoff }}</span>
+                <span class="param-item">节拍波动容忍: ±{{ (neuralNetworkParams.taktTimeVariance * 100).toFixed(0) }}%</span>
+                <span class="param-item">加班时长上限: {{ neuralNetworkParams.overtimeCostCap }}小时/月</span>
+              </div>
+            </el-alert>
+          </div>
         </div>
       </el-card>
 
@@ -236,7 +259,17 @@ export default {
       currentOptimizationKey: null,
       dataLoading: false, // API数据加载状态
       dataError: null, // API数据加载错误
-      selectedSolution: null
+      selectedSolution: null,
+      neuralNetworkParams: {
+        geoPoliticalWeight: 1.0,
+        marketVolatilityFactor: 0.8,
+        backupSupplierRatio: 0.3,
+        routeReevalFrequency: 7,
+        costDelayTradeoff: 1.2,
+        taktTimeVariance: 0.05,
+        overtimeCostCap: 200
+      },
+      showParameterSummary: false
     }
   },
 
@@ -273,9 +306,26 @@ export default {
     await this.loadOptimizationData();
     // 设置默认方案为平衡方案
     this.selectedSolution = 'balanced';
+    // 加载已保存的神经网络参数
+    this.loadNeuralNetworkParams();
   },
 
   methods: {
+    // 加载神经网络参数
+    loadNeuralNetworkParams() {
+      const savedParams = localStorage.getItem('neuralNetworkParams');
+      if (savedParams) {
+        try {
+          const params = JSON.parse(savedParams);
+          this.neuralNetworkParams = { ...this.neuralNetworkParams, ...params };
+          this.showParameterSummary = true;
+          console.log('已加载保存的神经网络参数:', this.neuralNetworkParams);
+        } catch (error) {
+          console.error('加载神经网络参数失败:', error);
+        }
+      }
+    },
+
     // 新增：加载优化数据的方法
     async loadOptimizationData() {
       this.dataLoading = true;
@@ -336,7 +386,7 @@ export default {
       setTimeout(() => {
         this.showLoading = false;
         this.showMainContent = true;
-      }, 5000); // 3秒加载时间
+      }, 1000);
     },
 
     async acceptChange(optimizationKey) {
@@ -441,6 +491,49 @@ export default {
         return this.optPoints[key].after2;
       }
       return this.optPoints[key].before;
+    },
+
+    // 神经网络参数处理方法
+    handleParameterChange(params) {
+      // 实时更新参数
+      this.neuralNetworkParams = { ...this.neuralNetworkParams, ...params };
+      console.log('神经网络参数更新:', this.neuralNetworkParams);
+    },
+
+    handleApplySettings(params) {
+      // 应用参数设置
+      this.neuralNetworkParams = { ...this.neuralNetworkParams, ...params };
+      console.log('应用神经网络参数:', params);
+      console.log('当前所有参数:', this.neuralNetworkParams);
+      
+      // 显示参数摘要
+      this.showParameterSummary = true;
+      
+      // 这里可以添加实际应用参数的逻辑
+      // 比如重新加载数据、重新分析等
+      
+      // 显示参数设置摘要
+      const paramSummary = [
+        `地缘政治影响: ${params.geoPoliticalWeight}`,
+        `价格波动敏感度: ${params.marketVolatilityFactor}`,
+        `备用供应商覆盖: ${(params.backupSupplierRatio * 100).toFixed(0)}%`,
+        `路径重评估: ${params.routeReevalFrequency}天`,
+        `成本延误权衡: ${params.costDelayTradeoff}`,
+        `节拍波动容忍: ±${(params.taktTimeVariance * 100).toFixed(0)}%`,
+        `加班时长上限: ${params.overtimeCostCap}小时/月`
+      ].join('；');
+      
+      this.$message.success({
+        message: `神经网络参数已全部应用：${paramSummary}`,
+        duration: 6000,
+        showClose: true
+      });
+    },
+
+    // 显示神经网络设置
+    showNeuralNetworkSettings() {
+      // 跳转到神经网络参数设置页面
+      this.$router.push('/home/neural-network-settings');
     }
   }
 }
@@ -462,18 +555,15 @@ export default {
 }
 
 /* 数据加载状态样式 */
-.data-loading-indicator,
 .data-error-indicator {
   width: 100%;
   max-width: 500px;
 }
 
-.loading-indicator-card,
 .error-indicator-card {
   text-align: center;
 }
 
-.loading-indicator-content,
 .error-indicator-content {
   padding: 20px;
   display: flex;
@@ -482,14 +572,9 @@ export default {
   gap: 15px;
 }
 
-.loading-indicator-content p,
 .error-indicator-content p {
   margin: 0;
   font-size: 14px;
-  color: #606266;
-}
-
-.error-indicator-content p {
   color: #F56C6C;
 }
 
@@ -531,17 +616,111 @@ export default {
   line-height: 1.6;
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin: 30px 0;
+}
+
 .refactor-button {
   padding: 15px 40px;
   font-size: 18px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
   transition: all 0.3s ease;
+  min-width: 220px;
 }
 
 .refactor-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+.refactor-button i {
+  margin-right: 8px;
+}
+
+.settings-button {
+  padding: 10px 25px;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(230, 162, 60, 0.3);
+  transition: all 0.3s ease;
+  min-width: 180px;
+}
+
+.settings-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(230, 162, 60, 0.4);
+}
+
+.settings-button i {
+  margin-right: 6px;
+}
+
+.parameter-summary {
+  margin-top: 25px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.param-summary-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  padding: 0;
+}
+
+.param-item {
+  font-size: 12px;
+  color: #606266;
+  background-color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 3px solid #409EFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    gap: 10px;
+  }
+  
+  .refactor-button {
+    padding: 12px 30px;
+    font-size: 16px;
+    min-width: 180px;
+  }
+  
+  .settings-button {
+    padding: 8px 20px;
+    font-size: 13px;
+    min-width: 150px;
+  }
+  
+  .param-summary-content {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .param-item {
+    font-size: 11px;
+  }
 }
 
 /* 加载动画页面样式 */
