@@ -8,6 +8,7 @@ const processOptimizationFlowData = {
     before: `graph TD\nA((开始)) --> B[接收部门需求]\nB --> C[需求分析整理]\nC --> D[预算审核]\nD -->|不通过| E[预算调整]\nE --> C\nD -->|通过| F[生成采购申请]\nF --> G((结束))`,
     after: `graph TD\nA((开始)) --> B[接收部门需求]\nB --> H[人员状态检查]\nH --> I{审核人员是否充足}\nI -->|人员不足| J[启动应急预案]\nJ --> K[人员调动] & L[紧急招聘]\nK --> M[快速培训]\nL --> N[新员工培训]\nM --> S[人员到位确认]\nN --> S\nS --> C[需求分析整理]\nI -->|人员充足| C\nC --> O[预算审核]\nO -->|不通过| P[预算调整]\nP --> C\nO -->|通过| Q[生成采购申请]\nQ --> R((结束))`,
     after2: `graph TD\nA((开始)) --> B[接收部门需求]\nB --> H[人员状态检查]\nH --> I{当前人员是否可用}\nI -->|人员不足| J[指定备用人员]\nJ --> C[需求分析整理]\nI -->|人员充足| C\nC --> D[预算审核+风险备注]\nD -->|不通过| E[预算调整]\nE --> C\nD -->|通过| F[生成采购申请]\nF --> G((结束))`,
+    llm: `graph TD\nA((开始)) --> B[接收部门需求]\nB --> H[人员状态智能检测]\nH --> I{人员可用性检查}\nI -->|主责人员可用| C[需求分析整理]\nI -->|人员不足| J[自动触发应急协议]\nJ --> K[内部人员调度] & L[外包资源调用]\nK & L --> M[快速上岗验证]\nM --> C\n\nC --> D[预算审核]\nD -->|不通过| E[预算调整]\nE --> C\nD -->|通过| F[生成采购申请]\nF --> G((结束))\n\nclassDef risk fill:#f9e3d3,stroke:#f66;\nclass J,K,L risk;`,
     // 资源变化分析
     resourceChanges: {
       // 总体变化概览
@@ -234,6 +235,7 @@ const processOptimizationFlowData = {
     before: `graph TD\n  A((开始)) --> B[供应商调研]\n  B --> C[初步筛选]\n  C --> D[供应商评估]\n  D --> E{合格评审}\n  E -->|通过| F[供应商入库]\n  E -->|不通过| G[供应商淘汰]\n  F --> H((结束))\n  G --> H`,
     after: `graph TD\n  A((开始)) --> B[关税风险评估]\n  B --> C{是否涉及美国供应商}\n  C -->|是| D[启动应急方案]\n  C -->|否| E[常规流程]\n  D --> F[多国供应商并行评估]\n  F --> G[东南亚供应商] & H[欧洲供应商] & I[本土供应商]\n  G --> J[综合评分]\n  H --> J\n  I --> J\n  J --> K{最优方案}\n  K -->|关税豁免| L[申请贸易救济]\n  K -->|替代方案| M[签订长期协议]\n  L --> N[海关备案]\n  M --> N\n  N --> O[建立安全库存]\n  O --> P((结束))`,
     after2: `graph TD\n  A((开始)) --> B[供应商调研]\n  B --> C[关税风险检查]\n  C --> D{是否涉及高风险区域}\n  D -->|是| E[寻找替代供应商]\n  D -->|否| F[初步筛选]\n  E --> G[简化评估]\n  F --> G\n  G --> H{合格评审}\n  H -->|通过| I[供应商入库]\n  H -->|不通过| J[供应商淘汰]\n  I --> K[建立基础库存]\n  K --> L((结束))\n  J --> L`,
+    llm: `graph TD\n    A((开始)) --> B[供应商国别识别]\n    B --> C{是否涉及美国供应?}\n    C -->|是| D[关税战专项评估]\n    C -->|否| E[常规评估流程]\n    \n    D --> F[实时关税查询]\n    F --> G[成本敏感性分析]\n    G --> H{成本波动>阈值?}\n    H -->|是| I[启动B计划]\n    H -->|否| E\n    \n    I --> J[替代供应商快速认证]\n    J --> K[建立缓冲库存]\n    K --> E\n    \n    E --> L[供应商能力评估]\n    L --> M{合格评审}\n    M -->|通过| N[弹性分级入库]\n    M -->|不通过| O[淘汰+替代源标记]\n    \n    N --> P((结束))\n    O --> B\n    \n    classDef us path fill:#ffcdd2,stroke:#d32f2f;\n    classDef normal path fill:#e8f5e9,stroke:#388e3c;\n    class D,F,G,H,I,J,K us;\n    class E,L,M,N,O normal;`,  
     // 资源变化分析
     resourceChanges: {
       // 总体变化概览
@@ -463,6 +465,7 @@ const processOptimizationFlowData = {
     before: `graph TD\nA((开始)) --> B[报警接收]\nB --> C[人工分析]\nC --> D{紧急程度}\nD -->|紧急| E[紧急处理]\nD -->|一般| F[常规处理]\nE --> G[故障排除]\nF --> G\nG --> H[报警记录]\nH --> I((结束))`,
     after: `graph TD\nA((开始)) --> B[报警接收]\nB --> C[人工分析] & D[AI智能分析]\nC --> E{紧急程度}\nD --> E\nE -->|紧急| F[自动启动应急] & G[通知专家]\nE -->|一般| H[智能派单]\nF --> I[快速故障排除]\nG --> I\nH --> I\nI --> J[自动记录] & K[经验学习]\nJ --> L((结束))\nK --> L`,
     after2: `graph TD\nA((开始)) --> B[报警接收]\nB --> C[人工分析]\nC --> D[AI辅助判断]\nD --> E{紧急程度}\nE -->|紧急| F[优先处理]\nE -->|一般| G[常规处理]\nF --> H[快速故障排除]\nG --> H\nH --> I[自动记录]\nI --> J((结束))`,
+    llm: `graph TD\nA((开始)) --> B[报警接收]\nB --> C[AI实时预分析]\nC --> D{AI置信度>90%?}\nD -->|是| E[自动分类]\nD -->|否| F[人工复核]\n\nE --> G{紧急程度}\nG -->|紧急| H[AI紧急处理]\nG -->|一般| I[AI常规处理]\n\nF --> J[专家会诊模式]\nJ --> K[双重确认]\nK --> G\n\nH & I --> L[执行处置]\nL --> M[结果反馈至AI]\nM --> N[报警记录+学习]\nN --> O((结束))\n\nclassDef ai fill:#e3f2fd,stroke:#2196f3;\nclassDef human fill:#fff8e1,stroke:#ffc107;\nclass C,D,E,G,H,I ai;\nclass F,J,K human;`,
     // 资源变化分析
     resourceChanges: {
       // 总体变化概览
@@ -685,6 +688,7 @@ const processOptimizationFlowData = {
     before: `graph TD\nA((开始)) --> B[需求接收]\nB --> C[需求分析]\nC --> D[可行性评估]\nD --> E{是否可行}\nE -->|否| F[需求反馈]\nF --> G((结束))\nE -->|是| H[制定整改方案]\nH --> I[执行整改]\nI --> G`,
     after: `graph TD\nA((开始)) --> B[需求接收]\nB --> C[政策影响评估]\nC --> D[需求分析] & E[政策合规检查]\nD --> F[可行性评估]\nE --> G[风险评估]\nF --> H{技术可行}\nG --> I{政策合规}\nH -->|否| J[需求反馈]\nI -->|不合规| K[政策调整建议]\nH -->|是| L{政策影响}\nI -->|合规| L\nL -->|重大影响| M[制定政策适应方案]\nL -->|轻微影响| N[制定标准整改方案]\nM --> O[执行政策适应整改]\nN --> P[执行标准整改]\nO --> Q[政策合规验收]\nP --> R[质量验收]\nQ --> S((结束))\nR --> S\nJ --> S\nK --> S`,
     after2: `graph TD\nA((开始)) --> B[需求接收]\nB --> C[基础政策检查]\nC --> D[需求分析]\nD --> E[可行性评估]\nE --> F{是否可行}\nF -->|否| G[需求反馈]\nF -->|是| H[制定整改方案]\nH --> I{政策影响检查}\nI -->|需要调整| J[方案调整]\nJ --> K[执行整改]\nI -->|无需调整| K\nK --> L[简单验收]\nL --> M((结束))\nG --> M`,
+    llm: `graph TD\nA((开始)) --> B[需求接收]\nB --> C[政策扫描引擎]\nC --> D[需求合规预检]\nD --> E{基础合规?}\nE -->|否| F[即时驳回]\nE -->|是| G[深度需求分析]\n\nG --> H[可行性评估]\nH --> I{技术可行?}\nI -->|否| J[需求反馈]\nI -->|是| K[政策风险评估]\n\nK --> L{政策风险等级}\nL -->|高风险| M[制定规避方案]\nL -->|中风险| N[增加补偿措施]\nL -->|低风险| O[标准整改方案]\n\nM & N & O --> P[合规审查会签]\nP --> Q{通过审查?}\nQ -->|否| R[方案调整]\nQ -->|是| S[执行整改]\n\nR --> K\nS --> T[政策符合性验证]\nT --> U((结束))\n\nclassDef policy fill:#e8f5e9,stroke:#2e7d32;\nclass C,D,E,K,L,P,T policy;`,
     
     // 资源变化分析
     resourceChanges: {

@@ -228,6 +228,51 @@
                   <span class="desc-text">{{ getRouteReevalDescription() }}</span>
                 </div>
               </div>
+
+              <div class="parameter-item">
+                <div class="parameter-label">
+                  <span class="label-text">最低库存比例</span>
+                  <el-tooltip content="关键物料必须维持的最低库存水平，取值范围5%-50%" placement="top">
+                    <i class="el-icon-question help-icon"></i>
+                  </el-tooltip>
+                </div>
+                
+                <div class="parameter-control">
+                  <el-row :gutter="8" type="flex" align="middle">
+                    <el-col :span="12">
+                      <el-slider
+                        v-model="minimumInventoryRatio"
+                        :min="0.05"
+                        :max="0.5"
+                        :step="0.01"
+                        :show-tooltip="false"
+                        @change="handleParameterChange"
+                        class="weight-slider">
+                      </el-slider>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-input
+                        :value="(minimumInventoryRatio * 100).toFixed(0) + '%'"
+                        size="mini"
+                        readonly
+                        style="text-align: center;">
+                      </el-input>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-tag 
+                        :type="getMinimumInventoryLevel().type" 
+                        size="mini"
+                        class="weight-tag">
+                        {{ getMinimumInventoryLevel().label }}
+                      </el-tag>
+                    </el-col>
+                  </el-row>
+                </div>
+                
+                <div class="parameter-description">
+                  <span class="desc-text">{{ getMinimumInventoryDescription() }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -405,6 +450,7 @@ export default {
       marketVolatilityFactor: 0.8,
       backupSupplierRatio: 0.3,
       routeReevalFrequency: 7,
+      minimumInventoryRatio: 0.15,
       costDelayTradeoff: 1.2,
       taktTimeVariance: 0.05,
       overtimeCostCap: 200
@@ -422,6 +468,7 @@ export default {
         this.marketVolatilityFactor = params.marketVolatilityFactor || 0.8;
         this.backupSupplierRatio = params.backupSupplierRatio || 0.3;
         this.routeReevalFrequency = params.routeReevalFrequency || 7;
+        this.minimumInventoryRatio = params.minimumInventoryRatio || 0.15;
         this.costDelayTradeoff = params.costDelayTradeoff || 1.2;
         this.taktTimeVariance = params.taktTimeVariance || 0.05;
         this.overtimeCostCap = params.overtimeCostCap || 200;
@@ -434,6 +481,7 @@ export default {
         marketVolatilityFactor: this.marketVolatilityFactor,
         backupSupplierRatio: this.backupSupplierRatio,
         routeReevalFrequency: this.routeReevalFrequency,
+        minimumInventoryRatio: this.minimumInventoryRatio,
         costDelayTradeoff: this.costDelayTradeoff,
         taktTimeVariance: this.taktTimeVariance,
         overtimeCostCap: this.overtimeCostCap
@@ -542,6 +590,30 @@ export default {
       }
     },
 
+    getMinimumInventoryLevel() {
+      if (this.minimumInventoryRatio <= 0.1) {
+        return { type: 'danger', label: '极低' };
+      } else if (this.minimumInventoryRatio <= 0.2) {
+        return { type: 'warning', label: '较低' };
+      } else if (this.minimumInventoryRatio <= 0.3) {
+        return { type: 'primary', label: '标准' };
+      } else {
+        return { type: 'success', label: '充足' };
+      }
+    },
+    
+    getMinimumInventoryDescription() {
+      if (this.minimumInventoryRatio <= 0.1) {
+        return '极低库存水平，高风险但低成本，适用于可靠供应链';
+      } else if (this.minimumInventoryRatio <= 0.2) {
+        return '较低库存水平，平衡风险与成本，需要较好的需求预测';
+      } else if (this.minimumInventoryRatio <= 0.3) {
+        return '标准库存水平，提供合理的安全边际，适用于一般业务';
+      } else {
+        return '充足库存水平，高安全性但高持有成本，适用于关键业务';
+      }
+    },
+
     getCostDelayLevel() {
       if (this.costDelayTradeoff <= 0.8) {
         return { type: 'success', label: '成本优先' };
@@ -634,6 +706,7 @@ export default {
         this.marketVolatilityFactor = 0.8;
         this.backupSupplierRatio = 0.3;
         this.routeReevalFrequency = 7;
+        this.minimumInventoryRatio = 0.15;
         this.costDelayTradeoff = 1.2;
         this.taktTimeVariance = 0.05;
         this.overtimeCostCap = 200;

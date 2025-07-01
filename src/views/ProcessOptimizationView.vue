@@ -25,16 +25,16 @@
           <h2 class="pre-title">流程重构优化系统</h2>
           <p class="pre-description">点击下方按钮开始流程重构分析</p>
           
-          <div class="action-buttons">
-            <el-button 
-              type="primary" 
-              size="large"
-              @click="startRefactoring"
+                    <div class="action-buttons">
+          <el-button 
+            type="primary" 
+            size="large"
+            @click="startRefactoring"
               :disabled="dataError || Object.keys(optPoints).length === 0"
-              class="refactor-button">
+            class="refactor-button">
               <i class="el-icon-cpu"></i>
               <span v-if="dataError">数据加载失败</span>
-              <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
+            <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
               <span v-else>开始重构分析</span>
             </el-button>
             
@@ -45,7 +45,16 @@
               class="settings-button">
               <i class="el-icon-setting"></i>
               设置神经网络参数
-            </el-button>
+          </el-button>
+          
+          <el-button 
+            type="success" 
+            size="medium"
+            @click="configureRAG"
+            class="rag-button">
+            <i class="el-icon-document"></i>
+            配置RAG
+          </el-button>
           </div>
           
           <div class="parameter-summary" v-if="showParameterSummary">
@@ -131,12 +140,12 @@
 
       <!-- 正常内容 -->
       <el-card v-else class="main-card">
-        <div slot="header" class="card-header">
-          <span>流程重构优化</span>
+      <div slot="header" class="card-header">
+        <span>流程重构优化</span>
           <div class="header-actions">
-            <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
+        <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
           </div>
-        </div>
+      </div>
       
       <!-- Mermaid图表区域 -->
       <div class="mermaid-container">
@@ -147,30 +156,30 @@
           <div class="selector-header">
             <h4 class="selector-title">选择优化方案</h4>
             <p class="selector-description">
-              选择不同的优化策略来查看对应的重构方案和资源配置
+              页面将始终显示重构前流程和LLM智能重构流程，请选择要对比的传统重构方案
             </p>
           </div>
-          <el-select 
-            v-model="selectedSolution" 
-            placeholder="选择优化方案"
-            @change="handleSolutionChange"
-            size="medium"
-            class="solution-select">
-            <el-option
-              label="平衡方案"
-              value="balanced"
-              :disabled="false">
-              <span>平衡方案</span>
-              <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
-            </el-option>
-            <el-option
-              label="资源优先"
-              value="resource-first"
-              :disabled="false">
-              <span>资源优先</span>
-              <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
-            </el-option>
-          </el-select>
+                  <el-select 
+          v-model="selectedSolution" 
+          placeholder="选择优化方案"
+          @change="handleSolutionChange"
+          size="medium"
+          class="solution-select">
+          <el-option
+            label="平衡方案"
+            value="balanced"
+            :disabled="false">
+            <span>平衡方案</span>
+            <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
+          </el-option>
+          <el-option
+            label="资源优先"
+            value="resource-first"
+            :disabled="false">
+            <span>资源优先</span>
+            <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
+          </el-option>
+        </el-select>
         </div>
         
         <el-tabs v-model="activeOptTab" type="border-card">
@@ -192,17 +201,37 @@
             </div>
             
             <div class="opt-chart-group">
-              <!-- 优化前后流程图 -->
+              <!-- 重构前流程图 -->
               <div class="opt-chart-block">
                 <div class="opt-chart-title">重构前流程</div>
                 <div class="chart-container">
-                  <MermaidChart :code="flowData.before" />
+                  <div :ref="`chart-before-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'before')"></div>
                 </div>
               </div>
-              <div class="opt-chart-block">
-                <div class="opt-chart-title">{{ getAfterTitle() }}</div>
+              
+              <!-- 根据选择的方案显示对应的重构流程 -->
+              <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
+                <div class="opt-chart-title">平衡方案重构流程</div>
                 <div class="chart-container">
-                  <MermaidChart :code="getAfterFlowData(key)" />
+                  <div :ref="`chart-after-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after')"></div>
+                </div>
+              </div>
+              
+              <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
+                <div class="opt-chart-title">资源优先重构流程</div>
+                <div class="chart-container">
+                  <div :ref="`chart-after2-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after2')"></div>
+                </div>
+              </div>
+              
+              <!-- LLM智能重构流程放在最右边 -->
+              <div class="opt-chart-block">
+                <div class="opt-chart-title">
+                  <span>LLM智能重构流程</span>
+                  <el-tag size="mini" type="success" style="margin-left: 8px;">AI生成</el-tag>
+                </div>
+                <div class="chart-container">
+                  <div :ref="`chart-llm-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'llm')"></div>
                 </div>
               </div>
             </div>
@@ -236,19 +265,19 @@
         @confirm="handleResourceConfirm"
         @cancel="handleResourceCancel"
       />
-    </div>
+      </div>
   </div>
 </template>
 
 <script>
-import MermaidChart from '@/components/MermaidChart.vue'
+// import MermaidChart from '@/components/MermaidChart.vue'
 import SystemStatusCard from '@/components/SystemStatusCard.vue'
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { MermaidChart, SystemStatusCard, ResourceChangeConfirmation },
+  components: { SystemStatusCard, ResourceChangeConfirmation },
   data() {
     return {
       showMainContent: false, // 控制是否显示主要内容
@@ -259,7 +288,7 @@ export default {
       currentOptimizationKey: null,
       dataLoading: false, // API数据加载状态
       dataError: null, // API数据加载错误
-      selectedSolution: null,
+      selectedSolution: 'balanced', // 默认选择平衡方案
       neuralNetworkParams: {
         geoPoliticalWeight: 1.0,
         marketVolatilityFactor: 0.8,
@@ -269,7 +298,11 @@ export default {
         taktTimeVariance: 0.05,
         overtimeCostCap: 200
       },
-      showParameterSummary: false
+      showParameterSummary: false,
+      // 添加mermaid相关属性
+      mermaidLoaded: false,
+      mermaidInitialized: false,
+      renderedCharts: {} // 存储渲染的图表
     }
   },
 
@@ -304,13 +337,91 @@ export default {
   async mounted() {
     // 组件挂载时自动加载数据
     await this.loadOptimizationData();
-    // 设置默认方案为平衡方案
-    this.selectedSolution = 'balanced';
     // 加载已保存的神经网络参数
     this.loadNeuralNetworkParams();
+    // 加载mermaid脚本
+    this.loadMermaidScript();
   },
 
   methods: {
+    // Mermaid相关方法
+    loadMermaidScript() {
+      if (window.mermaid) {
+        this.mermaidLoaded = true;
+        this.initMermaid();
+        this.renderAllCharts();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js';
+      script.onload = () => {
+        this.mermaidLoaded = true;
+        this.initMermaid();
+        this.renderAllCharts();
+      };
+      script.onerror = () => {
+        console.error('Failed to load mermaid script');
+      };
+      document.head.appendChild(script);
+    },
+    
+    initMermaid() {
+      if (this.mermaidInitialized || !window.mermaid) return;
+      
+      window.mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'loose',
+        theme: 'default',
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          curve: 'basis'
+        }
+      });
+      this.mermaidInitialized = true;
+    },
+    
+    async renderMermaidChart(code, chartId) {
+      if (!window.mermaid || !this.mermaidLoaded || !code) return '';
+      
+      try {
+        const id = `mermaid-${chartId}-${Date.now()}`;
+        const { svg } = await window.mermaid.render(id, code);
+        return svg;
+      } catch (error) {
+        console.error('Mermaid rendering error:', error);
+        return '<div class="error-message">流程图渲染失败</div>';
+      }
+    },
+    
+    async renderAllCharts() {
+      if (!this.mermaidLoaded || Object.keys(this.optPoints).length === 0) return;
+      
+      for (const [key, flowData] of Object.entries(this.optPoints)) {
+        if (flowData.before) {
+          this.renderedCharts[`${key}-before`] = await this.renderMermaidChart(flowData.before, `${key}-before`);
+        }
+        if (flowData.after) {
+          this.renderedCharts[`${key}-after`] = await this.renderMermaidChart(flowData.after, `${key}-after`);
+        }
+        if (flowData.after2) {
+          this.renderedCharts[`${key}-after2`] = await this.renderMermaidChart(flowData.after2, `${key}-after2`);
+        }
+        if (flowData.llm) {
+          this.renderedCharts[`${key}-llm`] = await this.renderMermaidChart(flowData.llm, `${key}-llm`);
+        }
+      }
+      
+      // 强制更新视图
+      this.$forceUpdate();
+    },
+    
+    getRenderedChart(key, type) {
+      const chartKey = `${key}-${type}`;
+      return this.renderedCharts[chartKey] || '<div class="loading-message">图表加载中...</div>';
+    },
+
     // 加载神经网络参数
     loadNeuralNetworkParams() {
       const savedParams = localStorage.getItem('neuralNetworkParams');
@@ -362,6 +473,10 @@ export default {
         if (response.data.code === 200) {
           this.optPoints = response.data.data;
           console.log('流程优化数据加载成功:', this.optPoints);
+          // 数据加载成功后渲染图表
+          if (this.mermaidLoaded) {
+            this.renderAllCharts();
+          }
         } else {
           throw new Error(response.data.message || '数据加载失败');
         }
@@ -459,6 +574,10 @@ export default {
     handleSolutionChange(value) {
       // 处理方案选择的逻辑
       console.log('Selected solution:', value);
+      // 强制更新视图以重新渲染对应的图表
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
     },
 
     getFlowTitle(key) {
@@ -481,7 +600,7 @@ export default {
       } else if (this.selectedSolution === 'resource-first') {
         return '资源优先方案后的流程';
       }
-      return '未选择方案后的流程';
+      return '重构方案';
     },
 
     getAfterFlowData(key) {
@@ -534,6 +653,12 @@ export default {
     showNeuralNetworkSettings() {
       // 跳转到神经网络参数设置页面
       this.$router.push('/home/neural-network-settings');
+    },
+
+    // 配置RAG
+    configureRAG() {
+      // 跳转到RAG配置页面
+      this.$router.push('/home/rag-config');
     }
   }
 }
@@ -580,7 +705,7 @@ export default {
 
 .pre-card {
   width: 100%;
-  max-width: 600px;
+  max-width: 1000px;
   text-align: center;
   transition: opacity 0.3s ease;
 }
@@ -660,6 +785,24 @@ export default {
   margin-right: 6px;
 }
 
+.rag-button {
+  padding: 10px 25px;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(103, 194, 58, 0.3);
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.rag-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.4);
+}
+
+.rag-button i {
+  margin-right: 6px;
+}
+
 .parameter-summary {
   margin-top: 25px;
   animation: fadeInUp 0.5s ease-out;
@@ -667,8 +810,8 @@ export default {
 
 .param-summary-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   margin-top: 10px;
   padding: 0;
 }
@@ -696,6 +839,13 @@ export default {
   }
 }
 
+@media (max-width: 1024px) and (min-width: 769px) {
+  .param-summary-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
 @media (max-width: 768px) {
   .action-buttons {
     gap: 10px;
@@ -711,6 +861,12 @@ export default {
     padding: 8px 20px;
     font-size: 13px;
     min-width: 150px;
+  }
+  
+  .rag-button {
+    padding: 8px 20px;
+    font-size: 13px;
+    min-width: 120px;
   }
   
   .param-summary-content {
@@ -933,32 +1089,81 @@ export default {
   text-align: center !important;
 }
 
+/* Mermaid图表样式 */
+.mermaid-chart {
+  width: 100%;
+  min-height: 200px;
+  text-align: center;
+  overflow: auto;
+}
+
+.loading-message {
+  color: #909399;
+  font-size: 14px;
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  border: 1px dashed #dcdfe6;
+}
+
+.error-message {
+  color: #F56C6C;
+  font-size: 14px;
+  padding: 20px;
+  text-align: center;
+  background-color: #fef0f0;
+  border-radius: 4px;
+  border: 1px solid #fbc4c4;
+}
+
 /* Mermaid图表通用样式 (使用 :deep() 穿透scoped CSS) */
-:deep(.mermaid svg) { /* 直接针对生成的svg元素 */
+:deep(.mermaid-chart svg) { /* 直接针对生成的svg元素 */
   display: block; /* 尝试解决可能的额外空间 */
   margin: auto; /* 配合父容器的flex居中 */
   max-width: 100% !important; /* 确保SVG不会超出其容器 */
   height: auto !important; /* 保持宽高比 */
 }
 
-:deep(.node rect),
-:deep(.node circle),
-:deep(.node ellipse),
-:deep(.node polygon) {
+:deep(.mermaid-chart .node rect),
+:deep(.mermaid-chart .node circle),
+:deep(.mermaid-chart .node ellipse),
+:deep(.mermaid-chart .node polygon) {
   fill: #f0f9ff !important;
   stroke: #3572b0 !important;
   stroke-width: 1px !important;
 }
 
-:deep(.edgePath .path) {
+:deep(.mermaid-chart .edgePath .path) {
   stroke: #3572b0 !important;
   stroke-width: 1.5px !important;
 }
 
-:deep(.label) {
+:deep(.mermaid-chart .label) {
   font-family: 'Consolas', 'Menlo', monospace !important; /* 使用更适合代码的字体 */
   font-size: 13px !important; /* 调整字体大小 */
   color: #333 !important;
+}
+
+/* 为不同类型的图表添加特定样式 */
+:deep(.mermaid-chart .risk) {
+  fill: #f9e3d3 !important;
+  stroke: #f66 !important;
+}
+
+:deep(.mermaid-chart .policy) {
+  fill: #e8f5e9 !important;
+  stroke: #2e7d32 !important;
+}
+
+:deep(.mermaid-chart .ai) {
+  fill: #e3f2fd !important;
+  stroke: #2196f3 !important;
+}
+
+:deep(.mermaid-chart .human) {
+  fill: #fff8e1 !important;
+  stroke: #ffc107 !important;
 }
 
 .opt-chart-group {
@@ -967,6 +1172,13 @@ export default {
   gap: 24px;
   margin-bottom: 10px;
 }
+
+.comparison-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .opt-chart-block {
   width: 100%;
 }
@@ -991,6 +1203,10 @@ export default {
 
 @media (min-width: 900px) {
   .opt-chart-group {
+    flex-direction: row;
+    gap: 40px;
+  }
+  .comparison-view {
     flex-direction: row;
     gap: 40px;
   }
@@ -1095,4 +1311,56 @@ export default {
   font-size: 14px;
   color: #606266;
 }
-</style>
+
+/* LLM重构流程特殊样式 */
+.opt-chart-title .el-tag {
+  font-size: 10px;
+  height: 20px;
+  line-height: 18px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #67C23A, #85ce61);
+  border: none;
+  color: white;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(103, 194, 58, 0.5);
+  }
+  to {
+    box-shadow: 0 0 10px rgba(103, 194, 58, 0.8);
+  }
+}
+
+/* LLM版本图表容器特殊效果 */
+.opt-chart-group .opt-chart-block:has(.el-tag) .chart-container {
+  border: 2px solid #67C23A;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.opt-chart-group .opt-chart-block:has(.el-tag) .chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(103, 194, 58, 0.1), transparent);
+  animation: shine 3s infinite;
+  z-index: 1;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+</style> 

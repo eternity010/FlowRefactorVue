@@ -143,7 +143,9 @@
     <el-card class="neural-network-card">
       <div slot="header" class="neural-header">
         <span>神经网络分析结果</span>
-        <el-tag size="small" type="success">算法版本: v0.3.0</el-tag>
+        <div class="header-right">
+          <el-tag size="small" type="success">算法版本: v0.3.0</el-tag>
+        </div>
       </div>
       
       <div class="neural-content">
@@ -285,13 +287,25 @@
       @close="stopAnimation"
     >
       <div class="model-output-content">
-        <pre class="output-text">{{ displayedContent }}</pre>
-        <div v-if="isAnimating" class="typing-cursor">|</div>
+        <!-- 加载状态 -->
+        <div v-if="isLoadingModelOutput" class="loading-container">
+          <i class="el-icon-loading loading-icon"></i>
+          <div class="loading-text">{{ loadingText }}</div>
+          <div class="loading-progress">
+            <div class="progress-bar"></div>
+          </div>
+        </div>
+        
+        <!-- 模型输出内容 -->
+        <div v-else>
+          <pre class="output-text">{{ displayedContent }}</pre>
+          <div v-if="isAnimating" class="typing-cursor">|</div>
+        </div>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">关闭</el-button>
-        <el-button type="primary" @click="copyToClipboard" :disabled="isAnimating">复制到剪贴板</el-button>
-        <el-button v-if="isAnimating" type="warning" @click="skipAnimation">跳过动画</el-button>
+        <el-button type="primary" @click="copyToClipboard" :disabled="isAnimating || isLoadingModelOutput">复制到剪贴板</el-button>
+        <el-button v-if="isAnimating && !isLoadingModelOutput" type="warning" @click="skipAnimation">跳过动画</el-button>
       </div>
     </el-dialog>
   </div>
@@ -302,12 +316,30 @@ import moment1Data from '@/data/RefactorTimingData';
 import { moment2Data } from '@/data/RefactorTimingData';
 import RiskMonitoringDialog from '@/components/RiskMonitoringDialog.vue';
 
+// 从localStorage获取存储的数据状态
+function getStoredDataMoment() {
+  const storedData = localStorage.getItem('refactorTimingData');
+  if (storedData) {
+    try {
+      return JSON.parse(storedData);
+    } catch (error) {
+      console.error('解析localStorage数据失败:', error);
+      return null;
+    }
+  }
+  return null;
+}
+
 export default {
   name: 'RefactorTimingView',
   components: {
     RiskMonitoringDialog
   },
   data() {
+    // 首先获取存储的数据状态
+    const storedMoment = getStoredDataMoment();
+    const useStoredData = storedMoment !== null;
+    
     return {
       currentDate: new Date().toLocaleString('zh-CN', {
         year: 'numeric',
@@ -316,14 +348,16 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       }),
-      // 从数据文件中导入时刻1数据
-      riskData: moment1Data.riskData,
-      subprocessData: moment1Data.subprocessData,
-      predictionData: moment1Data.predictionData,
-      modelStatus: moment1Data.modelStatus,
-      analysisResults: moment1Data.analysisResults,
-      recommendations: moment1Data.recommendations,
-      overallRecommendation: moment1Data.overallRecommendation,
+      // 标记当前使用的是哪个时刻的数据
+      currentDataMoment: useStoredData ? 'moment2' : 'moment1',
+      // 从数据文件中导入数据，根据存储的状态选择时刻
+      riskData: useStoredData ? storedMoment.riskData : moment1Data.riskData,
+      subprocessData: useStoredData ? storedMoment.subprocessData : moment1Data.subprocessData,
+      predictionData: useStoredData ? storedMoment.predictionData : moment1Data.predictionData,
+      modelStatus: useStoredData ? storedMoment.modelStatus : moment1Data.modelStatus,
+      analysisResults: useStoredData ? storedMoment.analysisResults : moment1Data.analysisResults,
+      recommendations: useStoredData ? storedMoment.recommendations : moment1Data.recommendations,
+      overallRecommendation: useStoredData ? storedMoment.overallRecommendation : moment1Data.overallRecommendation,
       // 大模型联网状态
       aiCollectionStatus: {
         enabled: false,
@@ -338,6 +372,9 @@ export default {
       isAnimating: false,
       animationTimer: null,
       contentLines: [],
+      isLoadingModelOutput: false,
+      loadingText: '正在加载联网数据...',
+      loadingTimer: null,
       modelOutputContent: `==================== 流程智能分析报告 ====================  
 当前待执行流程：弹性资源规划 ➜ 预测性补给模型 ➜ 需求波动预测 ➜ 贝叶斯网络建模 ➜ 安全库存计算 ➜ 补给路径仿真 ➜ 动态补给路线  
 流程实例 ID      ：proc_run_20250701_XYZ123
@@ -405,6 +442,10 @@ export default {
   beforeDestroy() {
     // 清理定时器
     this.stopAnimation();
+    if (this.loadingTimer) {
+      clearInterval(this.loadingTimer);
+      this.loadingTimer = null;
+    }
   },
   methods: {
     // 检查AI收集状态
@@ -412,11 +453,25 @@ export default {
       const aiData = localStorage.getItem('aiCollectionData');
       if (aiData) {
         const data = JSON.parse(aiData);
+        
+        // 判断数据是否为最新：比较最后收集时间与当前时间的差值
+        let dataFreshness = '需要更新';
+        if (data.lastCollectionTime) {
+          const lastCollectionDate = new Date(data.lastCollectionTime);
+          const currentDate = new Date();
+          const timeDiffInHours = (currentDate - lastCollectionDate) / (1000 * 60 * 60);
+          
+          // 如果时间差小于1小时，则认为数据是最新的
+          if (timeDiffInHours < 1) {
+            dataFreshness = '最新';
+          }
+        }
+        
         this.aiCollectionStatus = {
           enabled: true,
           lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
           collectedSources: data.collectedSources || 0,
-          dataFreshness: '最新'
+          dataFreshness: dataFreshness
         };
       }
     },
@@ -444,8 +499,10 @@ export default {
       this.$router.push('/home/ai-data-collection');
     },
     handleManualAnalysis() {
+      const isCurrentlyMoment1 = this.currentDataMoment === 'moment1';
+      
       this.$message({
-        message: '正在启动手动分析...',
+        message: isCurrentlyMoment1 ? '正在启动手动分析...' : '正在重置到初始状态...',
         type: 'info',
         duration: 1000
       });
@@ -453,43 +510,100 @@ export default {
       // 显示加载状态
       const loading = this.$loading({
         lock: true,
-        text: '神经网络分析中...',
+        text: isCurrentlyMoment1 ? '神经网络分析中...' : '正在重置数据...',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
       
-      // 模拟分析过程
+      // 模拟分析/重置过程
       setTimeout(() => {
-        // 更新为时刻2数据
-        this.riskData = moment2Data.riskData;
-        this.subprocessData = moment2Data.subprocessData;
-        this.predictionData = moment2Data.predictionData;
-        this.modelStatus = moment2Data.modelStatus;
-        this.analysisResults = moment2Data.analysisResults;
-        this.recommendations = moment2Data.recommendations;
-        this.overallRecommendation = moment2Data.overallRecommendation;
+        if (isCurrentlyMoment1) {
+          // 当前是时刻一，切换到时刻二
+          this.riskData = moment2Data.riskData;
+          this.subprocessData = moment2Data.subprocessData;
+          this.predictionData = moment2Data.predictionData;
+          this.modelStatus = moment2Data.modelStatus;
+          this.analysisResults = moment2Data.analysisResults;
+          this.recommendations = moment2Data.recommendations;
+          this.overallRecommendation = moment2Data.overallRecommendation;
+          
+          // 更新当前数据状态标记
+          this.currentDataMoment = 'moment2';
+          
+          // 保存时刻2数据到localStorage
+          this.saveDataToStorage();
+          
+          // 显示成功消息
+          this.$message({
+            message: '重构时机分析完成',
+            type: 'success'
+          });
+        } else {
+          // 当前是时刻二，切换到时刻一
+          this.riskData = moment1Data.riskData;
+          this.subprocessData = moment1Data.subprocessData;
+          this.predictionData = moment1Data.predictionData;
+          this.modelStatus = moment1Data.modelStatus;
+          this.analysisResults = moment1Data.analysisResults;
+          this.recommendations = moment1Data.recommendations;
+          this.overallRecommendation = moment1Data.overallRecommendation;
+          
+          // 更新当前数据状态标记
+          this.currentDataMoment = 'moment1';
+          
+          // 清除localStorage中的数据，回到初始状态
+          localStorage.removeItem('refactorTimingData');
+          
+          // 显示成功消息
+          this.$message({
+            message: '已重置到初始状态',
+            type: 'success'
+          });
+        }
         
         // 关闭加载状态
         loading.close();
-        
-        // 显示成功消息
-        this.$message({
-          message: '重构时机分析完成',
-          type: 'success'
-        });
       }, 1000);
     },
     // 显示模型输出
     showModelOutput() {
+      // 立即显示空白弹窗
       this.modelOutputDialogVisible = true;
+      this.isLoadingModelOutput = true;
       this.displayedContent = '';
-      this.isAnimating = true;
+      this.isAnimating = false;
       
-      // 将内容按行分割
-      this.contentLines = this.modelOutputContent.split('\n');
+      // 模拟加载过程
+      let step = 0;
+      const loadingSteps = [
+        '正在加载联网数据...',
+        '正在分析数据...',
+        '正在处理流程数据...',
+        '正在生成报告...'
+      ];
       
-      // 开始逐行显示动画
-      this.startAnimation();
+      this.loadingText = loadingSteps[0];
+      
+      this.loadingTimer = setInterval(() => {
+        step++;
+        if (step < loadingSteps.length) {
+          this.loadingText = loadingSteps[step];
+        } else {
+          // 清除加载状态
+          clearInterval(this.loadingTimer);
+          this.loadingTimer = null;
+          this.isLoadingModelOutput = false;
+          
+          // 开始显示模型输出内容
+          this.isAnimating = true;
+          
+          // 将内容按行分割
+          this.contentLines = this.modelOutputContent.split('\n');
+          
+          // 开始逐行显示动画
+          this.startAnimation();
+        }
+      }, 600); // 每800毫秒切换一个加载步骤
     },
     // 开始逐行显示动画
     startAnimation() {
@@ -527,13 +641,19 @@ export default {
     // 关闭弹窗
     closeDialog() {
       this.stopAnimation();
+      // 清除加载定时器
+      if (this.loadingTimer) {
+        clearInterval(this.loadingTimer);
+        this.loadingTimer = null;
+      }
+      this.isLoadingModelOutput = false;
       this.modelOutputDialogVisible = false;
     },
     // 复制到剪贴板
     copyToClipboard() {
-      if (this.isAnimating) {
+      if (this.isAnimating || this.isLoadingModelOutput) {
       this.$message({
-          message: '请等待动画完成后再复制',
+          message: this.isLoadingModelOutput ? '请等待数据加载完成后再复制' : '请等待动画完成后再复制',
           type: 'warning'
         });
         return;
@@ -565,7 +685,20 @@ export default {
     // 跳转到规划完成时间页面
     goToPlanningTime() {
       this.$router.push('/home/planning-time');
-    }
+    },
+    // 保存数据到localStorage
+    saveDataToStorage() {
+      const data = {
+        riskData: this.riskData,
+        subprocessData: this.subprocessData,
+        predictionData: this.predictionData,
+        modelStatus: this.modelStatus,
+        analysisResults: this.analysisResults,
+        recommendations: this.recommendations,
+        overallRecommendation: this.overallRecommendation
+      };
+      localStorage.setItem('refactorTimingData', JSON.stringify(data));
+         }
   }
 }
 </script>
@@ -1070,5 +1203,73 @@ export default {
   }
 }
 
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px;
+}
+
+.loading-icon {
+  font-size: 40px;
+  color: #409EFF;
+  margin-bottom: 20px;
+  animation: loading-rotate 2s linear infinite;
+}
+
+.loading-text {
+  font-size: 18px;
+  color: #606266;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.loading-progress {
+  width: 300px;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #409EFF, #67C23A);
+  border-radius: 2px;
+  animation: loading-progress 3.2s ease-in-out infinite;
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-progress {
+  0% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0%);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 </style> 

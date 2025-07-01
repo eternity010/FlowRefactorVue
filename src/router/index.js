@@ -12,6 +12,7 @@ import ProcessOptimizationView from '@/views/ProcessOptimizationView'
 import PlanningTimeView from '@/views/PlanningTimeView'
 import AIDataCollectionView from '@/views/AIDataCollectionView'
 import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
+import RAGConfigView from '@/views/RAGConfigView'
 
 Vue.use(Router)
 
@@ -75,6 +76,11 @@ export default new Router({
           path: 'neural-network-settings',
           name: 'NeuralNetworkSettingsView',
           component: NeuralNetworkSettingsView
+        },
+        {
+          path: 'rag-config',
+          name: 'RAGConfigView',
+          component: RAGConfigView
         }
       ]
     },

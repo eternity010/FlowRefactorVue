@@ -101,7 +101,7 @@
     </div>
     
     <!-- 添加甘特图区域 -->
-    <el-divider content-position="left">项目计划甘特图</el-divider>
+    <el-divider content-position="left">项目计划时间图</el-divider>
     <div v-if="ganttData" class="gantt-section">
       <gantt-chart :ganttData="ganttData" />
     </div>
