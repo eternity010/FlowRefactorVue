@@ -907,6 +907,15 @@ const processOptimizationFlowData = {
       ]
     }
   },
+
+  Optimization5: {
+    title: '故障检查流程重构优化',
+    description: '引入故障根因分析RAG，对原故障检查流程进行优化',
+    before: `graph TD\nA((开始)) --> B[接收故障报告]\nB --> C[初步故障分析]\nC --> D[现场故障检查]\nD --> E{是否存在故障}\nE -->|是| F[故障定位]\nE -->|否| G[误报记录]\nF --> H[故障分析]\nH --> I[制定修复方案]\nI --> J[执行故障修复]\nJ --> K[修复效果验证]\nK --> L{修复成功}\nL -->|是| M[故障记录归档]\nL -->|否| N[重新分析修复]\nN --> H\nM --> O((结束))\nG --> O`,
+    after: `graph TD\nA((开始)) --> B[接收故障报告]\nB --> C[初步故障分析]\nC --> D[现场故障检查]\nD --> E{是否存在故障}\nE -->|是| F[故障定位]\nE -->|否| G[误报记录]\nF --> H[故障根因分析]\nH --> I[RAG知识库查询]\nI --> J{找到相似案例?}\nJ -->|是| K[参考历史方案]\nJ -->|否| L[专家分析]\nK --> M[制定修复方案]\nL --> M\nM --> N[执行故障修复]\nN --> O[修复效果验证]\nO --> P{修复成功}\nP -->|是| Q[记录归档+知识更新]\nP -->|否| H\nQ --> R((结束))\nG --> R`,
+    after2: `graph TD\nA((开始)) --> B[接收故障报告]\nB --> C[初步故障分析+RAG辅助]\nC --> D[现场故障检查]\nD --> E{是否存在故障}\nE -->|是| F[故障定位+历史案例参考]\nE -->|否| G[误报记录]\nF --> H[故障分析+知识库查询]\nH --> I[制定修复方案+经验推荐]\nI --> J[执行故障修复]\nJ --> K[修复效果验证]\nK --> L{修复成功}\nL -->|是| M[故障记录归档]\nL -->|否| N[重新分析修复+深度检索]\nN --> H\nM --> O((结束))\nG --> O`,
+    llm: `graph TD\nA((开始)) --> B[接收故障报告]\nB --> C[初步故障分析]\nC --> D[现场故障检查]\nD --> E{是否存在故障}\nE -->|是| F[故障定位]\nE -->|否| G[误报记录]\nF --> H[故障根因分析]\nH --> I[[RAG知识库查询]]\nI --> J{匹配历史案例?}\nJ -->|是| K[调用标准修复方案]\nJ -->|否| L[人工分析]\nK & L --> M[制定修复方案]\nM --> N[执行故障修复]\nN --> O[修复效果验证]\nO --> P{修复成功}\nP -->|是| Q[案例存入RAG]\nP -->|否| H\nQ --> R((结束))\nG --> R\nstyle I fill:#e3f2fd,stroke:#2196f3\nstyle K fill:#e8f5e9,stroke:#2e7d32`
+  }
 };
 
 export default processOptimizationFlowData;

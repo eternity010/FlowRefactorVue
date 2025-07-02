@@ -1,0 +1,125 @@
+{
+  "flowName": "采购流程",
+  "flowType": "purchase",
+  "description": "采购环节的业务流程图，包含需求分析、供应商选择、审批、合同签订、货物接收、质量检验、入库等环节",
+  "mermaidDefinition": "graph LR\n    p1[采购需求]\n    p2[供应商选择]\n    p3{价格审批}\n    p4[签订合同]\n    p5[货物接收]\n    p6{质量检验}\n    p7[入库]\n    p8[退回处理]\n    \n    p1 --> p2\n    p2 --> p3\n    p3 -->|通过| p4\n    p4 --> p5\n    p5 --> p6\n    p6 -->|合格| p7\n    p6 -->|不合格| p8",
+  "nodes": [
+    {
+      "id": "p1",
+      "text": "采购需求",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "trigger"
+    },
+    {
+      "id": "p2",
+      "text": "供应商选择",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "process"
+    },
+    {
+      "id": "p3",
+      "text": "价格审批",
+      "type": "diamond",
+      "mermaidType": "decision",
+      "category": "decision"
+    },
+    {
+      "id": "p4",
+      "text": "签订合同",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "process"
+    },
+    {
+      "id": "p5",
+      "text": "货物接收",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "process"
+    },
+    {
+      "id": "p6",
+      "text": "质量检验",
+      "type": "diamond",
+      "mermaidType": "decision",
+      "category": "decision"
+    },
+    {
+      "id": "p7",
+      "text": "入库",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "result"
+    },
+    {
+      "id": "p8",
+      "text": "退回处理",
+      "type": "rect",
+      "mermaidType": "rectangle",
+      "category": "exception"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "p1",
+      "target": "p2",
+      "label": "",
+      "type": "polyline"
+    },
+    {
+      "id": "e2",
+      "source": "p2",
+      "target": "p3",
+      "label": "",
+      "type": "polyline"
+    },
+    {
+      "id": "e3",
+      "source": "p3",
+      "target": "p4",
+      "label": "通过",
+      "type": "polyline"
+    },
+    {
+      "id": "e4",
+      "source": "p4",
+      "target": "p5",
+      "label": "",
+      "type": "polyline"
+    },
+    {
+      "id": "e5",
+      "source": "p5",
+      "target": "p6",
+      "label": "",
+      "type": "polyline"
+    },
+    {
+      "id": "e6",
+      "source": "p6",
+      "target": "p7",
+      "label": "合格",
+      "type": "polyline"
+    },
+    {
+      "id": "e7",
+      "source": "p6",
+      "target": "p8",
+      "label": "不合格",
+      "type": "polyline"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2024-12-22",
+    "version": "1.0.0",
+    "nodeCount": 8,
+    "edgeCount": 7,
+    "flowComplexity": "medium",
+    "estimatedDuration": "3-7天",
+    "keyDecisionPoints": ["价格审批", "质量检验"],
+    "tags": ["采购", "供应链", "质量控制", "审批流程"]
+  }
+} 

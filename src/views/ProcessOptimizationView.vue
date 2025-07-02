@@ -30,11 +30,11 @@
             type="primary" 
             size="large"
             @click="startRefactoring"
-              :disabled="dataError || Object.keys(optPoints).length === 0"
+              :disabled="dataError || Object.keys(filteredOptPoints).length === 0"
             class="refactor-button">
               <i class="el-icon-cpu"></i>
               <span v-if="dataError">数据加载失败</span>
-            <span v-else-if="Object.keys(optPoints).length === 0">等待数据加载</span>
+            <span v-else-if="Object.keys(filteredOptPoints).length === 0">等待数据加载</span>
               <span v-else>开始重构分析</span>
             </el-button>
             
@@ -75,6 +75,43 @@
                 <span class="param-item">节拍波动容忍: ±{{ (neuralNetworkParams.taktTimeVariance * 100).toFixed(0) }}%</span>
                 <span class="param-item">加班时长上限: {{ neuralNetworkParams.overtimeCostCap }}小时/月</span>
               </div>
+            </el-alert>
+          </div>
+          
+          <div class="rag-summary" v-if="showRAGSummary">
+            <el-alert
+              title="已启用的RAG配置"
+              type="success"
+              :closable="false"
+              show-icon>
+              <template slot="title">
+                <span style="font-size: 14px; font-weight: bold;">已启用的RAG配置</span>
+              </template>
+                             <div class="rag-summary-content">
+                 <div class="rag-status-grid">
+                   <div class="rag-status-item">
+                     <i class="el-icon-pie-chart"></i>
+                     <span class="rag-label">启用状态:</span>
+                     <el-tag size="mini" :type="ragConfig.enabledCount > 0 ? 'success' : 'info'">
+                       {{ ragConfig.enabledCount }}/{{ ragConfig.totalCount }} 已启用
+                     </el-tag>
+                   </div>
+                   <div class="rag-status-item">
+                     <i class="el-icon-cpu"></i>
+                     <span class="rag-label">故障根因分析:</span>
+                     <el-tag size="mini" :type="ragConfig.faultAnalysis ? 'success' : 'danger'">
+                       {{ ragConfig.faultAnalysis ? '已启用' : '未启用' }}
+                     </el-tag>
+                   </div>
+                   <div class="rag-status-item">
+                     <i class="el-icon-lightning"></i>
+                     <span class="rag-label">能耗优化:</span>
+                     <el-tag size="mini" :type="ragConfig.energyOptimization ? 'success' : 'danger'">
+                       {{ ragConfig.energyOptimization ? '已启用' : '未启用' }}
+                     </el-tag>
+                   </div>
+                 </div>
+               </div>
             </el-alert>
           </div>
         </div>
@@ -125,7 +162,7 @@
     <!-- 主要内容 -->
     <div v-if="showMainContent && !showLoading">
       <!-- 数据检查 -->
-      <div v-if="Object.keys(optPoints).length === 0" class="no-data-warning">
+      <div v-if="Object.keys(filteredOptPoints).length === 0" class="no-data-warning">
         <el-card>
           <div class="no-data-content">
             <i class="el-icon-warning" style="font-size: 48px; color: #E6A23C;"></i>
@@ -184,7 +221,7 @@
         
         <el-tabs v-model="activeOptTab" type="border-card">
           <el-tab-pane 
-            v-for="(flowData, key) in optPoints" 
+            v-for="(flowData, key) in filteredOptPoints" 
             :key="key"
             :label="flowData.title" 
             :name="key"
@@ -299,6 +336,13 @@ export default {
         overtimeCostCap: 200
       },
       showParameterSummary: false,
+      showRAGSummary: false,
+      ragConfig: {
+        faultAnalysis: false,
+        energyOptimization: false,
+        enabledCount: 0,
+        totalCount: 2
+      },
       // 添加mermaid相关属性
       mermaidLoaded: false,
       mermaidInitialized: false,
@@ -307,6 +351,26 @@ export default {
   },
 
   computed: {
+    // 过滤后的优化项目，根据RAG启用状态决定是否显示
+    filteredOptPoints() {
+      const filtered = {};
+      
+      for (const [key, flowData] of Object.entries(this.optPoints)) {
+        // Optimization5需要故障根因分析RAG启用才显示
+        if (key === 'Optimization5') {
+          if (this.ragConfig.faultAnalysis) {
+            filtered[key] = flowData;
+          }
+          // 如果未启用故障根因分析RAG，则不显示Optimization5
+        } else {
+          // 其他优化项目正常显示
+          filtered[key] = flowData;
+        }
+      }
+      
+      return filtered;
+    },
+
     currentResourceData() {
       if (!this.currentOptimizationKey || !this.optPoints[this.currentOptimizationKey]) {
         return {};
@@ -339,6 +403,8 @@ export default {
     await this.loadOptimizationData();
     // 加载已保存的神经网络参数
     this.loadNeuralNetworkParams();
+    // 加载已保存的RAG配置
+    this.loadRAGConfig();
     // 加载mermaid脚本
     this.loadMermaidScript();
   },
@@ -398,7 +464,7 @@ export default {
     async renderAllCharts() {
       if (!this.mermaidLoaded || Object.keys(this.optPoints).length === 0) return;
       
-      for (const [key, flowData] of Object.entries(this.optPoints)) {
+      for (const [key, flowData] of Object.entries(this.filteredOptPoints)) {
         if (flowData.before) {
           this.renderedCharts[`${key}-before`] = await this.renderMermaidChart(flowData.before, `${key}-before`);
         }
@@ -433,6 +499,35 @@ export default {
           console.log('已加载保存的神经网络参数:', this.neuralNetworkParams);
         } catch (error) {
           console.error('加载神经网络参数失败:', error);
+        }
+      }
+    },
+
+    // 加载RAG配置
+    loadRAGConfig() {
+      const savedRAGStatus = localStorage.getItem('ragEnabledStatus');
+      if (savedRAGStatus) {
+        try {
+          const ragStatus = JSON.parse(savedRAGStatus);
+          // 计算启用的RAG数量
+          const enabledCount = Object.values(ragStatus).filter(status => status).length;
+          const totalCount = Object.keys(ragStatus).length;
+          
+          this.ragConfig = {
+            faultAnalysis: ragStatus.faultAnalysis || false,
+            energyOptimization: ragStatus.energyOptimization || false,
+            enabledCount: enabledCount,
+            totalCount: totalCount
+          };
+          
+          // 如果有启用的RAG则显示摘要
+          if (enabledCount > 0) {
+            this.showRAGSummary = true;
+          }
+          
+          console.log('已加载保存的RAG配置:', this.ragConfig);
+        } catch (error) {
+          console.error('加载RAG配置失败:', error);
         }
       }
     },
@@ -491,8 +586,8 @@ export default {
 
     startRefactoring() {
       // 检查数据是否已加载
-      if (Object.keys(this.optPoints).length === 0) {
-        this.$message.warning('数据尚未加载完成，请稍候');
+      if (Object.keys(this.filteredOptPoints).length === 0) {
+        this.$message.warning('数据尚未加载完成，或相关RAG功能未启用，请检查RAG配置');
         return;
       }
       
@@ -828,6 +923,49 @@ export default {
   text-overflow: ellipsis;
 }
 
+.rag-summary {
+  margin-top: 20px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.rag-summary-content {
+  margin-top: 10px;
+  padding: 0;
+}
+
+.rag-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.rag-status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #606266;
+  background-color: #f0f9ff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border-left: 3px solid #67C23A;
+}
+
+.rag-status-item i {
+  color: #67C23A;
+  font-size: 14px;
+}
+
+.rag-label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.rag-value {
+  font-weight: 600;
+  color: #303133;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -841,6 +979,11 @@ export default {
 
 @media (max-width: 1024px) and (min-width: 769px) {
   .param-summary-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .rag-status-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
@@ -876,6 +1019,20 @@ export default {
   
   .param-item {
     font-size: 11px;
+  }
+  
+  .rag-status-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .rag-status-item {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+  
+  .rag-status-item i {
+    font-size: 12px;
   }
 }
 

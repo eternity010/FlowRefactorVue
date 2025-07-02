@@ -144,7 +144,7 @@
       <div slot="header" class="neural-header">
         <span>神经网络分析结果</span>
         <div class="header-right">
-          <el-tag size="small" type="success">算法版本: v0.3.0</el-tag>
+        <el-tag size="small" type="success">算法版本: v0.3.0</el-tag>
         </div>
       </div>
       
@@ -519,25 +519,25 @@ export default {
       setTimeout(() => {
         if (isCurrentlyMoment1) {
           // 当前是时刻一，切换到时刻二
-          this.riskData = moment2Data.riskData;
-          this.subprocessData = moment2Data.subprocessData;
-          this.predictionData = moment2Data.predictionData;
-          this.modelStatus = moment2Data.modelStatus;
-          this.analysisResults = moment2Data.analysisResults;
-          this.recommendations = moment2Data.recommendations;
-          this.overallRecommendation = moment2Data.overallRecommendation;
-          
+        this.riskData = moment2Data.riskData;
+        this.subprocessData = moment2Data.subprocessData;
+        this.predictionData = moment2Data.predictionData;
+        this.modelStatus = moment2Data.modelStatus;
+        this.analysisResults = moment2Data.analysisResults;
+        this.recommendations = moment2Data.recommendations;
+        this.overallRecommendation = moment2Data.overallRecommendation;
+        
           // 更新当前数据状态标记
           this.currentDataMoment = 'moment2';
           
           // 保存时刻2数据到localStorage
           this.saveDataToStorage();
-          
-          // 显示成功消息
-          this.$message({
-            message: '重构时机分析完成',
-            type: 'success'
-          });
+        
+        // 显示成功消息
+        this.$message({
+          message: '重构时机分析完成',
+          type: 'success'
+        });
         } else {
           // 当前是时刻二，切换到时刻一
           this.riskData = moment1Data.riskData;
@@ -698,7 +698,7 @@ export default {
         overallRecommendation: this.overallRecommendation
       };
       localStorage.setItem('refactorTimingData', JSON.stringify(data));
-         }
+    }
   }
 }
 </script>

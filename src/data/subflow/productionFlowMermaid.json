@@ -1,0 +1,226 @@
+{
+  "mermaidDefinition": "flowchart LR\n    prod1[\"生产计划制定\"] --> prod2[\"原材料准备\"]\n    prod2 --> prod3{\"材料质检\"}\n    prod3 -->|合格| prod4[\"生产加工\"]\n    prod3 -->|不合格| prod7[\"返回处理\"]\n    prod4 --> prod5{\"产品质检\"}\n    prod5 -->|合格| prod6[\"包装入库\"]\n    prod5 -->|不合格| prod8[\"不良品处理\"]",
+  "nodes": [
+    {
+      "id": "prod1",
+      "type": "rect",
+      "text": "生产计划制定",
+      "x": 100,
+      "y": 150,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "制定详细的生产计划，包括生产时间安排、人员配置、设备使用等",
+        "category": "planning",
+        "priority": "high",
+        "estimatedTime": "2-4小时",
+        "resources": ["生产经理", "计划专员", "生产系统"]
+      }
+    },
+    {
+      "id": "prod2", 
+      "type": "rect",
+      "text": "原材料准备",
+      "x": 300,
+      "y": 150,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "准备生产所需的各种原材料和辅助材料",
+        "category": "preparation",
+        "priority": "high",
+        "estimatedTime": "1-2天",
+        "resources": ["仓库管理员", "物料配送员", "库存系统"]
+      }
+    },
+    {
+      "id": "prod3",
+      "type": "diamond",
+      "text": "材料质检",
+      "x": 500,
+      "y": 150,
+      "properties": {
+        "width": 100,
+        "height": 60,
+        "description": "对原材料进行质量检验，确保符合生产标准",
+        "category": "quality_control",
+        "priority": "critical",
+        "estimatedTime": "2-4小时",
+        "resources": ["质检员", "检测设备", "质检标准文档"],
+        "decision": true,
+        "outcomes": ["合格", "不合格"]
+      }
+    },
+    {
+      "id": "prod4",
+      "type": "rect", 
+      "text": "生产加工",
+      "x": 700,
+      "y": 150,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "按照工艺流程进行产品的生产加工",
+        "category": "production",
+        "priority": "high",
+        "estimatedTime": "4-8小时",
+        "resources": ["生产工人", "生产设备", "工艺文档"]
+      }
+    },
+    {
+      "id": "prod5",
+      "type": "diamond",
+      "text": "产品质检", 
+      "x": 900,
+      "y": 150,
+      "properties": {
+        "width": 100,
+        "height": 60,
+        "description": "对完成的产品进行质量检验",
+        "category": "quality_control",
+        "priority": "critical",
+        "estimatedTime": "1-2小时",
+        "resources": ["质检员", "检测设备", "产品质量标准"],
+        "decision": true,
+        "outcomes": ["合格", "不合格"]
+      }
+    },
+    {
+      "id": "prod6",
+      "type": "rect",
+      "text": "包装入库",
+      "x": 1100,
+      "y": 150,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "对合格产品进行包装并入库存储",
+        "category": "packaging",
+        "priority": "medium",
+        "estimatedTime": "1-2小时",
+        "resources": ["包装工人", "包装材料", "入库系统"]
+      }
+    },
+    {
+      "id": "prod7",
+      "type": "rect",
+      "text": "返回处理",
+      "x": 500,
+      "y": 300,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "处理不合格的原材料，联系供应商退换货",
+        "category": "exception_handling",
+        "priority": "medium",
+        "estimatedTime": "1-3天",
+        "resources": ["采购专员", "供应商联系人", "退换货流程"]
+      }
+    },
+    {
+      "id": "prod8",
+      "type": "rect",
+      "text": "不良品处理",
+      "x": 900,
+      "y": 300,
+      "properties": {
+        "width": 120,
+        "height": 60,
+        "description": "处理不合格的产品，分析原因并采取改进措施",
+        "category": "exception_handling",
+        "priority": "medium",
+        "estimatedTime": "2-4小时",
+        "resources": ["质检员", "技术人员", "改进措施文档"]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "pe1",
+      "type": "polyline",
+      "sourceNodeId": "prod1",
+      "targetNodeId": "prod2",
+      "text": "",
+      "properties": {
+        "description": "计划制定完成后开始准备原材料"
+      }
+    },
+    {
+      "id": "pe2", 
+      "type": "polyline",
+      "sourceNodeId": "prod2",
+      "targetNodeId": "prod3",
+      "text": "",
+      "properties": {
+        "description": "原材料准备完成后进行质量检验"
+      }
+    },
+    {
+      "id": "pe3",
+      "type": "polyline",
+      "sourceNodeId": "prod3",
+      "targetNodeId": "prod4",
+      "text": "合格",
+      "properties": {
+        "description": "材料质检合格后进入生产加工环节",
+        "condition": "quality_passed"
+      }
+    },
+    {
+      "id": "pe4",
+      "type": "polyline",
+      "sourceNodeId": "prod3", 
+      "targetNodeId": "prod7",
+      "text": "不合格",
+      "properties": {
+        "description": "材料质检不合格需要返回处理",
+        "condition": "quality_failed"
+      }
+    },
+    {
+      "id": "pe5",
+      "type": "polyline",
+      "sourceNodeId": "prod4",
+      "targetNodeId": "prod5",
+      "text": "",
+      "properties": {
+        "description": "生产加工完成后进行产品质检"
+      }
+    },
+    {
+      "id": "pe6",
+      "type": "polyline",
+      "sourceNodeId": "prod5",
+      "targetNodeId": "prod6",
+      "text": "合格",
+      "properties": {
+        "description": "产品质检合格后进行包装入库",
+        "condition": "quality_passed"
+      }
+    },
+    {
+      "id": "pe7",
+      "type": "polyline",
+      "sourceNodeId": "prod5",
+      "targetNodeId": "prod8", 
+      "text": "不合格",
+      "properties": {
+        "description": "产品质检不合格需要进行不良品处理",
+        "condition": "quality_failed"
+      }
+    }
+  ],
+  "metadata": {
+    "title": "生产流程管理",
+    "description": "从生产计划制定到产品入库的完整生产流程，包含质量控制和异常处理",
+    "version": "1.0",
+    "lastModified": "2024-01-15",
+    "category": "production",
+    "tags": ["生产", "质检", "流程管理", "质量控制"],
+    "totalSteps": 8,
+    "estimatedDuration": "1-2天",
+    "criticalPath": ["prod1", "prod2", "prod3", "prod4", "prod5", "prod6"],
+    "qualityCheckpoints": ["prod3", "prod5"],
+    "exceptionHandling": ["prod7", "prod8"]
+  }
+} 

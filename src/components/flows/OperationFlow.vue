@@ -88,7 +88,7 @@ export default {
     addNodeClickEvents() {
       const container = this.$refs.container;
       if (!container) return;
-      
+
       // 查找所有mermaid节点
       const nodes = container.querySelectorAll('.node');
       
@@ -101,15 +101,15 @@ export default {
           
           if (flowNode) {
             console.log('节点被点击:', flowNode);
-            
+        
             // 跳转到详情页面
-            this.$router.push({
-              path: '/node-detail',
-              query: {
+        this.$router.push({
+          path: '/node-detail',
+          query: {
                 id: flowNode.id,
                 title: flowNode.text,
-                type: 'operation'
-              }
+            type: 'operation'
+          }
             });
           }
         });
