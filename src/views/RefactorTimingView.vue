@@ -13,7 +13,7 @@
           <div class="data-panel ai-status-panel clickable" @click="handleAIDataCollection">
             <div class="card-header">
               <i class="el-icon-connection"></i>
-              <span>大模型联网状态</span>
+              <span>大模型联网收集数据</span>
             </div>
             <div class="card-content">
               <div class="main-value">
@@ -97,36 +97,37 @@
           </div>
         </el-col>
         
-        <!-- 规划完成时间数据卡片 -->
+        <!-- 业务态势全景感知卡片 -->
         <el-col :span="6">
-          <div class="data-panel prediction-panel clickable" @click="goToPlanningTime">
+          <div class="data-panel business-situation-panel clickable" @click="goToBusinessSituation">
             <div class="card-header">
-              <i class="el-icon-stopwatch"></i>
-              <span>规划完成时间</span>
+              <i class="el-icon-view"></i>
+              <span>业务态势全景感知</span>
             </div>
             <div class="card-content">
-              <div class="main-value">{{ predictionData.planTime }}s</div>
+              <div class="main-value">{{ businessSituationData.overallScore }}%</div>
               <div class="sub-info">
                 <div class="info-item">
-                  <span class="label">上一轮实际运行时间:</span>
-                  <span class="value">{{ predictionData.actualTime }}s</span>
+                  <span class="label">市场活跃度:</span>
+                  <span class="value" :class="getScoreClass(businessSituationData.marketActivity)">{{ businessSituationData.marketActivity }}%</span>
                 </div>
                 <div class="info-item">
-                  <span class="label">方案A-LR预测本轮时间:</span>
-                  <span class="value prediction-good">{{ predictionData.schemeA.time }}s ({{ predictionData.schemeA.error }})</span>
+                  <span class="label">运营效率:</span>
+                  <span class="value" :class="getScoreClass(businessSituationData.operationEfficiency)">{{ businessSituationData.operationEfficiency }}%</span>
                 </div>
                 <div class="info-item">
-                  <span class="label">方案B-XGB预测本轮时间:</span>
-                  <span class="value prediction-good">{{ predictionData.schemeB.time }}s ({{ predictionData.schemeB.error }})</span>
+                  <span class="label">系统健康度:</span>
+                  <span class="value" :class="getScoreClass(businessSituationData.systemHealth)">{{ businessSituationData.systemHealth }}%</span>
                 </div>
                 <div class="info-item">
-                  <span class="label">方案C-GCN预测本轮时间:</span>
-                  <span class="value prediction-poor">{{ predictionData.schemeC.time }}s ({{ predictionData.schemeC.error }})</span>
+                  <span class="label">预警级别:</span>
+                  <span class="value" :class="getAlertClass(businessSituationData.alertLevel)">{{ businessSituationData.alertLevel }}</span>
                 </div>
               </div>
             </div>
           </div>
         </el-col>
+
       </el-row>
     </el-card>
 
@@ -151,36 +152,37 @@
       <div class="neural-content">
         <el-row :gutter="20">
           <el-col :span="8">
-            <div class="network-info-panel">
+            <div class="network-planning-panel clickable" @click="goToPlanningTime">
               <div class="panel-header">
-                <i class="el-icon-monitor"></i>
-                <span>模型运行状态</span>
+                <i class="el-icon-stopwatch"></i>
+                <span>规划完成时间</span>
+                <i class="el-icon-right header-arrow"></i>
               </div>
               <div class="panel-content">
-                <div class="info-row">
-                  <span class="info-label">当前状态:</span>
-                  <span class="info-value status-active">
-                    <i class="el-icon-success"></i> {{ modelStatus.isRunning ? '正在运行' : '已停止' }}
-                  </span>
+                <div class="main-value">{{ predictionData.planTime }}s</div>
+                <div class="sub-info">
+                  <div class="info-item">
+                    <span class="label">上一轮实际运行时间:</span>
+                    <span class="value">{{ predictionData.actualTime }}s</span>
                 </div>
-                <div class="info-row">
-                  <span class="info-label">运行时长:</span>
-                  <span class="info-value">{{ modelStatus.runningTime }}</span>
+                  <div class="info-item">
+                    <span class="label">方案A-LR预测本轮时间:</span>
+                    <span class="value prediction-good">{{ predictionData.schemeA.time }}s ({{ predictionData.schemeA.error }})</span>
                 </div>
-                <div class="info-row">
-                  <span class="info-label">CPU使用率:</span>
-                  <span class="info-value">
-                    <el-progress :percentage="modelStatus.cpuUsage" :stroke-width="10"></el-progress>
-                  </span>
+                  <div class="info-item">
+                    <span class="label">方案B-XGB预测本轮时间:</span>
+                    <span class="value prediction-good">{{ predictionData.schemeB.time }}s ({{ predictionData.schemeB.error }})</span>
                 </div>
-                <div class="info-row">
-                  <span class="info-label">内存使用:</span>
-                  <span class="info-value">{{ modelStatus.memoryUsage }}</span>
+                  <div class="info-item">
+                    <span class="label">方案C-GCN预测本轮时间:</span>
+                    <span class="value prediction-poor">{{ predictionData.schemeC.time }}s ({{ predictionData.schemeC.error }})</span>
                 </div>
-                <div class="info-row">
-                  <span class="info-label">处理速度:</span>
-                  <span class="info-value">{{ modelStatus.processingSpeed }}</span>
                 </div>
+              </div>
+              <!-- 添加点击提示 -->
+              <div class="click-hint">
+                <i class="el-icon-right"></i>
+                <span>点击查看详细时间数据</span>
               </div>
             </div>
           </el-col>
@@ -255,17 +257,171 @@
         </el-row>
       </div>
     </el-card>
+
+    <!-- 大模型分析结果展示区域 -->
+    <el-card class="llm-analysis-card">
+      <div slot="header" class="llm-analysis-header">
+        <span>大模型分析结果</span>
+        <div class="header-right">
+          <el-tag size="small" :type="llmAnalysisData.hasData ? 'success' : 'warning'">
+            分析状态: {{ llmAnalysisData.hasData ? '已完成' : '待分析' }}
+          </el-tag>
+        </div>
+      </div>
+      
+      <div class="llm-analysis-content">
+        <!-- 空状态 -->
+        <div v-if="!llmAnalysisData.hasData" class="empty-state">
+          <div class="empty-icon">
+            <i class="el-icon-document-copy"></i>
+          </div>
+          <div class="empty-text">
+            <div class="empty-title">暂无分析结果</div>
+            <div class="empty-description">点击下方按钮开始大模型分析</div>
+          </div>
+        </div>
+        
+        <!-- 有数据时的展示 -->
+        <transition name="fade-in" appear>
+          <div v-if="llmAnalysisData.hasData" class="analysis-data">
+          <!-- 流程信息 -->
+          <div class="section process-section">
+            <div class="section-title">
+              <i class="el-icon-s-operation"></i>
+              <span>当前流程分析</span>
+            </div>
+            <div class="process-info">
+              <div class="process-flow">{{ llmAnalysisData.processInfo.currentProcess }}</div>
+              <div class="process-id">流程实例 ID: {{ llmAnalysisData.processInfo.processId }}</div>
+            </div>
+          </div>
+          
+          <!-- 外部环境感知 -->
+          <el-row :gutter="20" class="main-content">
+            <el-col :span="12">
+                             <div class="section environment-section">
+                 <div class="section-title">
+                   <i class="el-icon-globe"></i>
+                   <span>外部环境智能感知</span>
+                 </div>
+                 
+                 <!-- 文本内容展示 -->
+                 <div class="environment-text-content">
+                   <pre class="environment-text">{{ llmAnalysisData.environmentAnalysisText }}</pre>
+                 </div>
+               </div>
+            </el-col>
+            
+            <el-col :span="12">
+              <!-- 相似流程检索 -->
+              <div class="section similarity-section">
+                <div class="section-title">
+                  <i class="el-icon-search"></i>
+                  <span>相似历史流程检索</span>
+                </div>
+                <div class="similarity-table">
+                  <div class="table-header">
+                    <div class="col">排名</div>
+                    <div class="col">历史流程ID</div>
+                    <div class="col">路径匹配度</div>
+                    <div class="col">综合相似度</div>
+                  </div>
+                  <div v-for="process in llmAnalysisData.similarProcesses" :key="process.rank" 
+                       class="table-row" :class="{ 'reference-row': process.isReference }">
+                    <div class="col">{{ process.rank }}</div>
+                    <div class="col process-id">{{ process.id }}</div>
+                    <div class="col">{{ (process.pathMatch * 100).toFixed(0) }}%</div>
+                    <div class="col">
+                      {{ (process.overall * 100).toFixed(0) }}%
+                      <el-tag v-if="process.isReference" size="mini" type="warning">★</el-tag>
+                    </div>
+                  </div>
+                </div>
+                <div class="reference-time">
+                  参考流程总耗时: {{ llmAnalysisData.referenceProcessTime }} s
+                </div>
+              </div>
+              
+              <!-- 时间预测 -->
+              <div class="section prediction-section">
+                <div class="section-title">
+                  <i class="el-icon-time"></i>
+                  <span>流程总耗时预测</span>
+                </div>
+                <div class="prediction-content">
+                  <div class="prediction-item">
+                    <span class="label">节点耗时合计（风险加权）:</span>
+                    <span class="value">{{ llmAnalysisData.timePrediction.totalTime }} s</span>
+                  </div>
+                  <div class="prediction-item">
+                    <span class="label">统计置信区间 (95% CI):</span>
+                    <span class="value">{{ llmAnalysisData.timePrediction.confidenceInterval }}</span>
+                  </div>
+                  <div class="prediction-item">
+                    <span class="label">相对参考流程差异:</span>
+                    <span class="value">{{ llmAnalysisData.timePrediction.difference }}</span>
+                  </div>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+          
+          <!-- 节点分析 -->
+          <div class="section nodes-section">
+            <div class="section-title">
+              <i class="el-icon-cpu"></i>
+              <span>节点级风险评估 & 耗时预测</span>
+            </div>
+            <div class="nodes-table">
+              <div class="table-header">
+                <div class="col">序号</div>
+                <div class="col">节点名称</div>
+                <div class="col">主要风险因子</div>
+                <div class="col">风险得分</div>
+                <div class="col">预测耗时(s)</div>
+              </div>
+              <div v-for="node in llmAnalysisData.nodeAnalysis" :key="node.seq" class="table-row">
+                <div class="col">{{ node.seq }}</div>
+                <div class="col">{{ node.name }}</div>
+                <div class="col risk-factor">{{ node.riskFactor }}</div>
+                <div class="col">
+                  <el-tag size="mini" :type="getRiskTagType(node.riskScore)">
+                    {{ node.riskScore }}
+                  </el-tag>
+                </div>
+                <div class="col">{{ node.duration }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 建议 -->
+          <div class="section recommendations-section">
+            <div class="section-title">
+              <i class="el-icon-warning"></i>
+              <span>建议</span>
+            </div>
+            <div class="recommendations-list">
+              <div v-for="(rec, index) in llmAnalysisData.recommendations" :key="index" class="recommendation-item">
+                <span class="recommendation-number">{{ index + 1 }}.</span>
+                <span class="recommendation-text">{{ rec }}</span>
+              </div>
+            </div>
+          </div>
+          </div>
+        </transition>
+      </div>
+    </el-card>
     
     <!-- 底部按钮区域 -->
     <div class="action-footer">
-      <el-button type="success" size="large" icon="el-icon-connection" @click="handleAIDataCollection">
-        大模型联网收集信息
+      <el-button type="success" size="large" @click="showModelOutput" class="ai-analysis-btn">
+        <span class="btn-text">
+          <i class="el-icon-magic-stick btn-icon"></i>
+          {{ llmAnalysisData.hasData ? '查看分析结果' : '大模型智能分析' }}
+        </span>
       </el-button>
-      <el-button type="primary" size="large" icon="el-icon-refresh" @click="handleManualAnalysis">
+      <el-button type="primary" size="large" icon="el-icon-refresh" @click="handleManualAnalysis" class="manual-analysis-btn">
         手动分析重构时机
-      </el-button>
-      <el-button size="large" icon="el-icon-view" @click="showModelOutput">
-        显示模型输出
       </el-button>
     </div>
 
@@ -354,10 +510,64 @@ export default {
       riskData: useStoredData ? storedMoment.riskData : moment1Data.riskData,
       subprocessData: useStoredData ? storedMoment.subprocessData : moment1Data.subprocessData,
       predictionData: useStoredData ? storedMoment.predictionData : moment1Data.predictionData,
-      modelStatus: useStoredData ? storedMoment.modelStatus : moment1Data.modelStatus,
       analysisResults: useStoredData ? storedMoment.analysisResults : moment1Data.analysisResults,
       recommendations: useStoredData ? storedMoment.recommendations : moment1Data.recommendations,
       overallRecommendation: useStoredData ? storedMoment.overallRecommendation : moment1Data.overallRecommendation,
+      // 业务态势全景感知数据
+      businessSituationData: {
+        overallScore: 78,
+        marketActivity: 85,
+        operationEfficiency: 72,
+        systemHealth: 91,
+        alertLevel: '中等'
+      },
+      // 大模型分析结果数据
+      llmAnalysisData: {
+        hasData: false,
+        processInfo: {
+          currentProcess: '弹性资源规划 ➜ 预测性补给模型 ➜ 需求波动预测 ➜ 贝叶斯网络建模 ➜ 安全库存计算 ➜ 补给路径仿真 ➜ 动态补给路线',
+          processId: 'proc_run_20250701_XYZ123'
+        },
+                 environmentAnalysisText: `🔍 关联新闻事件（影响需求波动预测节点）：
+• [BBC] 红海航运危机持续（2024-07-01）：全球30%集装箱船改道好望角，亚欧航线补给周期延长12-15天
+• [Reuters] 中国制造业PMI超预期回升至51.8（2024-06-30），原材料进口需求激增
+• [Al Jazeera] 中东地缘政治紧张升级，原油价格单周上涨8%（影响路径仿真燃料成本）
+
+📊 关键市场指标（影响安全库存计算）：
+┌──────────┬────────────┬──────────┬────────────┐
+│ 数据源   │ 指标       │ 当前值   │ 72h波动率  │
+├──────────┼────────────┼──────────┼────────────┤
+│ NYSE     │ 零售业ETF(XRT) │ $78.42   │ +3.2% ▲   │
+│ LME      │ 铜期货价格    │ $9,842/吨 │ +5.7% ▲   │
+│ Forex    │ 美元指数(DXY) │ 104.85   │ -0.8% ▼   │
+│ Oil      │ 布伦特原油    │ $89.12/桶 │ +8.1% ▲   │
+└──────────┴────────────┴──────────┴────────────┘`,
+        similarProcesses: [
+          { rank: 1, id: 'proc_run_20250628_0f3925', pathMatch: 0.95, riskMatch: 0.91, overall: 0.93, isReference: true },
+          { rank: 2, id: 'proc_run_20250628_144c4a', pathMatch: 0.95, riskMatch: 0.79, overall: 0.87, isReference: false },
+          { rank: 3, id: 'proc_run_20250628_ce6dce', pathMatch: 0.95, riskMatch: 0.76, overall: 0.85, isReference: false }
+        ],
+        referenceProcessTime: '2 249',
+        nodeAnalysis: [
+          { seq: 1, name: '弹性资源规划', riskFactor: 'risk_02_cpu_pressure=0.62', riskScore: 0.62, duration: 260 },
+          { seq: 2, name: '预测性补给模型', riskFactor: 'risk_06_config_drift=0.41', riskScore: 0.41, duration: 380 },
+          { seq: 3, name: '需求波动预测', riskFactor: 'risk_07_source_api_latency=0.85', riskScore: 0.85, duration: 560 },
+          { seq: 4, name: '贝叶斯网络建模', riskFactor: '（低风险）', riskScore: 0.2, duration: 490 },
+          { seq: 5, name: '安全库存计算', riskFactor: 'risk_01_high_data_volume=0.48', riskScore: 0.48, duration: 300 },
+          { seq: 6, name: '补给路径仿真', riskFactor: 'risk_03_memory_leak=0.70', riskScore: 0.70, duration: 120 },
+          { seq: 7, name: '动态补给路线', riskFactor: 'risk_05_network_latency=0.55', riskScore: 0.55, duration: 240 }
+        ],
+        timePrediction: {
+          totalTime: '2 350',
+          confidenceInterval: '2 200 s – 2 500 s',
+          difference: '+101 s (+4.5 %)'
+        },
+        recommendations: [
+          '对 "需求波动预测" 节点（风险值最高 0.85）提前准备备用计算资源。',
+          '若"补给路径仿真" 出现持续内存泄漏，可考虑拆分子任务或采用动态扩缩容。',
+          '当总耗时超过 2 500 s 时触发告警并重评资源分配策略。'
+        ]
+      },
       // 大模型联网状态
       aiCollectionStatus: {
         enabled: false,
@@ -522,7 +732,6 @@ export default {
         this.riskData = moment2Data.riskData;
         this.subprocessData = moment2Data.subprocessData;
         this.predictionData = moment2Data.predictionData;
-        this.modelStatus = moment2Data.modelStatus;
         this.analysisResults = moment2Data.analysisResults;
         this.recommendations = moment2Data.recommendations;
         this.overallRecommendation = moment2Data.overallRecommendation;
@@ -538,12 +747,14 @@ export default {
           message: '重构时机分析完成',
           type: 'success'
         });
+        
+        // 重置大模型分析结果状态（切换到时刻二时，保持原有的分析状态）
+        // this.llmAnalysisData.hasData = true;
         } else {
           // 当前是时刻二，切换到时刻一
           this.riskData = moment1Data.riskData;
           this.subprocessData = moment1Data.subprocessData;
           this.predictionData = moment1Data.predictionData;
-          this.modelStatus = moment1Data.modelStatus;
           this.analysisResults = moment1Data.analysisResults;
           this.recommendations = moment1Data.recommendations;
           this.overallRecommendation = moment1Data.overallRecommendation;
@@ -553,6 +764,9 @@ export default {
           
           // 清除localStorage中的数据，回到初始状态
           localStorage.removeItem('refactorTimingData');
+          
+          // 重置大模型分析结果状态
+          this.llmAnalysisData.hasData = false;
           
           // 显示成功消息
           this.$message({
@@ -567,43 +781,57 @@ export default {
     },
     // 显示模型输出
     showModelOutput() {
-      // 立即显示空白弹窗
-      this.modelOutputDialogVisible = true;
-      this.isLoadingModelOutput = true;
-      this.displayedContent = '';
-      this.isAnimating = false;
+      // 如果已经有分析结果，直接滚动到结果区域
+      if (this.llmAnalysisData.hasData) {
+        this.scrollToAnalysisResult();
+        return;
+      }
       
-      // 模拟加载过程
-      let step = 0;
-      const loadingSteps = [
-        '正在加载联网数据...',
-        '正在分析数据...',
-        '正在处理流程数据...',
-        '正在生成报告...'
-      ];
+      // 显示加载提示
+      this.$message({
+        message: '正在启动大模型智能分析...',
+        type: 'info',
+        duration: 1000
+      });
       
-      this.loadingText = loadingSteps[0];
+      // 显示加载状态
+      const loading = this.$loading({
+        lock: true,
+        text: '大模型正在进行智能分析中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
       
-      this.loadingTimer = setInterval(() => {
-        step++;
-        if (step < loadingSteps.length) {
-          this.loadingText = loadingSteps[step];
-        } else {
-          // 清除加载状态
-          clearInterval(this.loadingTimer);
-          this.loadingTimer = null;
-          this.isLoadingModelOutput = false;
+      // 模拟分析过程
+      setTimeout(() => {
+        // 更新大模型分析结果数据状态
+        this.llmAnalysisData.hasData = true;
+        
+        // 关闭加载状态
+        loading.close();
+        
+        // 显示成功消息
+        this.$message({
+          message: '大模型智能分析完成',
+          type: 'success'
+        });
           
-          // 开始显示模型输出内容
-          this.isAnimating = true;
-          
-          // 将内容按行分割
-          this.contentLines = this.modelOutputContent.split('\n');
-          
-          // 开始逐行显示动画
-          this.startAnimation();
-        }
-      }, 600); // 每800毫秒切换一个加载步骤
+        // 滚动到分析结果区域
+        this.$nextTick(() => {
+          this.scrollToAnalysisResult();
+        });
+      }, 2000); // 2秒模拟分析时间
+    },
+    
+    // 滚动到分析结果区域
+    scrollToAnalysisResult() {
+      const analysisCard = document.querySelector('.llm-analysis-card');
+      if (analysisCard) {
+        analysisCard.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
     },
     // 开始逐行显示动画
     startAnimation() {
@@ -686,13 +914,45 @@ export default {
     goToPlanningTime() {
       this.$router.push('/home/planning-time');
     },
+    // 跳转到业务态势全景感知页面
+    goToBusinessSituation() {
+      this.$message({
+        message: '业务态势全景感知功能即将上线',
+        type: 'info'
+      });
+    },
+    // 根据分数获取样式类
+    getScoreClass(score) {
+      if (score >= 80) return 'prediction-good';
+      if (score >= 60) return 'prediction-medium';
+      return 'prediction-poor';
+    },
+    // 根据预警级别获取样式类
+    getAlertClass(level) {
+      switch (level) {
+        case '高':
+          return 'high-risk';
+        case '中等':
+          return 'medium-risk';
+        case '低':
+          return 'low-risk';
+        default:
+          return '';
+      }
+    },
+    // 根据风险得分获取标签类型
+    getRiskTagType(riskScore) {
+      if (riskScore >= 0.7) return 'danger';
+      if (riskScore >= 0.5) return 'warning';
+      if (riskScore >= 0.3) return 'info';
+      return 'success';
+    },
     // 保存数据到localStorage
     saveDataToStorage() {
       const data = {
         riskData: this.riskData,
         subprocessData: this.subprocessData,
         predictionData: this.predictionData,
-        modelStatus: this.modelStatus,
         analysisResults: this.analysisResults,
         recommendations: this.recommendations,
         overallRecommendation: this.overallRecommendation
@@ -749,6 +1009,10 @@ export default {
 
 .ai-status-panel {
   border-left-color: #67C23A;
+}
+
+.business-situation-panel {
+  border-left-color: #909399;
 }
 
 .card-header {
@@ -810,6 +1074,10 @@ export default {
   color: #67C23A;
 }
 
+.prediction-medium {
+  color: #E6A23C;
+}
+
 .prediction-poor {
   color: #F56C6C;
 }
@@ -829,6 +1097,10 @@ export default {
 
 .ai-status-panel .card-header i {
   color: #67C23A;
+}
+
+.business-situation-panel .card-header i {
+  color: #909399;
 }
 
 .ai-status-panel .main-value {
@@ -948,7 +1220,12 @@ export default {
   margin-top: 20px;
 }
 
-.neural-header {
+.llm-analysis-card {
+  margin-top: 20px;
+}
+
+.neural-header,
+.llm-analysis-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -958,7 +1235,7 @@ export default {
   padding: 10px 0;
 }
 
-.network-info-panel,
+.network-planning-panel,
 .network-result-panel,
 .network-recommendation-panel {
   height: 100%;
@@ -968,12 +1245,20 @@ export default {
   border-left: 4px solid #dcdfe6;
 }
 
-.network-info-panel {
-  border-left-color: #409EFF;
+.network-planning-panel {
+  border-left-color: #E6A23C;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.network-planning-panel.clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(230, 162, 60, 0.15);
+  cursor: pointer;
 }
 
 .network-result-panel {
-  border-left-color: #E6A23C;
+  border-left-color: #409EFF;
 }
 
 .network-recommendation-panel {
@@ -1040,36 +1325,19 @@ export default {
   font-size: 20px;
 }
 
-.network-info-panel .panel-header i {
-  color: #409EFF;
+.network-planning-panel .panel-header i {
+  color: #E6A23C;
 }
 
 .network-result-panel .panel-header i {
-  color: #E6A23C;
+  color: #409EFF;
 }
 
 .network-recommendation-panel .panel-header i {
   color: #67C23A;
 }
 
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
 
-.info-label {
-  color: #606266;
-}
-
-.info-value {
-  font-weight: 500;
-}
-
-.accuracy {
-  color: #409EFF;
-  font-weight: bold;
-}
 
 .result-item {
   margin-bottom: 15px;
@@ -1127,21 +1395,86 @@ export default {
   color: #606266;
 }
 
-.status-active {
-  color: #67C23A;
-  display: flex;
-  align-items: center;
-}
 
-.status-active i {
-  margin-right: 5px;
-}
 
 .action-footer {
   margin-top: 30px;
   text-align: center;
-  padding: 20px 0;
+  padding: 25px 0;
   border-top: 1px dashed #DCDFE6;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* 大模型分析按钮美化 */
+.ai-analysis-btn {
+  position: relative;
+  background: linear-gradient(135deg, #67C23A 0%, #85CE61 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  transition: all 0.3s ease;
+  padding: 12px 24px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ai-analysis-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.ai-analysis-btn:hover::before {
+  left: 100%;
+}
+
+.ai-analysis-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(103, 194, 58, 0.4);
+}
+
+.ai-analysis-btn .btn-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-analysis-btn .btn-icon {
+  font-size: 16px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* 手动分析按钮美化 */
+.manual-analysis-btn {
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+  transition: all 0.3s ease;
+  padding: 12px 20px;
+  border-radius: 6px;
+}
+
+.manual-analysis-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 /* 模型输出弹窗样式 */
@@ -1266,10 +1599,347 @@ export default {
   }
 }
 
+/* 规划面板内容样式 */
+.network-planning-panel .main-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #E6A23C;
+}
+
+.network-planning-panel .sub-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.network-planning-panel .info-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.network-planning-panel .label {
+  color: #606266;
+  font-size: 12px;
+}
+
+.network-planning-panel .value {
+  font-weight: 500;
+  font-size: 12px;
+}
+
 .header-right {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* 大模型分析结果区域样式 */
+.llm-analysis-content {
+  padding: 20px 0;
+  min-height: 200px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 20px;
+}
+
+.empty-icon i {
+  font-size: 48px;
+  color: #C0C4CC;
+}
+
+.empty-text {
+  color: #606266;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-description {
+  font-size: 14px;
+  color: #909399;
+}
+
+/* 大模型分析结果展示样式 */
+.analysis-data {
+  padding: 0;
+}
+
+.section {
+  margin-bottom: 25px;
+  background-color: #fafafa;
+  border-radius: 6px;
+  padding: 20px;
+  border-left: 4px solid #E6A23C;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 15px;
+}
+
+.section-title i {
+  margin-right: 8px;
+  color: #E6A23C;
+  font-size: 18px;
+}
+
+/* 流程信息区域 */
+.process-section {
+  border-left-color: #409EFF;
+}
+
+.process-section .section-title i {
+  color: #409EFF;
+}
+
+.process-flow {
+  font-size: 14px;
+  color: #606266;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.process-id {
+  font-size: 13px;
+  color: #909399;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* 环境感知区域 */
+.environment-section {
+  border-left-color: #67C23A;
+  height: fit-content;
+}
+
+.environment-section .section-title i {
+  color: #67C23A;
+}
+
+.environment-text-content {
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+  overflow: hidden;
+}
+
+.environment-text {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #606266;
+  margin: 0;
+  padding: 15px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #fafbfc;
+  border: none;
+}
+
+/* 相似流程检索区域 */
+.similarity-section {
+  border-left-color: #909399;
+  margin-bottom: 20px;
+}
+
+.similarity-section .section-title i {
+  color: #909399;
+}
+
+.similarity-table,
+.nodes-table {
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #EBEEF5;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 100px;
+  background-color: #F5F7FA;
+  border-bottom: 1px solid #EBEEF5;
+}
+
+.nodes-table .table-header {
+  grid-template-columns: 60px 120px 1fr 80px 100px;
+}
+
+.table-header .col {
+  padding: 12px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #909399;
+  text-align: center;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 100px;
+  border-bottom: 1px solid #EBEEF5;
+}
+
+.nodes-table .table-row {
+  grid-template-columns: 60px 120px 1fr 80px 100px;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row .col {
+  padding: 10px 8px;
+  font-size: 12px;
+  color: #606266;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-row .process-id {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 11px;
+}
+
+.table-row .risk-factor {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.reference-row {
+  background-color: #FDF6EC;
+}
+
+.reference-time {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #E6A23C;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 时间预测区域 */
+.prediction-section {
+  border-left-color: #F56C6C;
+}
+
+.prediction-section .section-title i {
+  color: #F56C6C;
+}
+
+.prediction-content {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+  border: 1px solid #EBEEF5;
+}
+
+.prediction-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.prediction-item:last-child {
+  margin-bottom: 0;
+}
+
+.prediction-item .label {
+  font-size: 13px;
+  color: #606266;
+}
+
+.prediction-item .value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+}
+
+/* 节点分析区域 */
+.nodes-section {
+  border-left-color: #7C3AED;
+}
+
+.nodes-section .section-title i {
+  color: #7C3AED;
+}
+
+/* 建议区域 */
+.recommendations-section {
+  border-left-color: #F56C6C;
+}
+
+.recommendations-section .section-title i {
+  color: #F56C6C;
+}
+
+.recommendations-list {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+  border: 1px solid #EBEEF5;
+}
+
+.recommendation-item {
+  display: flex;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.recommendation-item:last-child {
+  margin-bottom: 0;
+}
+
+.recommendation-number {
+  font-weight: 600;
+  color: #F56C6C;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.recommendation-text {
+  font-size: 13px;
+  color: #606266;
+}
+
+.main-content {
+  margin-bottom: 25px;
+}
+
+/* 分析结果淡入动画 */
+.fade-in-enter-active {
+  transition: all 0.6s ease;
+}
+
+.fade-in-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-in-enter-to {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 </style> 

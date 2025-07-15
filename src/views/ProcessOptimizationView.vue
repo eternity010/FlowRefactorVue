@@ -38,13 +38,14 @@
               <span v-else>开始重构分析</span>
             </el-button>
             
+            <div class="secondary-buttons">
             <el-button 
               type="warning" 
               size="medium"
               @click="showNeuralNetworkSettings"
               class="settings-button">
               <i class="el-icon-setting"></i>
-              设置神经网络参数
+              设置参数
           </el-button>
           
           <el-button 
@@ -55,6 +56,7 @@
             <i class="el-icon-document"></i>
             配置RAG
           </el-button>
+            </div>
           </div>
           
           <div class="parameter-summary" v-if="showParameterSummary">
@@ -64,7 +66,7 @@
               :closable="false"
               show-icon>
               <template slot="title">
-                <span style="font-size: 14px; font-weight: bold;">当前神经网络参数配置</span>
+                <span style="font-size: 14px; font-weight: bold;">当前参数配置</span>
               </template>
               <div class="param-summary-content">
                 <span class="param-item">地缘政治影响: {{ neuralNetworkParams.geoPoliticalWeight }}</span>
@@ -97,17 +99,10 @@
                      </el-tag>
                    </div>
                    <div class="rag-status-item">
-                     <i class="el-icon-cpu"></i>
-                     <span class="rag-label">故障根因分析:</span>
-                     <el-tag size="mini" :type="ragConfig.faultAnalysis ? 'success' : 'danger'">
-                       {{ ragConfig.faultAnalysis ? '已启用' : '未启用' }}
-                     </el-tag>
-                   </div>
-                   <div class="rag-status-item">
-                     <i class="el-icon-lightning"></i>
-                     <span class="rag-label">能耗优化:</span>
-                     <el-tag size="mini" :type="ragConfig.energyOptimization ? 'success' : 'danger'">
-                       {{ ragConfig.energyOptimization ? '已启用' : '未启用' }}
+                     <i class="el-icon-share"></i>
+                     <span class="rag-label">多场景决策模型及知识图谱:</span>
+                     <el-tag size="mini" :type="ragConfig.processOptimization ? 'success' : 'danger'">
+                       {{ ragConfig.processOptimization ? '已启用' : '未启用' }}
                      </el-tag>
                    </div>
                  </div>
@@ -116,9 +111,6 @@
           </div>
         </div>
       </el-card>
-
-      <!-- 系统状态卡片 -->
-      <SystemStatusCard />
     </div>
 
     <!-- 加载动画页面 -->
@@ -148,7 +140,7 @@
               <div class="node" v-for="i in 3" :key="'output-' + i"></div>
             </div>
           </div>
-          <h3 class="loading-title">神经网络分析中</h3>
+          <h3 class="loading-title">分析中</h3>
           <p class="loading-description">正在分析流程数据，识别优化点...</p>
           <div class="progress-dots">
             <span class="dot"></span>
@@ -193,7 +185,7 @@
           <div class="selector-header">
             <h4 class="selector-title">选择优化方案</h4>
             <p class="selector-description">
-              页面将始终显示重构前流程和LLM智能重构流程，请选择要对比的传统重构方案
+              页面将始终显示重构前流程和LLM智能重构流程，请选择要对比的强化学习重构方案
             </p>
           </div>
                   <el-select 
@@ -203,17 +195,17 @@
           size="medium"
           class="solution-select">
           <el-option
-            label="平衡方案"
+            label="强化学习平衡方案"
             value="balanced"
             :disabled="false">
-            <span>平衡方案</span>
+            <span>强化学习平衡方案</span>
             <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
           </el-option>
           <el-option
-            label="资源优先"
+            label="强化学习资源优先"
             value="resource-first"
             :disabled="false">
-            <span>资源优先</span>
+            <span>强化学习资源优先</span>
             <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
           </el-option>
         </el-select>
@@ -248,14 +240,14 @@
               
               <!-- 根据选择的方案显示对应的重构流程 -->
               <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
-                <div class="opt-chart-title">平衡方案重构流程</div>
+                <div class="opt-chart-title">强化学习平衡方案重构流程</div>
                 <div class="chart-container">
                   <div :ref="`chart-after-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after')"></div>
                 </div>
               </div>
               
               <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
-                <div class="opt-chart-title">资源优先重构流程</div>
+                <div class="opt-chart-title">强化学习资源优先重构流程</div>
                 <div class="chart-container">
                   <div :ref="`chart-after2-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after2')"></div>
                 </div>
@@ -308,13 +300,12 @@
 
 <script>
 // import MermaidChart from '@/components/MermaidChart.vue'
-import SystemStatusCard from '@/components/SystemStatusCard.vue'
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { SystemStatusCard, ResourceChangeConfirmation },
+  components: { ResourceChangeConfirmation },
   data() {
     return {
       showMainContent: false, // 控制是否显示主要内容
@@ -325,7 +316,7 @@ export default {
       currentOptimizationKey: null,
       dataLoading: false, // API数据加载状态
       dataError: null, // API数据加载错误
-      selectedSolution: 'balanced', // 默认选择平衡方案
+      selectedSolution: 'balanced', // 默认选择强化学习平衡方案
       neuralNetworkParams: {
         geoPoliticalWeight: 1.0,
         marketVolatilityFactor: 0.8,
@@ -338,10 +329,9 @@ export default {
       showParameterSummary: false,
       showRAGSummary: false,
       ragConfig: {
-        faultAnalysis: false,
-        energyOptimization: false,
+        processOptimization: false,
         enabledCount: 0,
-        totalCount: 2
+        totalCount: 1
       },
       // 添加mermaid相关属性
       mermaidLoaded: false,
@@ -356,12 +346,12 @@ export default {
       const filtered = {};
       
       for (const [key, flowData] of Object.entries(this.optPoints)) {
-        // Optimization5需要故障根因分析RAG启用才显示
+        // Optimization5需要多场景决策模型及知识图谱RAG启用才显示
         if (key === 'Optimization5') {
-          if (this.ragConfig.faultAnalysis) {
+          if (this.ragConfig.processOptimization) {
             filtered[key] = flowData;
           }
-          // 如果未启用故障根因分析RAG，则不显示Optimization5
+          // 如果未启用多场景决策模型及知识图谱RAG，则不显示Optimization5
         } else {
           // 其他优化项目正常显示
           filtered[key] = flowData;
@@ -390,7 +380,7 @@ export default {
         };
       }
       
-      // 默认返回平衡方案
+        // 默认返回强化学习平衡方案
       return {
         ...optimizationData.resourceChanges,
         ganttData: optimizationData.ganttData
@@ -514,8 +504,7 @@ export default {
           const totalCount = Object.keys(ragStatus).length;
           
           this.ragConfig = {
-            faultAnalysis: ragStatus.faultAnalysis || false,
-            energyOptimization: ragStatus.energyOptimization || false,
+            processOptimization: ragStatus.processOptimization || false,
             enabledCount: enabledCount,
             totalCount: totalCount
           };
@@ -691,11 +680,11 @@ export default {
 
     getAfterTitle() {
       if (this.selectedSolution === 'balanced') {
-        return '平衡方案后的流程';
+        return '强化学习平衡方案后的流程';
       } else if (this.selectedSolution === 'resource-first') {
-        return '资源优先方案后的流程';
+        return '强化学习资源优先方案后的流程';
       }
-      return '重构方案';
+      return '强化学习重构方案';
     },
 
     getAfterFlowData(key) {
@@ -844,6 +833,13 @@ export default {
   margin: 30px 0;
 }
 
+.secondary-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+}
+
 .refactor-button {
   padding: 15px 40px;
   font-size: 18px;
@@ -935,7 +931,7 @@ export default {
 
 .rag-status-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
@@ -984,13 +980,30 @@ export default {
   }
   
   .rag-status-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 10px;
+  }
+  
+  .secondary-buttons {
+    gap: 12px;
+  }
+  
+  .settings-button {
+    min-width: 160px;
+  }
+  
+  .rag-button {
+    min-width: 130px;
   }
 }
 
 @media (max-width: 768px) {
   .action-buttons {
+    gap: 10px;
+  }
+  
+  .secondary-buttons {
+    flex-direction: column;
     gap: 10px;
   }
   
@@ -1033,6 +1046,24 @@ export default {
   
   .rag-status-item i {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .secondary-buttons {
+    gap: 8px;
+  }
+  
+  .settings-button {
+    padding: 6px 15px;
+    font-size: 12px;
+    min-width: 120px;
+  }
+  
+  .rag-button {
+    padding: 6px 15px;
+    font-size: 12px;
+    min-width: 100px;
   }
 }
 

@@ -9,41 +9,41 @@
         <h2 class="rag-title">RAG (检索增强生成) 配置</h2>
         <p class="rag-description">在此页面配置RAG相关参数和设置</p>
         
-        <!-- 故障根因分析RAG配置 -->
-        <div class="rag-section" :class="{ 'disabled-section': !ragEnabledStatus.faultAnalysis }">
+        <!-- 多场景决策模型及知识图谱RAG配置 -->
+        <div class="rag-section" :class="{ 'disabled-section': !ragEnabledStatus.processOptimization }">
           <div class="section-header">
             <h3 class="section-title">
-              <i class="el-icon-cpu"></i>
-              故障根因分析RAG
+              <i class="el-icon-share"></i>
+              多场景决策模型及知识图谱RAG
             </h3>
             <div class="section-control">
               <span class="control-label">启用</span>
               <el-switch
-                v-model="ragEnabledStatus.faultAnalysis"
-                @change="handleRAGStatusChange('faultAnalysis', $event)"
+                v-model="ragEnabledStatus.processOptimization"
+                @change="handleRAGStatusChange('processOptimization', $event)"
                 active-color="#67C23A"
                 inactive-color="#DCDFE6">
               </el-switch>
             </div>
           </div>
           
-          <!-- 知识库构建 -->
+          <!-- 课题二研究成果数据源 -->
           <div class="config-subsection">
-            <h4 class="subsection-title">数据源示例</h4>
-            <el-table :data="faultAnalysisConfig" stripe class="config-table">
-              <el-table-column prop="dataType" label="数据类型" width="150">
+            <h4 class="subsection-title">课题二研究成果数据源</h4>
+            <el-table :data="processOptimizationConfig" stripe class="config-table">
+              <el-table-column prop="dataSource" label="数据来源" width="180">
                 <template slot-scope="scope">
-                  <el-tag :type="getFaultAnalysisTagType(scope.row.dataType)" size="small">
-                    {{ scope.row.dataType }}
+                  <el-tag :type="getDataSourceTagType(scope.row.dataSource)" size="small">
+                    {{ scope.row.dataSource }}
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="description" label="具体内容" min-width="220">
+              <el-table-column prop="description" label="具体内容" min-width="240">
                 <template slot-scope="scope">
                   <span class="data-description-text">{{ scope.row.description }}</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="processing" label="处理方式" width="160">
+              <el-table-column prop="processing" label="处理方式" width="140">
                 <template slot-scope="scope">
                   <el-tag :type="getProcessingTagType(scope.row.processing)" size="small">
                     {{ scope.row.processing }}
@@ -55,8 +55,8 @@
                   <el-button 
                     type="text" 
                     size="small" 
-                    @click="configureFaultAnalysis(scope.row)"
-                    :disabled="!ragEnabledStatus.faultAnalysis"
+                    @click="configureProcessOptimization(scope.row)"
+                    :disabled="!ragEnabledStatus.processOptimization"
                     icon="el-icon-setting">
                     配置
                   </el-button>
@@ -66,62 +66,7 @@
           </div>
         </div>
 
-        <!-- 能耗优化RAG配置 -->
-        <div class="rag-section" :class="{ 'disabled-section': !ragEnabledStatus.energyOptimization }">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="el-icon-lightning"></i>
-              能耗优化RAG
-            </h3>
-            <div class="section-control">
-              <span class="control-label">启用</span>
-              <el-switch
-                v-model="ragEnabledStatus.energyOptimization"
-                @change="handleRAGStatusChange('energyOptimization', $event)"
-                active-color="#67C23A"
-                inactive-color="#DCDFE6">
-              </el-switch>
-            </div>
-          </div>
-          
-          <!-- 特色数据接入 -->
-          <div class="config-subsection">
-            <h4 class="subsection-title">特色数据接入</h4>
-            <el-table :data="energyOptimizationConfig" stripe class="config-table">
-              <el-table-column prop="dataType" label="数据类型" width="150">
-                <template slot-scope="scope">
-                  <el-tag :type="getEnergyOptimizationTagType(scope.row.dataType)" size="small">
-                    {{ scope.row.dataType }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="description" label="具体内容" min-width="200">
-                <template slot-scope="scope">
-                  <span class="data-description-text">{{ scope.row.description }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="dataSource" label="数据源" width="160">
-                <template slot-scope="scope">
-                  <el-tag :type="getEnergyDataSourceTagType(scope.row.dataSource)" size="small">
-                    {{ scope.row.dataSource }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="100">
-                <template slot-scope="scope">
-                  <el-button 
-                    type="text" 
-                    size="small" 
-                    @click="configureEnergyOptimization(scope.row)"
-                    :disabled="!ragEnabledStatus.energyOptimization"
-                    icon="el-icon-setting">
-                    配置
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
+
         
         <!-- 操作按钮区域 -->
         <div class="action-buttons">
@@ -152,116 +97,62 @@ export default {
   },
   data() {
     return {
-      // 故障根因分析RAG配置
-      faultAnalysisConfig: [
+      // 多场景决策模型及知识图谱RAG配置 - 基于课题二研究成果
+      processOptimizationConfig: [
         {
-          dataType: '结构化数据',
-          description: '知识图谱、维修手册',
-          processing: 'API接口'
+          dataSource: '多场景智能运营决策模型',
+          description: '物料供应-生产调度融合决策机制，构建生产、采购一体化模型',
+          processing: '模型接口'
         },
         {
-          dataType: '非结构化数据',
-          description: '工程师经验笔记',
-          processing: 'OCR识别PDF'
-        },
-        {
-          dataType: '跨系统关联',
-          description: '同一型号列车在其他路局的故障记录',
-          processing: '关联分析'
+          dataSource: '知识图谱系统',
+          description: '面向多场景运营决策的知识图谱构建技术，装备制造知识获取',
+          processing: '图谱查询'
         }
       ],
-      // 能耗优化RAG配置
-      energyOptimizationConfig: [
-        {
-          dataType: '电网数据',
-          description: '分时电价',
-          dataSource: '国家电网API'
-        },
-        {
-          dataType: '生产计划',
-          description: '高耗能工序时间表',
-          dataSource: '生产系统'
-        },
-        {
-          dataType: '碳足迹数据库',
-          description: '不同能源的碳排放系数',
-          dataSource: '环保部数据'
-        }
-      ],
+
       // RAG启用状态
       ragEnabledStatus: {
-        faultAnalysis: false,  // 故障根因分析RAG默认关闭
-        energyOptimization: false  // 能耗优化RAG默认关闭
+        processOptimization: false  // 多场景决策模型及知识图谱RAG默认关闭
       }
     }
   },
   methods: {
     
-    // 获取故障分析数据类型标签颜色
-    getFaultAnalysisTagType(dataType) {
-      const typeMap = {
-        '结构化数据': 'success',
-        '非结构化数据': 'warning',
-        '跨系统关联': 'primary'
+    // 获取数据来源标签颜色
+    getDataSourceTagType(dataSource) {
+      const sourceMap = {
+        '多场景智能运营决策模型': 'success',
+        '知识图谱系统': 'warning'
       };
-      return typeMap[dataType] || 'info';
+      return sourceMap[dataSource] || 'info';
     },
     
     // 获取处理方式标签颜色
     getProcessingTagType(processing) {
       const processingMap = {
-        'API接口': 'success',
-        'OCR识别PDF': 'warning',
-        '关联分析': 'primary'
+        '模型接口': 'success',
+        '图谱查询': 'warning'
       };
       return processingMap[processing] || 'info';
     },
     
-    // 配置故障分析
-    configureFaultAnalysis(row) {
-      if (!this.ragEnabledStatus.faultAnalysis) {
-        this.$message.warning('请先启用故障根因分析RAG');
+    // 配置多场景决策模型及知识图谱
+    configureProcessOptimization(row) {
+      if (!this.ragEnabledStatus.processOptimization) {
+        this.$message.warning('请先启用多场景决策模型及知识图谱RAG');
         return;
       }
-      this.$message.info(`正在配置 ${row.dataType} - ${row.processing}...`);
-      // TODO: 实现具体的故障分析配置功能
+      this.$message.info(`正在配置 ${row.dataSource} - ${row.processing}...`);
+      // TODO: 实现具体的多场景决策模型及知识图谱配置功能
     },
     
-    // 获取能耗优化数据类型标签颜色
-    getEnergyOptimizationTagType(dataType) {
-      const typeMap = {
-        '电网数据': 'warning',
-        '生产计划': 'primary',
-        '碳足迹数据库': 'success'
-      };
-      return typeMap[dataType] || 'info';
-    },
-    
-    // 获取能耗数据源标签颜色
-    getEnergyDataSourceTagType(dataSource) {
-      const sourceMap = {
-        '国家电网API': 'warning',
-        '生产系统': 'primary',
-        '环保部数据': 'success'
-      };
-      return sourceMap[dataSource] || 'info';
-    },
-    
-    // 配置能耗优化
-    configureEnergyOptimization(row) {
-      if (!this.ragEnabledStatus.energyOptimization) {
-        this.$message.warning('请先启用能耗优化RAG');
-        return;
-      }
-      this.$message.info(`正在配置 ${row.dataType} - ${row.dataSource}...`);
-      // TODO: 实现具体的能耗优化配置功能
-    },
+
     
     // 处理RAG启用状态变化
     handleRAGStatusChange(ragType, status) {
       const ragNames = {
-        faultAnalysis: '故障根因分析RAG',
-        energyOptimization: '能耗优化RAG'
+        processOptimization: '多场景决策模型及知识图谱RAG'
       };
       
       if (status) {
@@ -450,12 +341,8 @@ export default {
   line-height: 1.4;
 }
 
-.section-title i.el-icon-cpu {
+.section-title i.el-icon-share {
   color: #409EFF;
-}
-
-.section-title i.el-icon-lightning {
-  color: #E6A23C;
 }
 
 /* 表格样式优化 */

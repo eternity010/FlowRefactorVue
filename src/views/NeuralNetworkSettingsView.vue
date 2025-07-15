@@ -1,10 +1,10 @@
 <template>
-  <div class="neural-network-settings-view">
+  <div class="parameter-settings-view">
     <!-- 页面头部 -->
     <div class="page-header">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/home/process-optimization' }">流程重构优化</el-breadcrumb-item>
-        <el-breadcrumb-item>神经网络参数设置</el-breadcrumb-item>
+        <el-breadcrumb-item>参数设置</el-breadcrumb-item>
       </el-breadcrumb>
       
       <div class="header-actions">
@@ -20,15 +20,15 @@
 
     <!-- 主要内容区域 -->
     <div class="content-wrapper">
-      <el-card class="neural-settings-card">
+      <el-card class="settings-card">
         <div slot="header" class="settings-header">
-          <span>神经网络参数设置</span>
+          <span>参数设置</span>
           <el-tag size="small" type="info">运行配置</el-tag>
         </div>
         
         <div class="settings-content">
           <div class="settings-description">
-            <p>调整神经网络运行参数以优化分析结果</p>
+            <p>调整运行参数以优化分析结果</p>
           </div>
           
           <!-- 风险评估参数 -->
@@ -443,7 +443,7 @@
 
 <script>
 export default {
-  name: 'NeuralNetworkSettingsView',
+  name: 'ParameterSettingsView',
   data() {
     return {
       geoPoliticalWeight: 1.0,
@@ -689,7 +689,7 @@ export default {
     applySettings() {
       const allParams = this.saveParams();
       
-      this.$message.success('神经网络参数已全部应用并保存');
+      this.$message.success('参数已全部应用并保存');
       
       setTimeout(() => {
         this.goBack();
@@ -723,7 +723,7 @@ export default {
 </script>
 
 <style scoped>
-.neural-network-settings-view {
+.parameter-settings-view {
   padding: 20px;
   background-color: #f5f7fa;
   min-height: 100vh;
@@ -750,7 +750,7 @@ export default {
   margin: 0 auto;
 }
 
-.neural-settings-card {
+.settings-card {
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
