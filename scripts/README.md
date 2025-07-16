@@ -58,9 +58,97 @@
 - 嵌套查询：查询步骤和任务信息
 - 聚合查询：统计和分析数据
 
+### 流程数据脚本
+
+#### 3. `import-processflowdata-to-mongodb.js` - 流程数据导入脚本
+
+**功能：**
+- 从 `src/data/processFlowData.js` 读取流程数据
+- 将数据导入到 MongoDB 数据库（process_flow_data 集合）
+- 支持四种流程：采购、生产、营销、运维
+- 自动计算统计摘要和趋势分析
+- 创建必要的索引以提高查询性能
+
+**数据结构：**
+```javascript
+{
+  _id: ObjectId("..."),
+  flowType: "purchase",        // 流程类型
+  flowName: "采购环节",         // 流程名称
+  description: "采购流程相关的月度数据和关键指标",
+  chartData: [                 // 月度图表数据
+    { month: "1月", value: 920000 },
+    { month: "2月", value: 850000 },
+    // ...
+  ],
+  panelData: [                 // 关键指标面板数据
+    { label: "当月采购总额", value: "¥1,256,890", unit: "" },
+    { label: "未处理申请", value: "24", unit: "件" },
+    // ...
+  ],
+  chartSummary: {              // 图表数据统计摘要
+    totalMonths: 6,
+    latestValue: 1256890,
+    earliestValue: 920000,
+    averageValue: 1026148,
+    maxValue: 1256890,
+    minValue: 850000
+  },
+  panelSummary: {              // 面板数据处理后的结构
+    totalPanels: 4,
+    panels: [...]
+  },
+  createdAt: ISODate("..."),
+  updatedAt: ISODate("...")
+}
+```
+
+### 流程节点数据脚本
+
+#### 4. `import-flownodesdata-to-mongodb.js` - 流程节点数据导入脚本
+
+**功能：**
+- 从 `src/data/flowNodesData.js` 读取流程节点详细信息数据
+- 将数据导入到 MongoDB 数据库（flow_nodes 集合）
+- 支持四种流程类型：运维(operation)、采购(purchase)、生产(production)、营销(marketing)
+- 创建必要的索引以提高查询性能
+- 提供详细的统计分析和风险评估
+
+**数据结构：**
+```javascript
+{
+  _id: ObjectId("..."),
+  nodeId: "101",           // 节点ID (如: 101, p1, prod1, m1)
+  flowType: "operation",   // 流程类型
+  title: "里程数周期性维护",    // 节点标题
+  description: "根据设备运行里程数达到特定值时进行的计划性维护工作",
+  responsibleDept: "设备维护部",  // 责任部门
+  cycleTime: "每5000小时或每季度", // 周期时间
+  riskLevel: "中",              // 风险等级 (低/中/高)
+  createdAt: ISODate("..."),
+  updatedAt: ISODate("...")
+}
+```
+
+#### 5. `test-flownodesdata-queries.js` - 流程节点查询测试脚本
+
+**功能：**
+- 验证流程节点数据导入是否成功
+- 按流程类型和风险等级进行统计分析
+- 提供部门责任分布查询
+- 支持全文搜索和复合查询
+- 展示风险分布矩阵
+
+**查询示例：**
+- 基本统计：总节点数、各流程类型节点数
+- 风险分析：高风险节点识别、风险等级分布
+- 部门分析：各部门负责的节点统计
+- 文本搜索：查找包含特定关键词的节点
+- 复合查询：多条件组合查询（如：质检部的高风险节点）
+
 ### 流程优化数据脚本
 
-#### 3. `import-process-optimization-to-mongodb.js` - 流程优化数据导入脚本
+#### 6. `import-process-optimization-to-mongodb.js` - 流程优化数据导入脚本
 
 **功能：**
 - 从 `src/data/processOptimizationFlowData.js` 读取流程优化数据
@@ -93,7 +181,7 @@
 }
 ```
 
-#### 4. `test-process-optimization-queries.js` - 流程优化查询测试脚本
+#### 7. `test-process-optimization-queries.js` - 流程优化查询测试脚本
 
 **功能：**
 - 验证流程优化数据导入是否成功
@@ -118,6 +206,15 @@ npm run import-data
 # 测试运维流程查询功能
 npm run test-db
 
+# 导入流程节点数据到 MongoDB (NEW)
+npm run import-flownodes
+
+# 测试流程节点查询功能 (NEW)
+npm run test-flownodes
+
+# 导入流程数据到 MongoDB (NEW)
+npm run import-processflow
+
 # 导入流程优化数据到 MongoDB
 npm run import-optimization
 
@@ -134,6 +231,15 @@ node scripts/import-to-mongodb.js
 # 测试运维流程查询
 node scripts/test-mongodb-queries.js
 
+# 导入流程节点数据
+node scripts/import-flownodesdata-to-mongodb.js
+
+# 测试流程节点查询
+node scripts/test-flownodesdata-queries.js
+
+# 导入流程数据
+node scripts/import-processflowdata-to-mongodb.js
+
 # 导入流程优化数据
 node scripts/import-process-optimization-to-mongodb.js
 
@@ -147,6 +253,8 @@ node scripts/test-process-optimization-queries.js
 - **数据库URI：** `mongodb://localhost:27017`
 - **数据库名：** `maintenance_system`
 - **运维流程集合：** `operation_implementations`
+- **流程节点集合：** `flow_nodes`
+- **流程数据集合：** `process_flow_data`
 - **流程优化集合：** `process_optimization_flows`
 
 如需修改配置，请编辑脚本文件顶部的常量：
@@ -188,7 +296,86 @@ db.operation_implementations.aggregate([
 ])
 ```
 
-### 5. 查询流程优化数据
+### 5. 查询流程节点数据
+```javascript
+// 查询特定节点
+db.flow_nodes.findOne({ nodeId: "101" })
+
+// 查询运维流程的所有节点
+db.flow_nodes.find({ flowType: "operation" })
+
+// 查询高风险节点
+db.flow_nodes.find({ riskLevel: "高" })
+
+// 查询质检部负责的节点
+db.flow_nodes.find({ responsibleDept: "质检部" })
+
+// 文本搜索：查找包含"维修"的节点
+db.flow_nodes.find({ $text: { $search: "维修" } })
+
+// 复合查询：质检部的中高风险节点
+db.flow_nodes.find({
+  responsibleDept: "质检部",
+  riskLevel: { $in: ["中", "高"] }
+})
+
+// 聚合查询：各流程类型的风险分布
+db.flow_nodes.aggregate([
+  {
+    $group: {
+      _id: { flowType: "$flowType", riskLevel: "$riskLevel" },
+      count: { $sum: 1 }
+    }
+  },
+  { $sort: { "_id.flowType": 1, "_id.riskLevel": 1 } }
+])
+```
+
+### 6. 查询流程数据
+```javascript
+// 查询特定流程数据
+db.process_flow_data.findOne({ flowType: "purchase" })
+
+// 查询所有流程的最新数值
+db.process_flow_data.find(
+  {},
+  { flowName: 1, "chartSummary.latestValue": 1 }
+)
+
+// 查询增长率最高的流程
+db.process_flow_data.aggregate([
+  {
+    $addFields: {
+      growthRate: {
+        $multiply: [
+          {
+            $divide: [
+              { $subtract: ["$chartSummary.latestValue", "$chartSummary.earliestValue"] },
+              "$chartSummary.earliestValue"
+            ]
+          },
+          100
+        ]
+      }
+    }
+  },
+  { $sort: { growthRate: -1 } }
+])
+
+// 查询特定面板指标
+db.process_flow_data.find(
+  { "panelData.label": { $regex: "完成率", $options: "i" } },
+  { flowName: 1, "panelData.$": 1 }
+)
+
+// 查询月度数据范围
+db.process_flow_data.find(
+  { "chartSummary.maxValue": { $gte: 1000000 } },
+  { flowName: 1, "chartSummary": 1 }
+)
+```
+
+### 7. 查询流程优化数据
 ```javascript
 // 查询流程优化记录
 db.process_optimization_flows.findOne({ id: "Optimization1" })
@@ -222,6 +409,20 @@ db.process_optimization_flows.aggregate([
 - `{ "data.title": 1 }` - 用于标题搜索
 - `{ "data.steps": 1 }` - 用于步骤查询
 
+**流程节点数据索引：**
+- `{ nodeId: 1, flowType: 1 }` - 唯一复合索引，用于快速查找特定流程的特定节点
+- `{ flowType: 1 }` - 用于按流程类型查询
+- `{ riskLevel: 1 }` - 用于风险等级查询
+- `{ responsibleDept: 1 }` - 用于部门查询
+- `{ title: "text", description: "text" }` - 全文搜索索引
+
+**流程数据索引：**
+- `{ flowType: 1 }` - 唯一索引，用于快速查找特定流程类型
+- `{ flowName: 1 }` - 用于流程名称查询
+- `{ "chartSummary.latestValue": -1 }` - 用于按最新数值排序
+- `{ "panelData.label": 1 }` - 用于面板指标查询
+- `{ description: "text", flowName: "text" }` - 全文搜索索引
+
 **流程优化数据索引：**
 - `{ id: 1 }` - 唯一索引，用于快速查找特定优化方案
 - `{ "data.title": 1 }` - 用于标题搜索
@@ -254,6 +455,8 @@ db.process_optimization_flows.aggregate([
 3. 选择 `maintenance_system` 数据库
 4. 浏览集合：
    - `operation_implementations` - 运维流程数据
+   - `flow_nodes` - 流程节点数据
+   - `process_flow_data` - 流程数据
    - `process_optimization_flows` - 流程优化数据
 
 这样可以可视化地查看和编辑数据。
@@ -268,6 +471,49 @@ db.process_optimization_flows.aggregate([
 - `o5`: 系统升级维护实现流程
 - `o6`: 安全巡检实现流程
 
+### 流程节点数据（约30个节点）
+包含四种流程类型的详细节点信息：
+
+**运维流程节点（12个）：**
+- 里程数周期性维护、客户整改需求、故障报警等维护相关节点
+- 涵盖从故障检测到修复完成的完整流程
+- 风险等级：低、中、高三个级别
+
+**采购流程节点（8个）：**
+- 采购需求、供应商选择、价格审批、合同签订等采购环节
+- 包含质量检验、入库、退回处理等关键控制点
+
+**生产流程节点（8个）：**
+- 生产计划制定、原材料准备、生产加工、产品质检等生产环节
+- 涵盖从计划到成品入库的完整生产链
+
+**营销流程节点（7个）：**
+- 市场调研、策略制定、渠道开发、线上线下推广等营销活动
+- 包含效果评估和策略调整的闭环管理
+
+### 流程数据（4条记录）
+包含四种流程的月度数据和关键指标：
+
+**采购环节数据：**
+- 月度采购总额趋势（6个月数据：850,000 - 1,256,890）
+- 关键指标：当月采购总额、未处理申请数、合作供应商数、采购完成率
+- 增长趋势：36.6% ↗️
+
+**生产环节数据：**
+- 月度产量趋势（6个月数据：850 - 1,200件）
+- 关键指标：当月产量、生产计划达成率、产品合格率、设备利用率
+- 增长趋势：41.2% ↗️
+
+**营销环节数据：**
+- 月度销售额趋势（6个月数据：880,000 - 1,450,000）
+- 关键指标：当月销售额、新增客户数、销售增长率、销售目标完成率
+- 增长趋势：64.8% ↗️
+
+**运维环节数据：**
+- 月度故障数趋势（6个月数据：24 - 9起）
+- 关键指标：故障响应时间、当月故障数、维护计划完成率、设备完好率
+- 改善趋势：-62.5% ↘️（故障数减少表示改善）
+
 ### 流程优化数据（4条记录）
 - `Optimization1`: 采购流程重构优化（人员风险管控）
 - `Optimization2`: 供应商选择流程重构优化（应对关税战）
@@ -279,4 +525,42 @@ db.process_optimization_flows.aggregate([
 - 详细的资源变化分析
 - 完整版和简化版实施方案
 - 甘特图项目计划
-- 人员、系统、文档、设备需求分析 
+- 人员、系统、文档、设备需求分析
+
+### 流程节点数据特点
+每个流程节点包含：
+- 节点唯一标识和所属流程类型
+- 详细的职责描述和负责部门
+- 明确的执行周期和时间要求
+- 科学的风险等级评估
+- 便于查询和分析的标准化结构
+
+**风险管理：**
+- 高风险节点：需要重点监控和特殊处理
+- 中风险节点：需要定期检查和预防措施
+- 低风险节点：正常流程处理，减少管理成本
+
+**部门协作：**
+- 明确各部门职责分工
+- 便于跨部门协调和沟通
+- 支持责任追溯和绩效评估
+
+### 流程数据特点
+每个流程数据文档包含：
+- 完整的月度时间序列数据（6个月）
+- 关键业务指标的实时监控面板
+- 自动计算的统计摘要信息
+- 数据趋势分析和增长率计算
+- 支持多维度查询和分析的索引结构
+
+**业务价值：**
+- 趋势分析：营销环节增长最快（64.8%），运维效率显著提升
+- 绩效监控：生产和采购环节稳步增长，均超过35%
+- 异常识别：运维故障数大幅下降，说明维护策略有效
+- 决策支持：为管理层提供数据驱动的业务洞察
+
+**数据应用：**
+- 仪表板展示各流程的实时关键指标
+- 趋势图表显示业务发展轨迹
+- 对比分析不同流程的表现差异
+- 预测分析基于历史数据预测未来趋势 

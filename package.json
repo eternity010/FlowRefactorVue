@@ -11,7 +11,11 @@
     "import-data": "node scripts/import-to-mongodb.js",
     "test-db": "node scripts/test-mongodb-queries.js",
     "import-optimization": "node scripts/import-process-optimization-to-mongodb.js",
-    "test-optimization": "node scripts/test-process-optimization-queries.js"
+    "test-optimization": "node scripts/test-process-optimization-queries.js",
+    "import-flownodes": "node scripts/import-flownodesdata-to-mongodb.js",
+    "test-flownodes": "node scripts/test-flownodesdata-queries.js",
+    "import-processflow": "node scripts/import-processflowdata-to-mongodb.js",
+    "test-processflow-service": "node scripts/test-processflowdata-service.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",
