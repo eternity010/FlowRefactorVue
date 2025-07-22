@@ -1,0 +1,541 @@
+// 规划时间分析数据 - 适合MongoDB存储格式
+// 用于神经网络模型预测和流程分析
+
+const planningTimeData = {
+  // 文档元数据
+  _id: `planning_time_${new Date('2025-07-21T00:00:00.000Z').toISOString().replace(/[:.]/g, '-')}`,
+  documentType: 'planning_time_analysis',
+  version: '1.1.0',
+  createdAt: new Date('2025-07-21T00:00:00.000Z'),
+  updatedAt: new Date('2025-07-21T00:00:00.000Z'),
+  
+  // 基础统计数据
+  statistics: {
+    processNodes: 156,
+    monitoringRate: 85, // ms
+    totalSamples: 1,
+    activeModels: 3
+  },
+  
+  // 样本数据
+  sampleData: {
+    sampleId: 'sample_001',
+    nodePath: ['S_21', 'S7', 'S15', 'S14', 'S15', 'S5'],
+    nodeCount: 6,
+    edgeCount: 5,
+    edges: [
+      {
+        id: 'edge_001',
+        edgeLabel: '边1',
+        connection: 'S21 → S7',
+        sourceNode: 'S21',
+        targetNode: 'S7',
+        edgeType: 'mc',
+        riskMetrics: {
+          riskFrom: 0.750,
+          riskTo: 0.793,
+          riskIncrease: 0.043
+        },
+        timeMetrics: {
+          theoreticalTime: 59.42,
+          actualTime: 94.94,
+          deviation: 59.8,
+          deviationPercent: '+59.8%'
+        }
+      },
+      {
+        id: 'edge_002',
+        edgeLabel: '边2',
+        connection: 'S7 → S15',
+        sourceNode: 'S7',
+        targetNode: 'S15',
+        edgeType: 'mc',
+        riskMetrics: {
+          riskFrom: 0.793,
+          riskTo: 0.243,
+          riskIncrease: -0.550
+        },
+        timeMetrics: {
+          theoreticalTime: 41.74,
+          actualTime: 46.04,
+          deviation: 4.3,
+          deviationPercent: '+10.3%'
+        }
+      },
+      {
+        id: 'edge_003',
+        edgeLabel: '边3',
+        connection: 'S15 → S14',
+        sourceNode: 'S15',
+        targetNode: 'S14',
+        edgeType: 'mc',
+        riskMetrics: {
+          riskFrom: 0.243,
+          riskTo: 0.579,
+          riskIncrease: 0.336
+        },
+        timeMetrics: {
+          theoreticalTime: 84.50,
+          actualTime: 59.96,
+          deviation: -24.54,
+          deviationPercent: '-29.0%'
+        }
+      },
+      {
+        id: 'edge_004',
+        edgeLabel: '边4',
+        connection: 'S14 → S15',
+        sourceNode: 'S14',
+        targetNode: 'S15',
+        edgeType: 'rpc',
+        riskMetrics: {
+          riskFrom: 0.579,
+          riskTo: 0.243,
+          riskIncrease: -0.336
+        },
+        timeMetrics: {
+          theoreticalTime: 41.84,
+          actualTime: 35.92,
+          deviation: -5.92,
+          deviationPercent: '-14.2%'
+        }
+      },
+      {
+        id: 'edge_005',
+        edgeLabel: '边5',
+        connection: 'S15 → S5',
+        sourceNode: 'S15',
+        targetNode: 'S5',
+        edgeType: 'mc',
+        riskMetrics: {
+          riskFrom: 0.243,
+          riskTo: 0.405,
+          riskIncrease: 0.162
+        },
+        timeMetrics: {
+          theoreticalTime: 27.22,
+          actualTime: 18.04,
+          deviation: -9.18,
+          deviationPercent: '-33.7%'
+        }
+      }
+    ],
+    totalMetrics: {
+      totalActualTime: 254.91,
+      totalTheoreticalTime: 254.71,
+      overallDeviation: 0.2,
+      overallDeviationPercent: '+0.08%'
+    }
+  },
+  
+  // 神经网络模型预测方案
+  predictionSchemes: [
+    {
+      schemeId: 'scheme_lr',
+      schemeName: '方案A-LR',
+      modelType: 'Linear Regression',
+      isActive: true,
+      currentAccuracy: 99.22,
+      accuracyHistory: [97.2, 98.1, 97.8, 98.9, 99.1, 98.7, 99.3, 98.5, 99.0, 99.4, 98.8, 99.2, 99.1, 99.22],
+      prediction: {
+        predictedTime: 252.92,
+        actualTime: 254.91,
+        error: -1.99,
+        errorPercent: -0.78,
+        errorLevel: 'low'
+      },
+      performance: {
+        trend: 'stable',
+        reliability: 'high',
+        lastUpdated: new Date('2025-07-21T00:00:00.000Z')
+      }
+    },
+    {
+      schemeId: 'scheme_xgb',
+      schemeName: '方案B-XGB',
+      modelType: 'XGBoost',
+      isActive: true,
+      currentAccuracy: 99.33,
+      accuracyHistory: [97.5, 98.2, 98.7, 99.1, 98.9, 99.4, 98.8, 99.2, 99.0, 99.5, 99.1, 99.3, 99.4, 99.33],
+      prediction: {
+        predictedTime: 253.20,
+        actualTime: 254.91,
+        error: -1.71,
+        errorPercent: -0.67,
+        errorLevel: 'low'
+      },
+      performance: {
+        trend: 'stable',
+        reliability: 'high',
+        lastUpdated: new Date('2025-07-21T00:00:00.000Z')
+      }
+    },
+    {
+      schemeId: 'scheme_gcn',
+      schemeName: '方案C-GCN',
+      modelType: 'Graph Convolutional Network',
+      isActive: true,
+      currentAccuracy: 84.37,
+      accuracyHistory: [82.1, 83.2, 82.8, 83.9, 84.1, 83.7, 84.3, 83.5, 84.0, 84.4, 83.8, 84.2, 84.1, 84.37],
+      prediction: {
+        predictedTime: 294.75,
+        actualTime: 254.91,
+        error: 39.84,
+        errorPercent: 15.63,
+        errorLevel: 'high'
+      },
+      performance: {
+        trend: 'stable',
+        reliability: 'medium',
+        lastUpdated: new Date('2025-07-21T00:00:00.000Z')
+      }
+    }
+  ],
+  
+  // 神经网络控制台输出模板
+  consoleTemplate: {
+    templateId: 'neural_network_console_v1',
+    executionSteps: [
+      {
+        step: 1,
+        delay: 100,
+        logLevel: 'info',
+        message: '正在加载神经网络模型...',
+        category: 'initialization'
+      },
+      {
+        step: 2,
+        delay: 600,
+        logLevel: 'info',
+        message: '模型加载完成，开始预测...',
+        category: 'initialization'
+      },
+      {
+        step: 3,
+        delay: 1200,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 4,
+        delay: 1200,
+        logLevel: 'success',
+        message: '=== 样本详细信息 ===',
+        category: 'header'
+      },
+      {
+        step: 5,
+        delay: 1200,
+        logLevel: 'info',
+        message: "节点路径: ['S21', 'S_7', 'S15', 'S14', 'S 15', 'S 5']",
+        category: 'sample_info'
+      },
+      {
+        step: 6,
+        delay: 1200,
+        logLevel: 'info',
+        message: '节点数量: 6 | 边数量: 5',
+        category: 'sample_info'
+      },
+      {
+        step: 7,
+        delay: 1800,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 8,
+        delay: 1800,
+        logLevel: 'success',
+        message: '=== 边详情 ===',
+        category: 'header'
+      },
+      // 边1详情
+      {
+        step: 9,
+        delay: 2200,
+        logLevel: 'info',
+        message: '[边1] S_21 -> S_7',
+        category: 'edge_info'
+      },
+      {
+        step: 10,
+        delay: 2200,
+        logLevel: 'info',
+        message: '类型: mc | 风险: 0.750/0.793',
+        category: 'edge_detail'
+      },
+      {
+        step: 11,
+        delay: 2200,
+        logLevel: 'info',
+        message: '理论耗时:  59.42 | 实际耗时:  94.94',
+        category: 'edge_timing'
+      },
+      // 边2详情
+      {
+        step: 12,
+        delay: 2700,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 13,
+        delay: 2700,
+        logLevel: 'info',
+        message: '[边2] S_7 -> S15',
+        category: 'edge_info'
+      },
+      {
+        step: 14,
+        delay: 2700,
+        logLevel: 'info',
+        message: '类型: mc | 风险: 0.793/0.243',
+        category: 'edge_detail'
+      },
+      {
+        step: 15,
+        delay: 2700,
+        logLevel: 'info',
+        message: '理论耗时:  41.74 | 实际耗时:  46.04',
+        category: 'edge_timing'
+      },
+      // 边3详情
+      {
+        step: 16,
+        delay: 3200,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 17,
+        delay: 3200,
+        logLevel: 'info',
+        message: '[边3] S15 -> S14',
+        category: 'edge_info'
+      },
+      {
+        step: 18,
+        delay: 3200,
+        logLevel: 'info',
+        message: '风险: 0.243/0.579',
+        category: 'edge_detail'
+      },
+      {
+        step: 19,
+        delay: 3200,
+        logLevel: 'info',
+        message: '理论耗时:  84.50 | 实际耗时:  59.96',
+        category: 'edge_timing'
+      },
+      // 边4详情
+      {
+        step: 20,
+        delay: 3700,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 21,
+        delay: 3700,
+        logLevel: 'info',
+        message: '[边4] S14 -> S 15',
+        category: 'edge_info'
+      },
+      {
+        step: 22,
+        delay: 3700,
+        logLevel: 'info',
+        message: '类型: mc | 风险: 0.579/0.243',
+        category: 'edge_detail'
+      },
+      {
+        step: 23,
+        delay: 3700,
+        logLevel: 'info',
+        message: '理论耗时:  41.84 | 实际耗时:  35.92',
+        category: 'edge_timing'
+      },
+      // 边5详情
+      {
+        step: 24,
+        delay: 4200,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 25,
+        delay: 4200,
+        logLevel: 'info',
+        message: '[边5] S 15 -> S 5',
+        category: 'edge_info'
+      },
+      {
+        step: 26,
+        delay: 4200,
+        logLevel: 'info',
+        message: '类型: rpc | 风险: 0.243/0.405',
+        category: 'edge_detail'
+      },
+      {
+        step: 27,
+        delay: 4200,
+        logLevel: 'info',
+        message: '理论耗时:  27.22 | 实际耗时:  18.04',
+        category: 'edge_timing'
+      },
+      // 预测结果
+      {
+        step: 28,
+        delay: 5000,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 29,
+        delay: 5000,
+        logLevel: 'success',
+        message: '=== 预测结果 ===',
+        category: 'header'
+      },
+      {
+        step: 30,
+        delay: 5000,
+        logLevel: 'info',
+        message: '实际总耗时: 254.91',
+        category: 'result'
+      },
+      {
+        step: 31,
+        delay: 5000,
+        logLevel: 'info',
+        message: '理论最优耗时: 254.71',
+        category: 'result'
+      },
+      {
+        step: 32,
+        delay: 5600,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 33,
+        delay: 5600,
+        logLevel: 'warning',
+        message: '方案A-LR  预测: 252.92 (误差: -0.78%)',
+        category: 'prediction'
+      },
+      {
+        step: 34,
+        delay: 5600,
+        logLevel: 'warning',
+        message: '方案B-XGB 预测: 253.20 (误差: -0.67%)',
+        category: 'prediction'
+      },
+      {
+        step: 35,
+        delay: 5600,
+        logLevel: 'error',
+        message: '方案C-GCN 预测: 294.75 (误差: +15.63%)',
+        category: 'prediction'
+      },
+      // 决策结果
+      {
+        step: 36,
+        delay: 6200,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 37,
+        delay: 6200,
+        logLevel: 'success',
+        message: '[决策] 是否需要重构: 否',
+        category: 'decision'
+      },
+      // 完成
+      {
+        step: 38,
+        delay: 6800,
+        logLevel: 'info',
+        message: '',
+        category: 'separator'
+      },
+      {
+        step: 39,
+        delay: 6800,
+        logLevel: 'success',
+        message: '模型预测完成！',
+        category: 'completion'
+      }
+    ]
+  },
+  
+  // 流程配置
+  flowConfiguration: {
+    inputNodes: [
+      {
+        nodeId: 'input_process',
+        nodeLabel: '流程数据',
+        nodeType: 'input',
+        icon: 'el-icon-s-operation',
+        color: '#667eea',
+        position: { x: 50, y: 100 }
+      },
+      {
+        nodeId: 'input_risk',
+        nodeLabel: '风险数据',
+        nodeType: 'input',
+        icon: 'el-icon-warning',
+        color: '#667eea',
+        position: { x: 50, y: 200 }
+      },
+      {
+        nodeId: 'input_monitor',
+        nodeLabel: '实时监控数据',
+        nodeType: 'input',
+        icon: 'el-icon-monitor',
+        color: '#667eea',
+        position: { x: 50, y: 300 }
+      }
+    ],
+    neuralNetwork: {
+      nodeId: 'neural_network',
+      nodeLabel: '深度学习模型',
+      nodeType: 'processor',
+      icon: 'el-icon-cpu',
+      color: '#f093fb',
+      position: { x: 400, y: 200 },
+      modelVersion: '1.1.0',
+      description: '神经网络预测模型'
+    },
+    dataFlow: {
+      animationEnabled: true,
+      particleCount: 6,
+      flowSpeed: 1.5,
+      energyFlowDelay: [0, 0.3, 0.6]
+    }
+  },
+  
+  // 元数据
+  metadata: {
+    author: 'Neural Network Team',
+    description: '神经网络模型规划时间分析数据',
+    tags: ['neural-network', 'prediction', 'planning', 'time-analysis'],
+    category: 'ai-analysis',
+    priority: 'high',
+    lastAnalysisDate: new Date('2025-07-21T00:00:00.000Z'),
+    nextScheduledAnalysis: new Date('2025-07-22T00:00:00.000Z')
+  }
+};
+
+module.exports = planningTimeData; 

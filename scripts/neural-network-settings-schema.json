@@ -1,0 +1,316 @@
+{
+  "_id": "neural_network_settings_default",
+  "version": "1.0.0",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "name": "默认神经网络参数配置",
+  "description": "用于流程优化的神经网络参数设置",
+  "isActive": true,
+  "categories": {
+    "riskAssessment": {
+      "name": "风险评估参数",
+      "description": "控制风险评估相关的参数设置",
+      "parameters": {
+        "geoPoliticalWeight": {
+          "name": "地缘政治事件影响系数",
+          "description": "控制地缘政治事件对流程风险评估的影响程度",
+          "value": 1.0,
+          "defaultValue": 1.0,
+          "type": "number",
+          "unit": "倍数",
+          "range": {
+            "min": 0.1,
+            "max": 2.0,
+            "step": 0.1
+          },
+          "levels": {
+            "0.1-0.5": {
+              "label": "低影响",
+              "type": "success",
+              "description": "地缘政治事件对风险评估影响较小，适用于稳定环境"
+            },
+            "0.6-1.2": {
+              "label": "正常",
+              "type": "primary", 
+              "description": "标准影响程度，平衡考虑地缘政治因素"
+            },
+            "1.3-1.6": {
+              "label": "高影响",
+              "type": "warning",
+              "description": "地缘政治事件影响较大，适用于动荡环境"
+            },
+            "1.7-2.0": {
+              "label": "极高影响",
+              "type": "danger",
+              "description": "地缘政治事件影响极大，适用于高风险环境"
+            }
+          }
+        },
+        "marketVolatilityFactor": {
+          "name": "原材料价格波动敏感度",
+          "description": "控制原材料价格变化对供应链决策的影响敏感度",
+          "value": 0.8,
+          "defaultValue": 0.8,
+          "type": "number",
+          "unit": "倍数",
+          "range": {
+            "min": 0.1,
+            "max": 2.0,
+            "step": 0.1
+          },
+          "levels": {
+            "0.1-0.4": {
+              "label": "低敏感",
+              "type": "success",
+              "description": "对原材料价格变化反应较弱，适用于价格稳定市场"
+            },
+            "0.5-1.0": {
+              "label": "正常",
+              "type": "primary",
+              "description": "标准敏感度，平衡响应市场价格变化"
+            },
+            "1.1-1.5": {
+              "label": "高敏感",
+              "type": "warning",
+              "description": "对价格变化高度敏感，快速调整供应策略"
+            },
+            "1.6-2.0": {
+              "label": "极敏感",
+              "type": "danger",
+              "description": "极度敏感，适用于高波动市场环境"
+            }
+          }
+        }
+      }
+    },
+    "supplyChainManagement": {
+      "name": "供应链管理参数",
+      "description": "控制供应链管理相关的参数设置",
+      "parameters": {
+        "backupSupplierRatio": {
+          "name": "备用供应商最低覆盖比例",
+          "description": "每个关键物料至少需要的备用供应商覆盖比例",
+          "value": 0.3,
+          "defaultValue": 0.3,
+          "type": "percentage",
+          "unit": "%",
+          "range": {
+            "min": 0.1,
+            "max": 0.8,
+            "step": 0.05
+          },
+          "levels": {
+            "0.1-0.2": {
+              "label": "低保障",
+              "type": "danger",
+              "description": "备用供应商覆盖不足，供应风险较高"
+            },
+            "0.21-0.4": {
+              "label": "中等",
+              "type": "warning",
+              "description": "中等程度的供应保障，适用于稳定供应环境"
+            },
+            "0.41-0.6": {
+              "label": "良好",
+              "type": "primary",
+              "description": "良好的供应保障水平，平衡成本与风险"
+            },
+            "0.61-0.8": {
+              "label": "高保障",
+              "type": "success",
+              "description": "高水平供应保障，适用于高风险环境"
+            }
+          }
+        },
+        "routeReevalFrequency": {
+          "name": "运输路径重评估频率",
+          "description": "重新评估和优化运输路径的时间间隔",
+          "value": 7,
+          "defaultValue": 7,
+          "type": "integer",
+          "unit": "天",
+          "range": {
+            "min": 1,
+            "max": 30,
+            "step": 1
+          },
+          "levels": {
+            "1-3": {
+              "label": "高频",
+              "type": "danger",
+              "description": "高频重评估，适用于动态变化的运输环境"
+            },
+            "4-7": {
+              "label": "常规",
+              "type": "warning",
+              "description": "常规重评估频率，平衡优化效果与计算成本"
+            },
+            "8-15": {
+              "label": "适中",
+              "type": "primary",
+              "description": "适中的重评估频率，适用于相对稳定环境"
+            },
+            "16-30": {
+              "label": "低频",
+              "type": "success",
+              "description": "低频重评估，适用于稳定的运输网络"
+            }
+          }
+        },
+        "minimumInventoryRatio": {
+          "name": "最低库存比例",
+          "description": "关键物料必须维持的最低库存水平",
+          "value": 0.15,
+          "defaultValue": 0.15,
+          "type": "percentage",
+          "unit": "%",
+          "range": {
+            "min": 0.05,
+            "max": 0.5,
+            "step": 0.01
+          },
+          "levels": {
+            "0.05-0.1": {
+              "label": "极低",
+              "type": "danger",
+              "description": "极低库存水平，高风险但低成本，适用于可靠供应链"
+            },
+            "0.11-0.2": {
+              "label": "较低",
+              "type": "warning",
+              "description": "较低库存水平，平衡风险与成本，需要较好的需求预测"
+            },
+            "0.21-0.3": {
+              "label": "标准",
+              "type": "primary",
+              "description": "标准库存水平，提供合理的安全边际，适用于一般业务"
+            },
+            "0.31-0.5": {
+              "label": "充足",
+              "type": "success",
+              "description": "充足库存水平，高安全性但高持有成本，适用于关键业务"
+            }
+          }
+        }
+      }
+    },
+    "operationOptimization": {
+      "name": "运营优化参数",
+      "description": "控制运营优化相关的参数设置",
+      "parameters": {
+        "costDelayTradeoff": {
+          "name": "成本与延误权衡系数",
+          "description": "在成本优化和交期保证之间的权衡系数",
+          "value": 1.2,
+          "defaultValue": 1.2,
+          "type": "number",
+          "unit": "倍数",
+          "range": {
+            "min": 0.5,
+            "max": 3.0,
+            "step": 0.1
+          },
+          "levels": {
+            "0.5-0.8": {
+              "label": "成本优先",
+              "type": "success",
+              "description": "优先考虑成本控制，容忍适度延误"
+            },
+            "0.9-1.5": {
+              "label": "平衡",
+              "type": "primary",
+              "description": "平衡成本与交期，综合优化决策"
+            },
+            "1.6-2.2": {
+              "label": "交期优先",
+              "type": "warning",
+              "description": "优先保证交期，愿意承担额外成本"
+            },
+            "2.3-3.0": {
+              "label": "极速交付",
+              "type": "danger",
+              "description": "极速交付模式，成本为次要考虑"
+            }
+          }
+        },
+        "taktTimeVariance": {
+          "name": "生产节拍波动容忍范围",
+          "description": "允许的生产节拍波动范围，超出此范围将触发流程重组",
+          "value": 0.05,
+          "defaultValue": 0.05,
+          "type": "percentage",
+          "unit": "%",
+          "range": {
+            "min": 0.01,
+            "max": 0.2,
+            "step": 0.01
+          },
+          "levels": {
+            "0.01-0.03": {
+              "label": "严格",
+              "type": "danger",
+              "description": "严格控制生产节拍，频繁触发流程调整"
+            },
+            "0.04-0.08": {
+              "label": "标准",
+              "type": "warning",
+              "description": "标准节拍控制，平衡稳定性与灵活性"
+            },
+            "0.09-0.15": {
+              "label": "宽松",
+              "type": "primary",
+              "description": "宽松的节拍控制，减少频繁调整"
+            },
+            "0.16-0.2": {
+              "label": "灵活",
+              "type": "success",
+              "description": "灵活的节拍管理，适应生产波动"
+            }
+          }
+        },
+        "overtimeCostCap": {
+          "name": "紧急人力成本上限",
+          "description": "每月最多调用的加班工时上限",
+          "value": 200,
+          "defaultValue": 200,
+          "type": "integer",
+          "unit": "小时/月",
+          "range": {
+            "min": 50,
+            "max": 500,
+            "step": 10
+          },
+          "levels": {
+            "50-100": {
+              "label": "节约",
+              "type": "success",
+              "description": "严格控制加班成本，优先通过流程优化解决问题"
+            },
+            "101-200": {
+              "label": "标准",
+              "type": "primary",
+              "description": "标准加班预算，平衡成本与应急能力"
+            },
+            "201-350": {
+              "label": "充足",
+              "type": "warning",
+              "description": "充足的应急人力预算，快速响应突发需求"
+            },
+            "351-500": {
+              "label": "充裕",
+              "type": "danger",
+              "description": "充裕的人力成本预算，优先保证生产连续性"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "source": "NeuralNetworkSettingsView.vue",
+    "lastModifiedBy": "system",
+    "environment": "production",
+    "tags": ["neural-network", "parameters", "optimization", "risk-assessment", "supply-chain", "operations"],
+    "notes": "从Vue组件转换而来的神经网络参数配置"
+  }
+} 

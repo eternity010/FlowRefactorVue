@@ -1,6 +1,28 @@
 <template>
-  <div class="process-flow">
-    <div class="flow-container">
+  <div class="process-flow" v-loading="loading">
+    <!-- 错误提示 -->
+    <div v-if="error" class="error-message">
+      <el-alert
+        :title="error"
+        type="error"
+        :closable="false"
+        show-icon>
+        <template slot="default">
+          <div class="error-actions">
+            <el-button 
+              size="mini" 
+              type="primary" 
+              @click="refreshData"
+              :loading="loading">
+              重新加载
+            </el-button>
+          </div>
+        </template>
+      </el-alert>
+    </div>
+    
+    <!-- 流程容器 -->
+    <div class="flow-container" v-else-if="hasAnyData">
       <div class="flow-step">
         <div class="parallelogram">
           <div class="step-content">
@@ -66,40 +88,261 @@
         </div>
       </div>
     </div>
+    
+    <!-- 无数据状态 -->
+    <div v-else-if="!loading" class="no-data-state">
+      <el-empty 
+        :image-size="120"
+        description="暂无流程数据">
+        <el-button 
+          type="primary" 
+          @click="refreshData"
+          :loading="loading">
+          加载数据
+        </el-button>
+      </el-empty>
+    </div>
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts'
-import { 
-  purchaseData, 
-  productionData, 
-  marketingData, 
-  maintenanceData 
-} from '@/data/processFlowData'
+import { processDataApi } from '@/api/processDataApi'
 
 export default {
   name: 'ProcessFlow',
   data() {
     return {
-      purchaseData,
-      productionData,
-      marketingData,
-      maintenanceData,
-      charts: {}
+      // 响应式数据结构
+      purchaseData: { chart: [], panels: [] },
+      productionData: { chart: [], panels: [] },
+      marketingData: { chart: [], panels: [] },
+      maintenanceData: { chart: [], panels: [] },
+      
+      // 状态管理
+      loading: false,
+      error: null,
+      charts: {},
+      
+      // 数据映射配置
+      flowTypeMapping: {
+        purchase: 'purchaseData',
+        production: 'productionData',
+        marketing: 'marketingData',
+        maintenance: 'maintenanceData'
+      }
     }
   },
-  mounted() {
-    this.initCharts()
+  computed: {
+    /**
+     * 检查是否有任何可显示的数据
+     */
+    hasAnyData() {
+      return (
+        (this.purchaseData.chart && this.purchaseData.chart.length > 0) ||
+        (this.productionData.chart && this.productionData.chart.length > 0) ||
+        (this.marketingData.chart && this.marketingData.chart.length > 0) ||
+        (this.maintenanceData.chart && this.maintenanceData.chart.length > 0)
+      )
+    }
+  },
+  async mounted() {
+    await this.loadFlowData()
     window.addEventListener('resize', this.resizeCharts)
   },
   methods: {
-    initCharts() {
-      this.initPurchaseChart()
-      this.initProductionChart()
-      this.initMarketingChart()
-      this.initMaintenanceChart()
+    /**
+     * 从API加载流程数据
+     */
+    async loadFlowData() {
+      this.loading = true
+      this.error = null
+      
+      try {
+        // 检查API连接
+        const connectionStatus = await processDataApi.checkConnection()
+        if (!connectionStatus.connected) {
+          throw new Error('API服务器未启动，请先运行: npm run api-server')
+        }
+        
+        // 获取所有流程数据
+        const result = await processDataApi.getAllFlowData()
+        
+        if (result.success && result.data) {
+          this.updateComponentData(result.data)
+          console.log('✅ ProcessFlow组件成功加载流程数据', {
+            dataCount: result.data.length,
+            flowTypes: result.data.map(item => item.flowType)
+          })
+          
+          // 等待DOM更新后初始化图表
+          this.$nextTick(() => {
+            this.initCharts()
+          })
+        } else {
+          throw new Error(result.message || '获取流程数据失败')
+        }
+        
+      } catch (error) {
+        console.error('❌ ProcessFlow组件加载流程数据失败:', error)
+        this.error = error.message
+        
+        // 显示错误提示
+        this.$message({
+          message: `流程图加载失败: ${error.message}`,
+          type: 'error',
+          duration: 5000
+        })
+      } finally {
+        this.loading = false
+      }
     },
+    
+
+    
+    /**
+     * 更新组件数据
+     */
+    updateComponentData(mongoData) {
+      console.log('📊 ProcessFlow组件开始更新数据', { 
+        receivedDataCount: mongoData.length 
+      })
+      
+      let updatedCount = 0
+      mongoData.forEach(flowData => {
+        const componentKey = this.flowTypeMapping[flowData.flowType]
+        if (componentKey && flowData.chartData && flowData.panelData) {
+          this[componentKey] = {
+            chart: flowData.chartData,
+            panels: flowData.panelData
+          }
+          updatedCount++
+          console.log(`✅ 更新${flowData.flowType}数据:`, {
+            chartDataCount: flowData.chartData.length,
+            panelDataCount: flowData.panelData.length
+          })
+        } else {
+          console.warn(`⚠️  跳过无效数据:`, {
+            flowType: flowData.flowType,
+            hasChartData: !!flowData.chartData,
+            hasPanelData: !!flowData.panelData,
+            componentKey
+          })
+        }
+      })
+      
+      console.log(`📊 ProcessFlow组件数据更新完成: ${updatedCount}/${mongoData.length}`)
+    },
+    
+    /**
+     * 刷新数据
+     */
+    async refreshData() {
+      console.log('🔄 ProcessFlow组件开始刷新数据')
+      this.$message({
+        message: '正在从API加载流程数据...',
+        type: 'info',
+        duration: 2000
+      })
+      
+      await this.loadFlowData()
+      
+      if (!this.error && !this.hasAnyData) {
+        this.$message({
+          message: '数据加载完成，但暂无流程数据',
+          type: 'warning',
+          duration: 3000
+        })
+      }
+    },
+    
+    /**
+     * 初始化所有图表
+     */
+    initCharts() {
+      if (!this.hasAnyData) {
+        console.log('⚠️  无数据，跳过图表初始化')
+        return
+      }
+      
+      console.log('📈 ProcessFlow组件开始初始化图表')
+      
+      if (this.purchaseData.chart && this.purchaseData.chart.length > 0) {
+        this.initPurchaseChart()
+      }
+      if (this.productionData.chart && this.productionData.chart.length > 0) {
+        this.initProductionChart()
+      }
+      if (this.marketingData.chart && this.marketingData.chart.length > 0) {
+        this.initMarketingChart()
+      }
+      if (this.maintenanceData.chart && this.maintenanceData.chart.length > 0) {
+        this.initMaintenanceChart()
+      }
+      
+      console.log('📈 ProcessFlow组件图表初始化完成')
+    },
+    
+    /**
+     * 更新所有图表
+     */
+    updateAllCharts() {
+      console.log('📈 ProcessFlow组件开始更新所有图表')
+      this.updatePurchaseChart()
+      this.updateProductionChart()
+      this.updateMarketingChart()
+      this.updateMaintenanceChart()
+      console.log('📈 ProcessFlow组件所有图表更新完成')
+    },
+    
+    /**
+     * 更新采购图表
+     */
+    updatePurchaseChart() {
+      if (this.charts.purchase && this.purchaseData.chart.length > 0) {
+        const option = this.charts.purchase.getOption()
+        option.xAxis[0].data = this.purchaseData.chart.map(item => item.month)
+        option.series[0].data = this.purchaseData.chart.map(item => item.value)
+        this.charts.purchase.setOption(option)
+      }
+    },
+    
+    /**
+     * 更新生产图表
+     */
+    updateProductionChart() {
+      if (this.charts.production && this.productionData.chart.length > 0) {
+        const option = this.charts.production.getOption()
+        option.xAxis[0].data = this.productionData.chart.map(item => item.month)
+        option.series[0].data = this.productionData.chart.map(item => item.value)
+        this.charts.production.setOption(option)
+      }
+    },
+    
+    /**
+     * 更新营销图表
+     */
+    updateMarketingChart() {
+      if (this.charts.marketing && this.marketingData.chart.length > 0) {
+        const option = this.charts.marketing.getOption()
+        option.xAxis[0].data = this.marketingData.chart.map(item => item.month)
+        option.series[0].data = this.marketingData.chart.map(item => item.value)
+        this.charts.marketing.setOption(option)
+      }
+    },
+    
+    /**
+     * 更新运维图表
+     */
+    updateMaintenanceChart() {
+      if (this.charts.maintenance && this.maintenanceData.chart.length > 0) {
+        const option = this.charts.maintenance.getOption()
+        option.xAxis[0].data = this.maintenanceData.chart.map(item => item.month)
+        option.series[0].data = this.maintenanceData.chart.map(item => item.value)
+        this.charts.maintenance.setOption(option)
+      }
+    },
+    
     initPurchaseChart() {
       if (this.$refs.purchaseChart) {
         this.charts.purchase = echarts.init(this.$refs.purchaseChart)
@@ -418,6 +661,60 @@ export default {
       Object.values(this.charts).forEach(chart => {
         chart && chart.resize()
       })
+    },
+    
+    /**
+     * 检查API连接状态
+     */
+    async checkApiConnection() {
+      try {
+        const status = await processDataApi.checkConnection()
+        console.log('🔍 ProcessFlow API连接检查:', status)
+        return status
+      } catch (error) {
+        console.error('❌ ProcessFlow API连接检查失败:', error)
+        return { success: false, connected: false, message: error.message }
+      }
+    },
+    
+    /**
+     * 手动重新初始化图表
+     */
+    reinitializeCharts() {
+      console.log('🔄 ProcessFlow组件重新初始化图表')
+      
+      // 销毁现有图表
+      Object.values(this.charts).forEach(chart => {
+        chart && chart.dispose()
+      })
+      this.charts = {}
+      
+      // 重新初始化
+      this.$nextTick(() => {
+        this.initCharts()
+      })
+    },
+    
+    /**
+     * 获取组件状态信息
+     */
+    getComponentStatus() {
+      const status = {
+        loading: this.loading,
+        error: this.error,
+        hasAnyData: this.hasAnyData,
+        hasData: {
+          purchase: this.purchaseData.chart && this.purchaseData.chart.length > 0,
+          production: this.productionData.chart && this.productionData.chart.length > 0,
+          marketing: this.marketingData.chart && this.marketingData.chart.length > 0,
+          maintenance: this.maintenanceData.chart && this.maintenanceData.chart.length > 0
+        },
+        chartsInitialized: Object.keys(this.charts).length > 0,
+        apiMode: true  // 标识组件仅使用API模式
+      }
+      
+      console.log('📊 ProcessFlow组件状态:', status)
+      return status
     }
   },
   beforeDestroy() {
@@ -438,6 +735,30 @@ export default {
   flex-direction: column;  /* 纵向排列 */
   align-items: center;     /* 水平居中 */
   padding-top: 20px;       /* 顶部留白，避免覆盖分割线 */
+}
+
+/* 错误提示样式 */
+.error-message {
+  width: 90%;
+  margin-bottom: 20px;
+}
+
+.error-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* 无数据状态样式 */
+.no-data-state {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px dashed #d9d9d9;
 }
 
 /* 流程图标题样式 */

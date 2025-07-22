@@ -28,13 +28,13 @@
             <div class="info-block-content">
               <div class="card-title">风险事项</div>
               <div class="risk-items">
-                <div class="risk-item warning">
+                <div 
+                  class="risk-item" 
+                  :class="item.type" 
+                  v-for="(item,index) in riskItems" 
+                  :key="'risk-'+index">
                   <i class="el-icon-warning"></i>
-                  <span>员工离职</span>
-                </div>
-                <div class="risk-item danger">
-                  <i class="el-icon-warning"></i>
-                  <span>供应商A缺货</span>
+                  <span>{{ item.message }}</span>
                 </div>
               </div>
             </div>
@@ -75,7 +75,7 @@
 <script>
 import * as echarts from 'echarts'
 import ProcessFlow from '@/components/ProcessFlow.vue'
-
+import { processDataApi } from '@/api/processDataApi'
 export default {
   name: 'ProcessManagement',
   components: {
@@ -85,18 +85,17 @@ export default {
     return {
       productionChart: null,
       progressChart: null,
-      progressPercent: 60,
-      productionData: [
-        { month: '3月', value: 112 },
-        { month: '4月', value: 113 },
-        { month: '5月', value: 150 },
-        { month: '6月', value: 120 },
-        { month: '7月', value: 130 },
-        { month: '8月', value: 140 },
-        { month: '9月', value: 150 },
-        { month: '10月', value: 160 },
-        { month: '11月', value: 170 },
-      ],
+      loading: false,
+      error: null,
+
+      progressPercent: 0,
+      productionData: [],
+      efficiencyData: {
+        completionRate: { value: 0, trend: 0, isUp: true },
+        turnaroundTime: { value: 0, trend: 0, isUp: false }
+      },
+      riskItems: [],
+       
       efficiencyData: {
         completionRate: {
           value: 93.2,
@@ -111,11 +110,69 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
+    await this.loadTotalData()
     this.initProductionChart()
     this.initProgressChart()
   },
   methods: {
+    async loadTotalData () {
+      this.loading = true
+      this.error = null
+      try {
+        const resp = await processDataApi.getTotalData()
+        if (resp.success && resp.data) {
+          const d = resp.data
+          this.productionData  = d.productionData || []
+          this.progressPercent = d.progressPercent || 0
+          this.efficiencyData  = d.efficiencyData || this.efficiencyData
+          this.riskItems       = d.riskItems || []
+          
+          // 更新图表
+          this.$nextTick(() => {
+            this.updateProductionChart()
+            this.updateProgressChart()
+          })
+          
+          console.log('✅ 流程管理页面数据加载成功', {
+            productionData: this.productionData.length,
+            progressPercent: this.progressPercent,
+            riskItems: this.riskItems.length
+          })
+        } else {
+          throw new Error(resp.message || 'API返回异常')
+        }
+      } catch (e) {
+        console.error('❌ 加载流程管理数据失败:', e)
+        this.error = e.message
+        
+        // 显示错误提示
+        this.$message({
+          message: `加载数据失败: ${e.message}`,
+          type: 'error',
+          duration: 5000
+        })
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // 更新图表方法
+    updateProductionChart() {
+      if (this.productionChart) {
+        const option = this.productionChart.getOption()
+        option.xAxis[0].data = this.productionData.map(i=>i.month)
+        option.series[0].data = this.productionData.map(i=>i.value)
+        this.productionChart.setOption(option)
+      }
+    },
+    updateProgressChart() {
+      if (this.progressChart) {
+        const option = this.progressChart.getOption()
+        option.series[0].data[0].value = this.progressPercent
+        this.progressChart.setOption(option)
+      }
+    },
     initProductionChart() {
       this.productionChart = echarts.init(this.$refs.productionChart)
       

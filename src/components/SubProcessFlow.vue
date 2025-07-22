@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      currentProcess: 'operation',
+      currentProcess: 'purchase',
       processTabs: [
         { key: 'purchase', label: '采购环节' },
         { key: 'production', label: '生产环节' },

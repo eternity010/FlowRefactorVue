@@ -1,0 +1,451 @@
+# 服务层架构文档
+
+## 概述
+
+本项目采用三层架构设计，服务层位于前端和后端之间，提供统一的数据访问接口。
+
+## 文件结构
+
+```
+src/services/
+├── flowDataService.js       # 流程数据库服务
+├── planningTimeService.js   # 规划时间数据服务
+├── neuralNetworkService.js  # 神经网络参数服务
+├── apiServer.js            # Express API服务器
+└── index.js                # 服务层统一导出
+
+src/api/
+├── planningTimeApi.js      # 规划时间API客户端
+├── processDataApi.js       # 流程数据API客户端
+├── processOptimizationApi.js # 流程优化API客户端
+├── subProcessDataApi.js    # 子流程数据API客户端
+└── neuralNetworkApi.js     # 神经网络参数API客户端
+```
+
+## 各文件职责
+
+### 前端API客户端 (src/api/)
+
+#### 1. API客户端通用特性
+- **运行环境**: 浏览器 (Vue.js)
+- **技术栈**: Axios
+- **主要职责**:
+  - 封装HTTP请求
+  - 提供前端组件调用的API方法
+  - 处理请求/响应拦截
+  - 错误处理和重试机制
+  - 离线模式支持
+
+#### 2. `processDataApi.js` - 流程数据API客户端
+- 流程数据获取和管理
+- 趋势分析和统计查询
+- 数据库连接状态检查
+
+#### 3. `planningTimeApi.js` - 规划时间API客户端
+- 规划时间数据管理
+- 预测方案和准确度分析
+- 历史数据查询
+
+#### 4. `neuralNetworkApi.js` - 神经网络参数API客户端
+- 参数配置管理
+- 参数验证和更新
+- 配置导入导出
+- 离线模式支持
+
+#### 5. `subProcessDataApi.js` - 子流程数据API客户端
+- 子流程数据获取
+- Mermaid流程图数据管理
+
+### 后端服务层 (src/services/)
+
+#### 1. `flowDataService.js` - 流程数据库服务
+- **运行环境**: Node.js
+- **技术栈**: MongoDB Driver
+- **主要职责**:
+  - 流程数据、子流程数据的CRUD操作
+  - Mermaid流程图数据管理
+  - 数据聚合和分析
+  - 搜索和查询功能
+
+#### 2. `planningTimeService.js` - 规划时间数据服务
+- **运行环境**: Node.js
+- **技术栈**: MongoDB Driver
+- **主要职责**:
+  - 规划时间数据管理
+  - 重构时机数据处理
+  - 大模型分析数据管理
+  - 预测方案和准确度跟踪
+
+#### 3. `neuralNetworkService.js` - 神经网络参数服务
+- **运行环境**: Node.js
+- **技术栈**: MongoDB Driver
+- **主要职责**:
+  - 神经网络参数CRUD操作
+  - 参数验证和历史记录
+  - 配置管理和导入导出
+  - 统计信息生成
+
+#### 4. `apiServer.js` - Express API服务器
+- **运行环境**: Node.js
+- **技术栈**: Express.js, CORS
+- **主要职责**:
+  - 提供RESTful API接口
+  - 路由管理和中间件配置
+  - 统一响应格式处理
+  - 错误处理和日志记录
+  - 服务器生命周期管理
+
+## 数据流向
+
+```
+前端组件
+    ↓
+API客户端 (processDataApi, planningTimeApi, neuralNetworkApi, subProcessDataApi)
+    ↓
+apiServer.js (Express API服务器)
+    ↓
+后端服务 (flowDataService, planningTimeService, neuralNetworkService)
+    ↓
+MongoDB数据库
+```
+
+### 具体数据流
+
+#### 流程数据流
+```
+Vue组件 → processDataApi → apiServer → flowDataService → MongoDB
+```
+
+#### 规划时间数据流
+```
+Vue组件 → planningTimeApi → apiServer → planningTimeService → MongoDB
+```
+
+#### 神经网络参数流
+```
+Vue组件 → neuralNetworkApi → apiServer → neuralNetworkService → MongoDB
+```
+
+## API端点列表
+
+### 流程数据API (flowDataService)
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/flow-data` | GET | 获取所有流程数据 | `getAllFlowData()` |
+| `/api/flow-data/:type` | GET | 根据类型获取流程数据 | `getFlowDataByType()` |
+| `/api/flow-summary` | GET | 获取流程摘要 | `getFlowSummary()` |
+| `/api/flow-trends` | GET | 获取趋势分析 | `getFlowTrendAnalysis()` |
+| `/api/monthly-data/:type` | GET | 获取指定流程月度数据 | `getMonthlyDataByType()` |
+| `/api/panel-data/:type` | GET | 获取指定流程关键指标 | `getPanelDataByType()` |
+| `/api/database-stats` | GET | 获取数据库统计信息 | `getDatabaseStats()` |
+| `/api/sub-process-data` | GET | 获取子流程数据 | `getSubProcessData()` |
+| `/api/sub-process-data/:type` | GET | 获取指定类型子流程数据 | `getSubProcessDataByType()` |
+| `/api/mermaid-flow/:type` | GET | 获取Mermaid流程图数据 | `getMermaidFlowData()` |
+| `/api/mermaid-flows` | GET | 获取所有Mermaid流程图数据 | `getAllMermaidFlowData()` |
+| `/api/total-data` | GET | 获取总数据 | `getTotalData()` |
+| `/api/search-flow` | GET | 搜索流程数据 | `searchFlowData()` |
+| `/api/flow-data-by-latest` | GET | 按最新数值排序获取数据 | `getFlowDataByLatestValue()` |
+| `/api/flows-by-panel` | GET | 获取包含特定面板指标的流程 | `getFlowsByPanelLabel()` |
+| `/api/multiple-flow-data` | GET | 批量获取多个流程类型数据 | `getMultipleFlowData()` |
+| `/api/refresh-data` | POST | 触发数据刷新 | 系统操作 |
+
+### 规划时间API (planningTimeService)
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/planning-time` | GET | 获取完整规划时间数据 | `getPlanningTimeData()` |
+| `/api/planning-time/statistics` | GET | 获取统计数据 | `getStatistics()` |
+| `/api/planning-time/sample-data` | GET | 获取样本数据 | `getSampleData()` |
+| `/api/planning-time/prediction-schemes` | GET | 获取预测方案数据 | `getPredictionSchemes()` |
+| `/api/planning-time/prediction-schemes/:id` | GET | 获取指定预测方案 | `getPredictionSchemeById()` |
+| `/api/planning-time/accuracy-history` | GET | 获取历史准确度数据 | `getAccuracyHistory()` |
+| `/api/refactor-timing` | GET | 获取重构时机数据 | `getRefactorTimingData()` |
+| `/api/refactor-timing/latest` | GET | 获取最新重构时机数据 | `getLatestRefactorTimingData()` |
+| `/api/llm-analysis` | GET | 获取大模型分析数据 | `getLLMAnalysisData()` |
+| `/api/llm-analysis/latest` | GET | 获取最新大模型分析报告 | `getLatestLLMAnalysisReport()` |
+
+### 神经网络参数API (neuralNetworkService)
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/neural-network/parameters` | GET | 获取所有参数配置 | `getNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/current` | GET | 获取当前参数值 | `getCurrentNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/definitions` | GET | 获取参数定义信息 | `getNeuralNetworkParameterDefinitions()` |
+| `/api/neural-network/parameters/category/:category` | GET | 获取特定类别参数 | `getNeuralNetworkParametersByCategory()` |
+| `/api/neural-network/parameters` | PUT | 更新参数配置 | `updateNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/reset` | POST | 重置参数为默认值 | `resetNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/save` | POST | 保存参数配置 | `saveNeuralNetworkParameterConfig()` |
+| `/api/neural-network/parameters/configs` | GET | 获取保存的配置列表 | `getSavedNeuralNetworkConfigs()` |
+| `/api/neural-network/parameters/configs/:name` | GET | 加载保存的配置 | `loadNeuralNetworkParameterConfig()` |
+| `/api/neural-network/parameters/configs/:name` | DELETE | 删除保存的配置 | `deleteNeuralNetworkParameterConfig()` |
+| `/api/neural-network/parameters/stats` | GET | 获取参数使用统计 | `getNeuralNetworkParameterStats()` |
+| `/api/neural-network/parameters/validate` | POST | 验证参数值 | `validateNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/history` | GET | 获取参数历史记录 | `getNeuralNetworkParameterHistory()` |
+| `/api/neural-network/parameters/export` | GET | 导出参数配置 | `exportNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/import` | POST | 导入参数配置 | `importNeuralNetworkParameters()` |
+
+## 统一响应格式
+
+所有API端点都返回统一的响应格式：
+
+### 成功响应
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+### 错误响应
+```json
+{
+  "success": false,
+  "error": "错误信息"
+}
+```
+
+## 使用示例
+
+### 前端使用 (Vue组件)
+```javascript
+import { processDataApi } from '@/api/processDataApi'
+import { subProcessDataApi } from '@/api/subProcessDataApi'
+import { planningTimeApi } from '@/api/planningTimeApi'
+import { neuralNetworkApi } from '@/api/neuralNetworkApi'
+
+// 获取流程数据
+const flowData = await processDataApi.getFlowDataByType('purchase')
+
+// 获取子流程数据  
+const subProcessData = await subProcessDataApi.getSubProcessDataByType('purchase')
+
+// 获取Mermaid流程图数据
+const mermaidData = await subProcessDataApi.getMermaidFlowData('purchase')
+
+// 获取规划时间数据
+const planningData = await planningTimeApi.getPlanningTimeData()
+
+// 获取神经网络参数
+const currentParams = await neuralNetworkApi.getCurrentParameters()
+
+// 更新神经网络参数
+const updateResult = await neuralNetworkApi.updateParameters({
+  geoPoliticalWeight: 1.5,
+  marketVolatilityFactor: 0.9
+})
+
+// 获取参数统计
+const stats = await neuralNetworkApi.getParameterStats()
+
+// 检查连接状态
+const connectionStatus = await processDataApi.checkConnection()
+```
+
+### 后端使用 (API服务器)
+```javascript
+const FlowDataService = require('./flowDataService')
+const PlanningTimeService = require('./planningTimeService')
+const NeuralNetworkService = require('./neuralNetworkService')
+
+// 创建服务实例
+const flowDataService = new FlowDataService()
+const planningTimeService = new PlanningTimeService()
+const neuralNetworkService = new NeuralNetworkService()
+
+// 流程数据操作
+const flowResult = await flowDataService.getFlowDataByType('purchase')
+const mermaidResult = await flowDataService.getMermaidFlowData('purchase')
+const dbStats = await flowDataService.getDatabaseStats()
+
+// 规划时间数据操作
+const planningData = await planningTimeService.getPlanningTimeData()
+const refactorTiming = await planningTimeService.getRefactorTimingData()
+const llmAnalysis = await planningTimeService.getLLMAnalysisData()
+
+// 神经网络参数操作
+const currentParams = await neuralNetworkService.getCurrentNeuralNetworkParameters()
+const updateResult = await neuralNetworkService.updateNeuralNetworkParameters({
+  geoPoliticalWeight: 1.5
+})
+const paramStats = await neuralNetworkService.getNeuralNetworkParameterStats()
+```
+
+## 错误处理
+
+### 前端错误处理
+```javascript
+// 流程数据API错误处理
+try {
+  const data = await processDataApi.getFlowDataByType('purchase')
+  // 处理成功响应
+} catch (error) {
+  console.error('流程数据API调用失败:', error.message)
+  // 处理错误
+}
+
+// 神经网络参数API错误处理
+try {
+  const result = await neuralNetworkApi.updateParameters({
+    geoPoliticalWeight: 1.5
+  })
+  
+  if (result.data.code === 200) {
+    console.log('参数更新成功:', result.data.data)
+  } else {
+    console.warn('参数更新失败:', result.data.message)
+  }
+} catch (error) {
+  console.error('神经网络参数API调用失败:', error.message)
+  // 在离线模式下仍可能成功
+  if (error.response?.status === 503) {
+    console.log('服务器不可用，但可能已使用离线模式')
+  }
+}
+```
+
+### 后端错误处理
+```javascript
+// 流程数据服务错误处理
+const flowResult = await flowDataService.getFlowDataByType('purchase')
+if (flowResult.success) {
+  res.json({ success: true, data: flowResult.data })
+} else {
+  res.status(404).json({ success: false, error: flowResult.error })
+}
+
+// 神经网络参数服务错误处理
+try {
+  const paramResult = await neuralNetworkService.updateNeuralNetworkParameters({
+    geoPoliticalWeight: 1.5
+  })
+  res.json({
+    code: 200,
+    message: '参数更新成功',
+    data: paramResult
+  })
+} catch (error) {
+  res.status(500).json({
+    code: 500,
+    message: '更新参数失败',
+    data: null,
+    error: error.message
+  })
+}
+
+// 规划时间服务错误处理
+try {
+  const planningData = await planningTimeService.getPlanningTimeData()
+  res.json({
+    success: true,
+    data: planningData,
+    message: '获取规划时间数据成功'
+  })
+} catch (error) {
+  res.status(500).json({
+    success: false,
+    error: error.message
+  })
+}
+```
+
+## 启动服务
+
+### 启动API服务器
+```bash
+# 使用npm脚本
+npm run api-server
+
+# 或直接运行
+node src/services/apiServer.js
+```
+
+### 检查服务状态
+```bash
+# 检查流程数据API
+curl http://localhost:3001/api/flow-summary
+
+# 检查规划时间API
+curl http://localhost:3001/api/planning-time/overview
+
+# 检查神经网络参数API
+curl http://localhost:3001/api/neural-network/parameters/current
+
+# 检查服务器健康状态
+curl http://localhost:3001/api/database-stats
+```
+
+## 注意事项
+
+### 基础配置
+1. **数据库连接**: 确保MongoDB服务正在运行
+2. **端口配置**: API服务器默认运行在3001端口
+3. **CORS配置**: 已配置允许前端跨域访问
+4. **环境变量**: 可通过 `VUE_APP_API_URL` 配置API基础URL
+
+### 服务特性
+5. **服务分离**: 三个独立的后端服务管理不同类型的数据
+6. **错误处理**: 所有API调用都有统一的错误处理机制
+7. **响应格式**: 流程数据使用 `{success, data}` 格式，神经网络参数使用 `{code, message, data}` 格式
+8. **离线支持**: 神经网络参数API支持离线模式，使用localStorage作为备份
+
+### 数据库集合
+9. **流程数据集合**: `processflowdata`, `subprocesscardsdata`, `mermaid_flows`
+10. **规划时间集合**: `planning_time_data`, `refactor_timing_data`, `llm_analysis_data`
+11. **参数配置集合**: `neural_network_parameters`, `neural_network_parameter_history`, `neural_network_saved_configs`
+
+### 开发建议
+12. **渐进增强**: 前端应优雅处理API服务不可用的情况
+13. **参数验证**: 神经网络参数在前后端都有验证机制
+14. **历史记录**: 参数变更会自动记录历史，便于追踪
+15. **配置管理**: 支持导入导出参数配置，便于环境迁移
+
+## 服务架构图
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    前端 Vue.js 应用                          │
+├─────────────────────────────────────────────────────────────┤
+│  ProcessFlow.vue  │  PlanningTimeView.vue  │  NeuralNetwork │
+│  SubProcessView   │  RefactorTimingView    │  SettingsView  │
+└─────────────┬───────────────┬───────────────────┬───────────┘
+              │               │                   │
+┌─────────────▼───────────────▼───────────────────▼───────────┐
+│                    API客户端层                              │
+├─────────────────────────────────────────────────────────────┤
+│ processDataApi │ planningTimeApi │ neuralNetworkApi │ ...    │
+└─────────────┬───────────────┬───────────────────┬───────────┘
+              │               │                   │
+              │        HTTP Requests              │
+              │         (Port 3001)               │
+              │               │                   │
+┌─────────────▼───────────────▼───────────────────▼───────────┐
+│                   Express API服务器                         │
+│                   (apiServer.js)                           │
+├─────────────────────────────────────────────────────────────┤
+│  路由管理  │  中间件  │  错误处理  │  响应格式化  │  CORS     │
+└─────────────┬───────────────┬───────────────────┬───────────┘
+              │               │                   │
+┌─────────────▼───────────────▼───────────────────▼───────────┐
+│                   后端服务层                                │
+├─────────────────────────────────────────────────────────────┤
+│flowDataService  │planningTimeService│neuralNetworkService   │
+│  流程数据管理   │    规划时间管理    │   参数配置管理         │
+└─────────────┬───────────────┬───────────────────┬───────────┘
+              │               │                   │
+┌─────────────▼───────────────▼───────────────────▼───────────┐
+│                    MongoDB 数据库                           │
+├─────────────────────────────────────────────────────────────┤
+│ processflowdata │ planning_time_data │ neural_network_*      │
+│ subprocessdata  │ refactor_timing    │ parameter_history     │
+│ mermaid_flows   │ llm_analysis_data  │ saved_configs         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 数据流向说明
+
+1. **前端组件** 调用对应的API客户端
+2. **API客户端** 发送HTTP请求到Express服务器
+3. **Express服务器** 根据路由分发到相应的后端服务
+4. **后端服务** 执行业务逻辑并操作MongoDB
+5. **响应数据** 按相反路径返回到前端组件 

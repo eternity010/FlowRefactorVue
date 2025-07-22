@@ -1,6 +1,26 @@
 <template>
   <div class="refactor-timing-container">
     
+    <!-- 加载状态 -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-content">
+        <i class="el-icon-loading loading-spinner"></i>
+        <div class="loading-text">正在加载重构时机数据...</div>
+      </div>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="loadError" class="error-overlay">
+      <div class="error-content">
+        <i class="el-icon-warning error-icon"></i>
+        <div class="error-text">{{ loadError }}</div>
+        <el-button type="primary" @click="loadRefactorTimingData" size="small">重新加载</el-button>
+      </div>
+    </div>
+    
+    <!-- 主要内容 -->
+    <div v-else>
+    
     <!-- 顶部信息卡片区域 -->
     <el-card class="overview-card">
       <div slot="header" class="overview-header">
@@ -464,27 +484,14 @@
         <el-button v-if="isAnimating && !isLoadingModelOutput" type="warning" @click="skipAnimation">跳过动画</el-button>
       </div>
     </el-dialog>
+    
+    </div> <!-- 结束 主要内容 div -->
   </div>
 </template>
 
 <script>
-import moment1Data from '@/data/RefactorTimingData';
-import { moment2Data } from '@/data/RefactorTimingData';
+import { planningTimeApi } from '@/api/planningTimeApi';
 import RiskMonitoringDialog from '@/components/RiskMonitoringDialog.vue';
-
-// 从localStorage获取存储的数据状态
-function getStoredDataMoment() {
-  const storedData = localStorage.getItem('refactorTimingData');
-  if (storedData) {
-    try {
-      return JSON.parse(storedData);
-    } catch (error) {
-      console.error('解析localStorage数据失败:', error);
-      return null;
-    }
-  }
-  return null;
-}
 
 export default {
   name: 'RefactorTimingView',
@@ -492,10 +499,6 @@ export default {
     RiskMonitoringDialog
   },
   data() {
-    // 首先获取存储的数据状态
-    const storedMoment = getStoredDataMoment();
-    const useStoredData = storedMoment !== null;
-    
     return {
       currentDate: new Date().toLocaleString('zh-CN', {
         year: 'numeric',
@@ -505,14 +508,39 @@ export default {
         minute: '2-digit'
       }),
       // 标记当前使用的是哪个时刻的数据
-      currentDataMoment: useStoredData ? 'moment2' : 'moment1',
-      // 从数据文件中导入数据，根据存储的状态选择时刻
-      riskData: useStoredData ? storedMoment.riskData : moment1Data.riskData,
-      subprocessData: useStoredData ? storedMoment.subprocessData : moment1Data.subprocessData,
-      predictionData: useStoredData ? storedMoment.predictionData : moment1Data.predictionData,
-      analysisResults: useStoredData ? storedMoment.analysisResults : moment1Data.analysisResults,
-      recommendations: useStoredData ? storedMoment.recommendations : moment1Data.recommendations,
-      overallRecommendation: useStoredData ? storedMoment.overallRecommendation : moment1Data.overallRecommendation,
+      currentDataMoment: 'needs_refactor',
+      // 从MongoDB API获取的数据
+      riskData: {
+        totalRisks: 0,
+        highRisks: 0,
+        mediumRisks: 0,
+        lowRisks: 0
+      },
+      subprocessData: {
+        totalSubprocesses: 0,
+        operationCount: 0,
+        purchaseCount: 0,
+        productionCount: 0,
+        marketingCount: 0
+      },
+      predictionData: {
+        planTime: 0,
+        actualTime: 0,
+        schemeA: { time: 0, error: '0%' },
+        schemeB: { time: 0, error: '0%' },
+        schemeC: { time: 0, error: '0%' }
+      },
+      analysisResults: {
+        refactorNecessity: 0,
+        recommendedPriority: 0,
+        resourceRequirement: 0,
+        implementationDifficulty: 0
+      },
+      recommendations: [],
+      overallRecommendation: '正在加载数据...',
+      // 数据加载状态
+      isLoading: true,
+      loadError: null,
       // 业务态势全景感知数据
       businessSituationData: {
         overallScore: 78,
@@ -644,6 +672,7 @@ export default {
   },
   mounted() {
     this.checkAICollectionStatus();
+    this.loadRefactorTimingData();
   },
   activated() {
     // 页面激活时检查AI收集状态
@@ -658,6 +687,111 @@ export default {
     }
   },
   methods: {
+    // 加载重构时机数据
+    async loadRefactorTimingData() {
+      try {
+        this.isLoading = true;
+        this.loadError = null;
+        
+        console.log('🔄 开始加载重构时机数据...');
+        
+        // 获取最新的重构时机数据
+        const result = await planningTimeApi.getLatestRefactorTimingData();
+        
+        if (result.success && result.data) {
+          this.updateDataFromMongoDB(result.data);
+          console.log('✅ 重构时机数据加载成功:', result.data.description);
+        } else {
+          throw new Error(result.message || '获取数据失败');
+        }
+      } catch (error) {
+        console.error('❌ 加载重构时机数据失败:', error);
+        this.loadError = error.message || '加载数据失败';
+        this.$message.error('加载重构时机数据失败: ' + this.loadError);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    // 从MongoDB数据更新组件状态
+    updateDataFromMongoDB(mongoData) {
+      if (!mongoData) {
+        console.warn('⚠️ MongoDB数据为空');
+        return;
+      }
+
+      try {
+        // 更新当前数据状态标记
+        this.currentDataMoment = (mongoData.metadata && mongoData.metadata.systemStatus) || 'needs_refactor';
+        
+        // 更新风险数据
+        if (mongoData.riskData) {
+          this.riskData = {
+            totalRisks: mongoData.riskData.totalRisks || 0,
+            highRisks: mongoData.riskData.highRisks || 0,
+            mediumRisks: mongoData.riskData.mediumRisks || 0,
+            lowRisks: mongoData.riskData.lowRisks || 0
+          };
+        }
+
+        // 更新子流程数据
+        if (mongoData.subprocessData) {
+          this.subprocessData = {
+            totalSubprocesses: mongoData.subprocessData.totalSubprocesses || 0,
+            operationCount: mongoData.subprocessData.operationCount || 0,
+            purchaseCount: mongoData.subprocessData.purchaseCount || 0,
+            productionCount: mongoData.subprocessData.productionCount || 0,
+            marketingCount: mongoData.subprocessData.marketingCount || 0
+          };
+        }
+
+        // 更新预测数据
+        if (mongoData.predictionData) {
+          this.predictionData = {
+            planTime: mongoData.predictionData.planTime || 0,
+            actualTime: mongoData.predictionData.actualTime || 0,
+            schemeA: {
+              time: (mongoData.predictionData.schemeA && mongoData.predictionData.schemeA.time) || 0,
+              error: (mongoData.predictionData.schemeA && mongoData.predictionData.schemeA.error) || '0%'
+            },
+            schemeB: {
+              time: (mongoData.predictionData.schemeB && mongoData.predictionData.schemeB.time) || 0,
+              error: (mongoData.predictionData.schemeB && mongoData.predictionData.schemeB.error) || '0%'
+            },
+            schemeC: {
+              time: (mongoData.predictionData.schemeC && mongoData.predictionData.schemeC.time) || 0,
+              error: (mongoData.predictionData.schemeC && mongoData.predictionData.schemeC.error) || '0%'
+            }
+          };
+        }
+
+        // 更新分析结果
+        if (mongoData.analysisResults) {
+          this.analysisResults = {
+            refactorNecessity: mongoData.analysisResults.refactorNecessity || 0,
+            recommendedPriority: mongoData.analysisResults.recommendedPriority || 0,
+            resourceRequirement: mongoData.analysisResults.resourceRequirement || 0,
+            implementationDifficulty: mongoData.analysisResults.implementationDifficulty || 0
+          };
+        }
+
+        // 更新建议
+        if (mongoData.recommendations) {
+          this.recommendations = mongoData.recommendations || [];
+        }
+
+        // 更新总体建议
+        if (mongoData.overallRecommendation) {
+          this.overallRecommendation = mongoData.overallRecommendation;
+        }
+
+        console.log('✅ 数据更新完成 - 当前状态:', this.currentDataMoment);
+      } catch (error) {
+        console.error('❌ 更新数据时出错:', error);
+        this.$message.error('数据更新失败: ' + error.message);
+      }
+    },
+
     // 检查AI收集状态
     checkAICollectionStatus() {
       const aiData = localStorage.getItem('aiCollectionData');
@@ -708,11 +842,11 @@ export default {
     handleAIDataCollection() {
       this.$router.push('/home/ai-data-collection');
     },
-    handleManualAnalysis() {
-      const isCurrentlyMoment1 = this.currentDataMoment === 'moment1';
+    async handleManualAnalysis() {
+      const isCurrentlyNeedsRefactor = this.currentDataMoment === 'needs_refactor';
       
       this.$message({
-        message: isCurrentlyMoment1 ? '正在启动手动分析...' : '正在重置到初始状态...',
+        message: isCurrentlyNeedsRefactor ? '正在启动手动分析...' : '正在重置到初始状态...',
         type: 'info',
         duration: 1000
       });
@@ -720,67 +854,55 @@ export default {
       // 显示加载状态
       const loading = this.$loading({
         lock: true,
-        text: isCurrentlyMoment1 ? '神经网络分析中...' : '正在重置数据...',
+        text: isCurrentlyNeedsRefactor ? '神经网络分析中...' : '正在重置数据...',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
       
-      // 模拟分析/重置过程
-      setTimeout(() => {
-        if (isCurrentlyMoment1) {
-          // 当前是时刻一，切换到时刻二
-        this.riskData = moment2Data.riskData;
-        this.subprocessData = moment2Data.subprocessData;
-        this.predictionData = moment2Data.predictionData;
-        this.analysisResults = moment2Data.analysisResults;
-        this.recommendations = moment2Data.recommendations;
-        this.overallRecommendation = moment2Data.overallRecommendation;
+      try {
+        let result;
         
-          // 更新当前数据状态标记
-          this.currentDataMoment = 'moment2';
+        if (isCurrentlyNeedsRefactor) {
+          // 当前是需要重构状态，切换到稳定状态
+          result = await planningTimeApi.switchToNextMoment();
           
-          // 保存时刻2数据到localStorage
-          this.saveDataToStorage();
-        
-        // 显示成功消息
-        this.$message({
-          message: '重构时机分析完成',
-          type: 'success'
-        });
-        
-        // 重置大模型分析结果状态（切换到时刻二时，保持原有的分析状态）
-        // this.llmAnalysisData.hasData = true;
+          if (result.success && result.data) {
+            this.updateDataFromMongoDB(result.data);
+            this.$message({
+              message: '重构时机分析完成 - 系统状态已优化',
+              type: 'success'
+            });
+          } else {
+            throw new Error(result.message || '切换状态失败');
+          }
         } else {
-          // 当前是时刻二，切换到时刻一
-          this.riskData = moment1Data.riskData;
-          this.subprocessData = moment1Data.subprocessData;
-          this.predictionData = moment1Data.predictionData;
-          this.analysisResults = moment1Data.analysisResults;
-          this.recommendations = moment1Data.recommendations;
-          this.overallRecommendation = moment1Data.overallRecommendation;
+          // 当前是稳定状态，重置到初始状态
+          result = await planningTimeApi.resetToInitialMoment();
           
-          // 更新当前数据状态标记
-          this.currentDataMoment = 'moment1';
-          
-          // 清除localStorage中的数据，回到初始状态
-          localStorage.removeItem('refactorTimingData');
-          
-          // 重置大模型分析结果状态
-          this.llmAnalysisData.hasData = false;
-          
-          // 显示成功消息
-          this.$message({
-            message: '已重置到初始状态',
-            type: 'success'
-          });
+          if (result.success && result.data) {
+            this.updateDataFromMongoDB(result.data);
+            
+            // 重置大模型分析结果状态
+            this.llmAnalysisData.hasData = false;
+            
+            this.$message({
+              message: '已重置到初始状态',
+              type: 'success'
+            });
+          } else {
+            throw new Error(result.message || '重置状态失败');
+          }
         }
-        
+      } catch (error) {
+        console.error('❌ 手动分析操作失败:', error);
+        this.$message.error('操作失败: ' + error.message);
+      } finally {
         // 关闭加载状态
         loading.close();
-      }, 1000);
+      }
     },
     // 显示模型输出
-    showModelOutput() {
+    async showModelOutput() {
       // 如果已经有分析结果，直接滚动到结果区域
       if (this.llmAnalysisData.hasData) {
         this.scrollToAnalysisResult();
@@ -797,30 +919,111 @@ export default {
       // 显示加载状态
       const loading = this.$loading({
         lock: true,
-        text: '大模型正在进行智能分析中...',
+        text: '正在从数据库加载大模型分析结果...',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
       
-      // 模拟分析过程
-      setTimeout(() => {
-        // 更新大模型分析结果数据状态
-        this.llmAnalysisData.hasData = true;
+      try {
+        // 从MongoDB加载大模型分析数据
+        const result = await planningTimeApi.getLLMAnalysisData();
         
+        if (result.success && result.data) {
+          // 更新大模型分析结果数据
+          this.updateLLMAnalysisDataFromMongoDB(result.data);
+          
+          // 显示成功消息
+          this.$message({
+            message: '大模型智能分析数据加载完成',
+            type: 'success'
+          });
+          
+          // 滚动到分析结果区域
+          this.$nextTick(() => {
+            this.scrollToAnalysisResult();
+          });
+        } else {
+          throw new Error(result.message || '获取大模型分析数据失败');
+        }
+      } catch (error) {
+        console.error('❌ 加载大模型分析数据失败:', error);
+        this.$message.error('加载大模型分析数据失败: ' + error.message);
+      } finally {
         // 关闭加载状态
         loading.close();
+      }
+    },
+
+    // 从MongoDB数据更新大模型分析状态
+    updateLLMAnalysisDataFromMongoDB(mongoData) {
+      if (!mongoData) {
+        console.warn('⚠️ 大模型分析数据为空');
+        return;
+      }
+
+      try {
+        // 更新基本状态
+        this.llmAnalysisData.hasData = mongoData.analysisStatus === 'completed';
         
-        // 显示成功消息
-        this.$message({
-          message: '大模型智能分析完成',
-          type: 'success'
-        });
+        // 更新流程信息
+        if (mongoData.processInfo) {
+          this.llmAnalysisData.processInfo = {
+            currentProcess: mongoData.processInfo.currentProcess || this.llmAnalysisData.processInfo.currentProcess,
+            processId: mongoData.processInfo.processId || this.llmAnalysisData.processInfo.processId
+          };
+        }
+
+        // 更新环境分析文本
+        if (mongoData.environmentAnalysis && mongoData.environmentAnalysis.environmentAnalysisText) {
+          this.llmAnalysisData.environmentAnalysisText = mongoData.environmentAnalysis.environmentAnalysisText;
+        }
+
+        // 更新相似流程数据
+        if (mongoData.similarProcesses && mongoData.similarProcesses.results) {
+          this.llmAnalysisData.similarProcesses = mongoData.similarProcesses.results.map(process => ({
+            rank: process.rank,
+            id: process.id,
+            pathMatch: process.pathMatch,
+            riskMatch: process.riskMatch,
+            overall: process.overall,
+            isReference: process.isReference
+          }));
           
-        // 滚动到分析结果区域
-        this.$nextTick(() => {
-          this.scrollToAnalysisResult();
-        });
-      }, 2000); // 2秒模拟分析时间
+          if (mongoData.similarProcesses.referenceProcess) {
+            this.llmAnalysisData.referenceProcessTime = mongoData.similarProcesses.referenceProcess.totalTime;
+          }
+        }
+
+        // 更新节点分析数据
+        if (mongoData.nodeAnalysis && mongoData.nodeAnalysis.nodes) {
+          this.llmAnalysisData.nodeAnalysis = mongoData.nodeAnalysis.nodes.map(node => ({
+            seq: node.seq,
+            name: node.name,
+            riskFactor: node.riskFactor,
+            riskScore: node.riskScore,
+            duration: node.duration
+          }));
+        }
+
+        // 更新时间预测数据
+        if (mongoData.timePrediction) {
+          this.llmAnalysisData.timePrediction = {
+            totalTime: mongoData.timePrediction.totalTime || this.llmAnalysisData.timePrediction.totalTime,
+            confidenceInterval: mongoData.timePrediction.confidenceInterval ? mongoData.timePrediction.confidenceInterval.display : this.llmAnalysisData.timePrediction.confidenceInterval,
+            difference: mongoData.timePrediction.comparison ? mongoData.timePrediction.comparison.display : this.llmAnalysisData.timePrediction.difference
+          };
+        }
+
+        // 更新建议
+        if (mongoData.recommendations && mongoData.recommendations.items) {
+          this.llmAnalysisData.recommendations = mongoData.recommendations.items.map(item => item.recommendation);
+        }
+
+        console.log('✅ 大模型分析数据更新完成');
+      } catch (error) {
+        console.error('❌ 更新大模型分析数据时出错:', error);
+        this.$message.error('大模型分析数据更新失败: ' + error.message);
+      }
     },
     
     // 滚动到分析结果区域
@@ -947,18 +1150,7 @@ export default {
       if (riskScore >= 0.3) return 'info';
       return 'success';
     },
-    // 保存数据到localStorage
-    saveDataToStorage() {
-      const data = {
-        riskData: this.riskData,
-        subprocessData: this.subprocessData,
-        predictionData: this.predictionData,
-        analysisResults: this.analysisResults,
-        recommendations: this.recommendations,
-        overallRecommendation: this.overallRecommendation
-      };
-      localStorage.setItem('refactorTimingData', JSON.stringify(data));
-    }
+
   }
 }
 </script>
@@ -969,6 +1161,87 @@ export default {
   padding-right: 5px;
   padding-bottom: 10px;
   padding-left: 5px;
+  position: relative;
+}
+
+/* 加载状态样式 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  text-align: center;
+  padding: 40px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  font-size: 32px;
+  color: #409EFF;
+  margin-bottom: 16px;
+  animation: loading-rotate 2s linear infinite;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #606266;
+  font-weight: 500;
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误状态样式 */
+.error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.error-content {
+  text-align: center;
+  padding: 40px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+}
+
+.error-icon {
+  font-size: 48px;
+  color: #F56C6C;
+  margin-bottom: 16px;
+}
+
+.error-text {
+  font-size: 16px;
+  color: #606266;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .overview-card {

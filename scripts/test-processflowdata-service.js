@@ -1,7 +1,7 @@
-const ProcessFlowDataService = require('../src/services/processFlowDataService');
+const FlowDataService = require('../src/services/flowDataService');
 
-async function testProcessFlowDataService() {
-  const service = new ProcessFlowDataService();
+async function testFlowDataService() {
+const service = new FlowDataService();
   
   try {
     // 连接到数据库
@@ -12,7 +12,7 @@ async function testProcessFlowDataService() {
       return;
     }
 
-    console.log('\n🧪 开始测试 ProcessFlowDataService 方法...\n');
+    console.log('\n🧪 开始测试 FlowDataService 方法...\n');
 
     // 测试1: 获取数据库统计信息
     console.log('📊 测试1 - 获取数据库统计信息:');
@@ -206,7 +206,7 @@ async function testProcessFlowDataService() {
 
 // 如果直接运行此脚本
 if (require.main === module) {
-  testProcessFlowDataService();
+  testFlowDataService();
 }
 
-module.exports = { testProcessFlowDataService }; 
+module.exports = { testFlowDataService }; 

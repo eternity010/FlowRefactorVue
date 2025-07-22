@@ -2,11 +2,39 @@
   <div class="planning-time-container">
     <div class="page-header">
       <span>规划完成时间分析</span>
-      <el-tag size="small" type="info">神经网络模型 v1.1.0</el-tag>
+      <div class="header-right">
+        <el-tag size="small" type="info">神经网络模型 v1.1.0</el-tag>
+        <el-button 
+          v-if="!isLoading" 
+          size="mini" 
+          icon="el-icon-refresh" 
+          @click="refreshData"
+          :loading="isLoading"
+          class="refresh-btn">
+          刷新数据
+        </el-button>
+      </div>
+    </div>
+    
+    <!-- 加载状态 -->
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-spinner">
+        <i class="el-icon-loading"></i>
+      </div>
+      <div class="loading-text">{{ loadingText }}</div>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="hasError" class="error-container">
+      <div class="error-icon">
+        <i class="el-icon-warning"></i>
+      </div>
+      <div class="error-text">{{ errorMessage }}</div>
+      <el-button type="primary" @click="loadPlanningTimeData" class="retry-btn">重新加载</el-button>
     </div>
     
     <!-- 数据流向神经网络可视化 -->
-    <div class="neural-flow-section">
+    <div v-else class="neural-flow-section">
       <h3 class="section-title">数据输入流向分析</h3>
       <div class="flow-diagram">
         <!-- 三个输入数据源 -->
@@ -251,97 +279,171 @@
 </template>
 
 <script>
+import { planningTimeApi } from '@/api/planningTimeApi';
+
 export default {
   name: 'PlanningTimeView',
   data() {
     return {
-      // 统计数据
+      // 加载状态
+      isLoading: true,
+      loadingText: '正在加载规划时间数据...',
+      hasError: false,
+      errorMessage: '',
+      
+      // 从API获取的数据
       stats: {
-        processNodes: '156',
-        monitoringRate: 85
+        processNodes: 0,
+        monitoringRate: 0
       },
-      modelOutputVisible: false,
       sampleData: {
-        nodePath: ['S_21', 'S7', 'S15', 'S14', 'S15', 'S5'],
-        nodeCount: 6,
-        edgeCount: 5,
-        edges: [
-          { 
-            id: '边1', 
-            connection: 'S21 → S7', 
-            type: 'mc', 
-            riskFrom: 0.750, 
-            riskTo: 0.793, 
-            theoreticalTime: 59.42, 
-            actualTime: 94.94,
-            deviation: ((94.94 - 59.42) / 59.42 * 100).toFixed(1)
-          },
-          { 
-            id: '边2', 
-            connection: 'S7 → S15', 
-            type: 'mc', 
-            riskFrom: 0.793, 
-            riskTo: 0.243, 
-            theoreticalTime: 41.74, 
-            actualTime: 46.04,
-            deviation: ((46.04 - 41.74) / 41.74 * 100).toFixed(1)
-          },
-          { 
-            id: '边3', 
-            connection: 'S15 → S14', 
-            type: 'mc', 
-            riskFrom: 0.243, 
-            riskTo: 0.579, 
-            theoreticalTime: 84.50, 
-            actualTime: 59.96,
-            deviation: ((59.96 - 84.50) / 84.50 * 100).toFixed(1)
-          },
-          { 
-            id: '边4', 
-            connection: 'S14 → S15', 
-            type: 'rpc', 
-            riskFrom: 0.579, 
-            riskTo: 0.243, 
-            theoreticalTime: 41.84, 
-            actualTime: 35.92,
-            deviation: ((35.92 - 41.84) / 41.84 * 100).toFixed(1)
-          },
-          { 
-            id: '边5', 
-            connection: 'S15 → S5', 
-            type: 'mc', 
-            riskFrom: 0.243, 
-            riskTo: 0.405, 
-            theoreticalTime: 27.22, 
-            actualTime: 18.04,
-            deviation: ((18.04 - 27.22) / 27.22 * 100).toFixed(1)
-          }
-        ]
+        nodePath: [],
+        nodeCount: 0,
+        edgeCount: 0,
+        edges: []
       },
+      currentAccuracy: {
+        lr: 0,
+        xgb: 0,
+        gcn: 0
+      },
+      accuracyHistory: {
+        lr: [],
+        xgb: [],
+        gcn: []
+      },
+      consoleTemplate: null,
+      flowConfiguration: null,
+      
+      // 控制台相关状态
+      modelOutputVisible: false,
       consoleStatus: 'pending',
       consoleLogs: [],
       runTime: 0,
-      runTimeTimer: null,
-      currentAccuracy: {
-        lr: 99.22,   // 方案A-LR 当前准确度
-        xgb: 99.33,  // 方案B-XGB 当前准确度  
-        gcn: 84.37   // 方案C-GCN 当前准确度
-      },
-      accuracyHistory: {
-        // 方案A-LR 历史数据 (围绕99.22上下浮动)
-        lr: [97.2, 98.1, 97.8, 98.9, 99.1, 98.7, 99.3, 98.5, 99.0, 99.4, 98.8, 99.2, 99.1, 99.22],
-        // 方案B-XGB 历史数据 (围绕99.33上下浮动)  
-        xgb: [97.5, 98.2, 98.7, 99.1, 98.9, 99.4, 98.8, 99.2, 99.0, 99.5, 99.1, 99.3, 99.4, 99.33],
-        // 方案C-GCN 历史数据 (围绕84.37上下浮动，准确度较低)
-        gcn: [82.1, 83.2, 82.8, 83.9, 84.1, 83.7, 84.3, 83.5, 84.0, 84.4, 83.8, 84.2, 84.1, 84.37]
-      }
+      runTimeTimer: null
     }
   },
-  mounted() {
+  async mounted() {
+    // 加载数据
+    await this.loadPlanningTimeData();
+    
     // 启动数据流动动画
     this.startFlowAnimation();
   },
+  
+  beforeDestroy() {
+    // 清理定时器
+    if (this.runTimeTimer) {
+      clearInterval(this.runTimeTimer);
+    }
+  },
   methods: {
+    /**
+     * 加载规划时间数据
+     */
+    async loadPlanningTimeData() {
+      this.isLoading = true;
+      this.hasError = false;
+      this.loadingText = '正在加载规划时间数据...';
+      
+      try {
+        // 并行获取所有需要的数据
+        const [
+          statisticsResult,
+          sampleDataResult,
+          predictionSchemesResult,
+          consoleTemplateResult,
+          flowConfigResult
+        ] = await Promise.all([
+          planningTimeApi.getStatistics(),
+          planningTimeApi.getSampleData(),
+          planningTimeApi.getPredictionSchemes(),
+          planningTimeApi.getConsoleTemplate(),
+          planningTimeApi.getFlowConfiguration()
+        ]);
+
+        // 检查所有请求是否成功
+        if (!statisticsResult.success) {
+          throw new Error(statisticsResult.message || '获取统计数据失败');
+        }
+        if (!sampleDataResult.success) {
+          throw new Error(sampleDataResult.message || '获取样本数据失败');
+        }
+        if (!predictionSchemesResult.success) {
+          throw new Error(predictionSchemesResult.message || '获取预测方案失败');
+        }
+        if (!consoleTemplateResult.success) {
+          throw new Error(consoleTemplateResult.message || '获取控制台模板失败');
+        }
+        if (!flowConfigResult.success) {
+          throw new Error(flowConfigResult.message || '获取流程配置失败');
+        }
+
+        // 设置统计数据
+        this.stats = {
+          processNodes: statisticsResult.data.processNodes || 0,
+          monitoringRate: statisticsResult.data.monitoringRate || 0
+        };
+
+        // 设置样本数据
+        this.sampleData = {
+          nodePath: sampleDataResult.data.nodePath || [],
+          nodeCount: sampleDataResult.data.nodeCount || 0,
+          edgeCount: sampleDataResult.data.edgeCount || 0,
+          edges: sampleDataResult.data.edges || []
+        };
+
+        // 设置预测方案数据
+        const schemes = predictionSchemesResult.data || [];
+        
+        // 重置准确度数据
+        this.currentAccuracy = { lr: 0, xgb: 0, gcn: 0 };
+        this.accuracyHistory = { lr: [], xgb: [], gcn: [] };
+        
+        // 处理每个预测方案
+        schemes.forEach(scheme => {
+          switch (scheme.schemeId) {
+            case 'scheme_lr':
+              this.currentAccuracy.lr = scheme.currentAccuracy || 0;
+              this.accuracyHistory.lr = scheme.accuracyHistory || [];
+              break;
+            case 'scheme_xgb':
+              this.currentAccuracy.xgb = scheme.currentAccuracy || 0;
+              this.accuracyHistory.xgb = scheme.accuracyHistory || [];
+              break;
+            case 'scheme_gcn':
+              this.currentAccuracy.gcn = scheme.currentAccuracy || 0;
+              this.accuracyHistory.gcn = scheme.accuracyHistory || [];
+              break;
+          }
+        });
+
+        // 设置控制台模板和流程配置
+        this.consoleTemplate = consoleTemplateResult.data;
+        this.flowConfiguration = flowConfigResult.data;
+
+        console.log('✅ 规划时间数据加载成功', {
+          stats: this.stats,
+          sampleData: this.sampleData,
+          schemes: schemes.length,
+          consoleSteps: (this.consoleTemplate && this.consoleTemplate.executionSteps) ? this.consoleTemplate.executionSteps.length : 0
+        });
+
+      } catch (error) {
+        console.error('❌ 加载规划时间数据失败:', error);
+        this.hasError = true;
+        this.errorMessage = error.message || '加载数据失败';
+        
+        this.$message({
+          message: `加载规划时间数据失败: ${this.errorMessage}`,
+          type: 'error',
+          duration: 5000
+        });
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
     startFlowAnimation() {
       // 模拟数据流动效果
       setInterval(() => {
@@ -379,108 +481,37 @@ export default {
     },
     
     startModelPrediction() {
-      // 模拟模型初始化
-      setTimeout(() => {
-        this.addLog('info', '正在加载神经网络模型...', null);
-      }, 100);
+      if (!this.consoleTemplate || !this.consoleTemplate.executionSteps) {
+        this.addLog('error', '控制台模板未加载，无法启动模型预测', null);
+        return;
+      }
+
+      // 使用从API获取的控制台模板执行步骤
+      const steps = this.consoleTemplate.executionSteps;
       
-      setTimeout(() => {
-        this.addLog('info', '模型加载完成，开始预测...', null);
-      }, 600);
-      
-      // 输出样本详细信息
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('success', '=== 样本详细信息 ===', null);
-        this.addLog('info', "节点路径: ['S21', 'S_7', 'S15', 'S14', 'S 15', 'S 5']", null);
-        this.addLog('info', '节点数量: 6 | 边数量: 5', null);
-      }, 1200);
-      
-      // 输出边详情
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('success', '=== 边详情 ===', null);
-      }, 1800);
-      
-      // 边1
-      setTimeout(() => {
-        this.addLog('info', '[边1] S_21 -> S_7', null);
-        this.addLog('info', '类型: mc | 风险: 0.750/0.793', null);
-        this.addLog('info', '理论耗时:  59.42 | 实际耗时:  94.94', null);
-      }, 2200);
-      
-      // 边2
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('info', '[边2] S_7 -> S15', null);
-        this.addLog('info', '类型: mc | 风险: 0.793/0.243', null);
-        this.addLog('info', '理论耗时:  41.74 | 实际耗时:  46.04', null);
-      }, 2700);
-      
-      // 边3
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('info', '[边3] S15 -> S14', null);
-        this.addLog('info', '风险: 0.243/0.579', null);
-        this.addLog('info', '理论耗时:  84.50 | 实际耗时:  59.96', null);
-      }, 3200);
-      
-      // 边4
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('info', '[边4] S14 -> S 15', null);
-        this.addLog('info', '类型: mc | 风险: 0.579/0.243', null);
-        this.addLog('info', '理论耗时:  41.84 | 实际耗时:  35.92', null);
-      }, 3700);
-      
-      // 边5
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('info', '[边5] S 15 -> S 5', null);
-        this.addLog('info', '类型: rpc | 风险: 0.243/0.405', null);
-        this.addLog('info', '理论耗时:  27.22 | 实际耗时:  18.04', null);
-      }, 4200);
-      
-      // 预测结果
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('success', '=== 预测结果 ===', null);
-        this.addLog('info', '实际总耗时: 254.91', null);
-        this.addLog('info', '理论最优耗时: 254.71', null);
-      }, 5000);
-      
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('warning', '方案A-LR  预测: 252.92 (误差: -0.78%)', null);
-        this.addLog('warning', '方案B-XGB 预测: 253.20 (误差: -0.67%)', null);
-        this.addLog('error', '方案C-GCN 预测: 294.75 (误差: +15.63%)', null);
-      }, 5600);
-      
-      // 决策结果
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('success', '[决策] 是否需要重构: 否', null);
-      }, 6200);
-      
-      // 完成
-      setTimeout(() => {
-        this.addLog('info', '', null);
-        this.addLog('success', '模型预测完成！', null);
-        this.consoleStatus = 'completed';
-        
-        // 清除运行时间计时器
-        if (this.runTimeTimer) {
-          clearInterval(this.runTimeTimer);
-        }
-        
-        // 自动滚动到底部
-        this.$nextTick(() => {
-          const consoleBody = this.$refs.consoleBody;
-          if (consoleBody) {
-            consoleBody.scrollTop = consoleBody.scrollHeight;
+      steps.forEach((step, index) => {
+        setTimeout(() => {
+          this.addLog(step.logLevel, step.message, step.value || null);
+          
+          // 如果是最后一步，设置完成状态
+          if (index === steps.length - 1) {
+            this.consoleStatus = 'completed';
+            
+            // 清除运行时间计时器
+            if (this.runTimeTimer) {
+              clearInterval(this.runTimeTimer);
+            }
+            
+            // 自动滚动到底部
+            this.$nextTick(() => {
+              const consoleBody = this.$refs.consoleBody;
+              if (consoleBody) {
+                consoleBody.scrollTop = consoleBody.scrollHeight;
+              }
+            });
           }
-        });
-      }, 6800);
+        }, step.delay);
+      });
     },
     
     startRunTimeCounter() {
@@ -535,6 +566,19 @@ export default {
       if (diff > 0.5) return '上升';
       if (diff < -0.5) return '下降';
       return '稳定';
+    },
+    
+    /**
+     * 刷新数据
+     */
+    async refreshData() {
+      this.$message({
+        message: '正在刷新规划时间数据...',
+        type: 'info',
+        duration: 1000
+      });
+      
+      await this.loadPlanningTimeData();
     }
   }
 }
@@ -557,6 +601,20 @@ export default {
   backdrop-filter: blur(10px);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.refresh-btn {
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+  transform: scale(1.05);
 }
 
 .neural-flow-section {
@@ -1390,5 +1448,81 @@ export default {
 
 .console-body::-webkit-scrollbar-thumb:hover {
   background: #5a5a5a;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 20px 0;
+}
+
+.loading-spinner {
+  margin-bottom: 20px;
+}
+
+.loading-spinner i {
+  font-size: 40px;
+  color: #409EFF;
+  animation: loading-rotate 2s linear infinite;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #606266;
+  font-weight: 500;
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误状态样式 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 20px 0;
+  text-align: center;
+}
+
+.error-icon {
+  margin-bottom: 20px;
+}
+
+.error-icon i {
+  font-size: 48px;
+  color: #F56C6C;
+}
+
+.error-text {
+  font-size: 16px;
+  color: #F56C6C;
+  margin-bottom: 30px;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  font-size: 14px;
 }
 </style> 

@@ -20,13 +20,33 @@
 
     <!-- 主要内容区域 -->
     <div class="content-wrapper">
-      <el-card class="settings-card">
+      <el-card class="settings-card" v-loading="loading" element-loading-text="加载参数中...">
         <div slot="header" class="settings-header">
           <span>参数设置</span>
           <el-tag size="small" type="info">运行配置</el-tag>
         </div>
         
         <div class="settings-content">
+          <!-- 状态信息 -->
+          <div class="status-info" v-if="lastUpdated || offlineMode">
+            <el-row :gutter="16">
+              <el-col :span="12" v-if="lastUpdated">
+                <div class="status-item">
+                  <span class="status-label">最后更新时间：</span>
+                  <span class="status-value">{{ formatDateTime(lastUpdated) }}</span>
+                </div>
+              </el-col>
+              <el-col :span="12" v-if="offlineMode">
+                <div class="status-item">
+                  <el-tag type="warning" size="small">
+                    <i class="el-icon-warning"></i>
+                    离线模式
+                  </el-tag>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+          
           <div class="settings-description">
             <p>调整运行参数以优化分析结果</p>
           </div>
@@ -422,15 +442,28 @@
           </div>
           
           <div class="settings-actions">
-            <el-button type="primary" size="medium" @click="applySettings">
-              <i class="el-icon-check"></i>
+            <el-button 
+              type="primary" 
+              size="medium" 
+              @click="applySettings"
+              :loading="saving"
+              :disabled="loading">
+              <i class="el-icon-check" v-if="!saving"></i>
               应用设置并返回
             </el-button>
-            <el-button size="medium" @click="resetSettings">
-              <i class="el-icon-refresh"></i>
+            <el-button 
+              size="medium" 
+              @click="resetSettings"
+              :loading="loading"
+              :disabled="saving">
+              <i class="el-icon-refresh" v-if="!loading"></i>
               重置默认
             </el-button>
-            <el-button type="info" size="medium" @click="goBack">
+            <el-button 
+              type="info" 
+              size="medium" 
+              @click="goBack"
+              :disabled="loading || saving">
               <i class="el-icon-close"></i>
               取消
             </el-button>
@@ -442,10 +475,13 @@
 </template>
 
 <script>
+import { neuralNetworkApi } from '@/api/neuralNetworkApi';
+
 export default {
   name: 'ParameterSettingsView',
   data() {
     return {
+      // 参数值
       geoPoliticalWeight: 1.0,
       marketVolatilityFactor: 0.8,
       backupSupplierRatio: 0.3,
@@ -453,29 +489,69 @@ export default {
       minimumInventoryRatio: 0.15,
       costDelayTradeoff: 1.2,
       taktTimeVariance: 0.05,
-      overtimeCostCap: 200
+      overtimeCostCap: 200,
+      
+      // 界面状态
+      loading: false,
+      saving: false,
+      lastUpdated: null,
+      offlineMode: false
     }
   },
   mounted() {
     this.loadSavedParams();
   },
   methods: {
-    loadSavedParams() {
-      const savedParams = localStorage.getItem('neuralNetworkParams');
-      if (savedParams) {
-        const params = JSON.parse(savedParams);
-        this.geoPoliticalWeight = params.geoPoliticalWeight || 1.0;
-        this.marketVolatilityFactor = params.marketVolatilityFactor || 0.8;
-        this.backupSupplierRatio = params.backupSupplierRatio || 0.3;
-        this.routeReevalFrequency = params.routeReevalFrequency || 7;
-        this.minimumInventoryRatio = params.minimumInventoryRatio || 0.15;
-        this.costDelayTradeoff = params.costDelayTradeoff || 1.2;
-        this.taktTimeVariance = params.taktTimeVariance || 0.05;
-        this.overtimeCostCap = params.overtimeCostCap || 200;
+    async loadSavedParams() {
+      this.loading = true;
+      try {
+        const response = await neuralNetworkApi.getCurrentParameters();
+        
+        if (response.data && response.data.code === 200) {
+          const params = response.data.data;
+          
+          // 检查是否为离线模式
+          this.offlineMode = params.offline_mode || false;
+          this.lastUpdated = params.last_updated || response.data.data.updated_at;
+          
+          // 更新参数值
+          this.geoPoliticalWeight = params.geoPoliticalWeight || 1.0;
+          this.marketVolatilityFactor = params.marketVolatilityFactor || 0.8;
+          this.backupSupplierRatio = params.backupSupplierRatio || 0.3;
+          this.routeReevalFrequency = params.routeReevalFrequency || 7;
+          this.minimumInventoryRatio = params.minimumInventoryRatio || 0.15;
+          this.costDelayTradeoff = params.costDelayTradeoff || 1.2;
+          this.taktTimeVariance = params.taktTimeVariance || 0.05;
+          this.overtimeCostCap = params.overtimeCostCap || 200;
+          
+          if (this.offlineMode) {
+            this.$message.warning('离线模式：当前使用本地存储的参数');
+          } else {
+            this.$message.success('参数加载成功');
+          }
+        } else {
+          throw new Error(response.data.message || '获取参数失败');
+        }
+      } catch (error) {
+        console.error('加载参数失败:', error);
+        this.$message.error('加载参数失败: ' + (error.message || '网络错误'));
+        
+        // 设置默认值作为备选
+        this.geoPoliticalWeight = 1.0;
+        this.marketVolatilityFactor = 0.8;
+        this.backupSupplierRatio = 0.3;
+        this.routeReevalFrequency = 7;
+        this.minimumInventoryRatio = 0.15;
+        this.costDelayTradeoff = 1.2;
+        this.taktTimeVariance = 0.05;
+        this.overtimeCostCap = 200;
+        this.offlineMode = true;
+      } finally {
+        this.loading = false;
       }
     },
 
-    saveParams() {
+    async saveParams() {
       const params = {
         geoPoliticalWeight: this.geoPoliticalWeight,
         marketVolatilityFactor: this.marketVolatilityFactor,
@@ -486,12 +562,35 @@ export default {
         taktTimeVariance: this.taktTimeVariance,
         overtimeCostCap: this.overtimeCostCap
       };
-      localStorage.setItem('neuralNetworkParams', JSON.stringify(params));
-      return params;
+      
+      try {
+        const response = await neuralNetworkApi.updateParameters(params);
+        
+        if (response.data && response.data.code === 200) {
+          this.lastUpdated = response.data.data.updated_at || new Date().toISOString();
+          this.offlineMode = response.data.data.offline_mode || false;
+          return params;
+        } else {
+          throw new Error(response.data.message || '保存参数失败');
+        }
+      } catch (error) {
+        console.error('保存参数失败:', error);
+        this.$message.error('保存参数失败: ' + (error.message || '网络错误'));
+        throw error;
+      }
     },
 
-    handleParameterChange() {
-      this.saveParams();
+    async handleParameterChange() {
+      if (this.saving) return;
+      
+      this.saving = true;
+      try {
+        await this.saveParams();
+      } catch (error) {
+        // 错误已在saveParams中处理
+      } finally {
+        this.saving = false;
+      }
     },
     
     getGeoPoliticalLevel() {
@@ -686,14 +785,20 @@ export default {
       }
     },
     
-    applySettings() {
-      const allParams = this.saveParams();
-      
-      this.$message.success('参数已全部应用并保存');
-      
-      setTimeout(() => {
-        this.goBack();
-      }, 1000);
+    async applySettings() {
+      this.saving = true;
+      try {
+        await this.saveParams();
+        this.$message.success('参数已全部应用并保存');
+        
+        setTimeout(() => {
+          this.goBack();
+        }, 1000);
+      } catch (error) {
+        // 错误已在saveParams中处理
+      } finally {
+        this.saving = false;
+      }
     },
     
     resetSettings() {
@@ -701,18 +806,67 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.geoPoliticalWeight = 1.0;
-        this.marketVolatilityFactor = 0.8;
-        this.backupSupplierRatio = 0.3;
-        this.routeReevalFrequency = 7;
-        this.minimumInventoryRatio = 0.15;
-        this.costDelayTradeoff = 1.2;
-        this.taktTimeVariance = 0.05;
-        this.overtimeCostCap = 200;
-        this.handleParameterChange();
-        this.$message.info('所有参数已重置为默认值');
+      }).then(async () => {
+        this.loading = true;
+        try {
+          // 调用重置API
+          const response = await neuralNetworkApi.resetParameters();
+          
+          if (response.data && response.data.code === 200) {
+            const resetParams = response.data.data.reset_parameters || response.data.data.all_parameters;
+            
+            // 更新界面值
+            this.geoPoliticalWeight = resetParams.geoPoliticalWeight || 1.0;
+            this.marketVolatilityFactor = resetParams.marketVolatilityFactor || 0.8;
+            this.backupSupplierRatio = resetParams.backupSupplierRatio || 0.3;
+            this.routeReevalFrequency = resetParams.routeReevalFrequency || 7;
+            this.minimumInventoryRatio = resetParams.minimumInventoryRatio || 0.15;
+            this.costDelayTradeoff = resetParams.costDelayTradeoff || 1.2;
+            this.taktTimeVariance = resetParams.taktTimeVariance || 0.05;
+            this.overtimeCostCap = resetParams.overtimeCostCap || 200;
+            
+            this.lastUpdated = response.data.data.updated_at || new Date().toISOString();
+            this.offlineMode = response.data.data.offline_mode || false;
+            
+            this.$message.success('所有参数已重置为默认值');
+          } else {
+            throw new Error(response.data.message || '重置参数失败');
+          }
+        } catch (error) {
+          console.error('重置参数失败:', error);
+          this.$message.error('重置参数失败: ' + (error.message || '网络错误'));
+          
+          // 备选方案：手动设置默认值
+          this.geoPoliticalWeight = 1.0;
+          this.marketVolatilityFactor = 0.8;
+          this.backupSupplierRatio = 0.3;
+          this.routeReevalFrequency = 7;
+          this.minimumInventoryRatio = 0.15;
+          this.costDelayTradeoff = 1.2;
+          this.taktTimeVariance = 0.05;
+          this.overtimeCostCap = 200;
+          this.$message.info('已在本地重置为默认值');
+        } finally {
+          this.loading = false;
+        }
       });
+    },
+
+    formatDateTime(dateTime) {
+      if (!dateTime) return '--';
+      try {
+        const date = new Date(dateTime);
+        return date.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      } catch (error) {
+        return dateTime;
+      }
     },
 
     goBack() {
@@ -765,6 +919,32 @@ export default {
 
 .settings-content {
   padding: 10px 0;
+}
+
+.status-info {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.status-label {
+  font-size: 13px;
+  color: #606266;
+  margin-right: 8px;
+}
+
+.status-value {
+  font-size: 13px;
+  color: #303133;
+  font-weight: 500;
 }
 
 .settings-description {

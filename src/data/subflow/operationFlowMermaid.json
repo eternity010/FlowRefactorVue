@@ -1,113 +1,80 @@
 {
-  "flowName": "运维流程",
-  "flowType": "operation",
-  "description": "运维环节的业务流程图，包含维护、故障处理、技术支持等环节",
   "mermaidDefinition": "graph LR\n    o1[里程数周期性维护]\n    o2[客户整改需求]\n    o3[故障报警]\n    o4[安排维修人员]\n    o5[检查现场情况]\n    o6[现场情况分析]\n    o7[设备维护]\n    o8{是否存在故障}\n    o9{是否需要返厂}\n    o10[现场修]\n    o11[返厂修]\n    o12{是否需要技术支持}\n    o13[选择已有方案]\n    o14[设计部门支持]\n    o15[工艺部门支持]\n    \n    o2 --> o4\n    o3 --> o4\n    o4 --> o5\n    o5 --> o6\n    o6 --> o8\n    o8 -->|否| o7\n    o1 --> o7\n    o7 --> o9\n    o8 -->|是| o9\n    o9 -->|否| o10\n    o9 -->|是| o11\n    o10 --> o12\n    o11 --> o12\n    o12 --> o13\n    o12 --> o14\n    o12 --> o15",
   "nodes": [
     {
       "id": "o1",
       "text": "里程数周期性维护",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "trigger"
+      "type": "rect"
     },
     {
       "id": "o2", 
       "text": "客户整改需求",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "trigger"
+      "type": "rect"
     },
     {
       "id": "o3",
       "text": "故障报警", 
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "trigger"
+      "type": "rect"
     },
     {
       "id": "o4",
       "text": "安排维修人员",
-      "type": "rect", 
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o5",
       "text": "检查现场情况",
-      "type": "rect",
-      "mermaidType": "rectangle", 
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o6",
       "text": "现场情况分析",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o7",
       "text": "设备维护",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o8",
       "text": "是否存在故障",
-      "type": "diamond",
-      "mermaidType": "decision",
-      "category": "decision"
+      "type": "diamond"
     },
     {
       "id": "o9", 
       "text": "是否需要返厂",
-      "type": "diamond",
-      "mermaidType": "decision",
-      "category": "decision"
+      "type": "diamond"
     },
     {
       "id": "o10",
       "text": "现场修",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o11",
       "text": "返厂修",
-      "type": "rect", 
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o12",
       "text": "是否需要技术支持",
-      "type": "diamond",
-      "mermaidType": "decision", 
-      "category": "decision"
+      "type": "diamond"
     },
     {
       "id": "o13",
       "text": "选择已有方案",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "process"
+      "type": "rect"
     },
     {
       "id": "o14", 
       "text": "设计部门支持",
-      "type": "rect",
-      "mermaidType": "rectangle",
-      "category": "support"
+      "type": "rect"
     },
     {
       "id": "o15",
       "text": "工艺部门支持",
-      "type": "rect",
-      "mermaidType": "rectangle", 
-      "category": "support"
+      "type": "rect"
     }
   ],
   "edges": [
@@ -223,15 +190,5 @@
       "label": "",
       "type": "polyline"
     }
-  ],
-  "metadata": {
-    "convertedFrom": "LogicFlow",
-    "originalFile": "src/components/flows/OperationFlow.vue",
-    "convertedAt": "2024-01-20T10:30:00Z",
-    "nodeCount": 15,
-    "edgeCount": 17,
-    "hasDecisionPoints": true,
-    "hasBranching": true,
-    "categories": ["trigger", "process", "decision", "support"]
-  }
+  ]
 } 
