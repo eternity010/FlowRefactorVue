@@ -1,0 +1,70 @@
+{
+  "collection": "rag_config_data",
+  "database": "maintenance_system",
+  "document": {
+    "_id": "default_rag_config",
+    "name": "RAG配置数据",
+    "description": "检索增强生成(RAG)系统的配置信息",
+    "version": "1.0",
+    "created_at": "2024-01-15T10:00:00.000Z",
+    "updated_at": "2024-01-15T10:00:00.000Z",
+    "is_active": true,
+    "rag_systems": {
+      "process_optimization": {
+        "name": "多场景决策模型及知识图谱RAG",
+        "description": "基于课题二研究成果的多场景智能运营决策",
+        "enabled": false,
+        "category": "process_optimization",
+        "data_sources": [
+          {
+            "id": "multi_scenario_model",
+            "name": "多场景智能运营决策模型",
+            "description": "物料供应-生产调度融合决策机制，构建生产、采购一体化模型",
+            "processing_method": "模型接口",
+            "processing_type": "model_interface",
+            "tag_type": "success",
+            "config_status": "configurable"
+          },
+          {
+            "id": "knowledge_graph",
+            "name": "知识图谱系统", 
+            "description": "面向多场景运营决策的知识图谱构建技术，装备制造知识获取",
+            "processing_method": "图谱查询",
+            "processing_type": "graph_query",
+            "tag_type": "warning",
+            "config_status": "configurable"
+          }
+        ],
+        "configuration": {
+          "model_endpoint": "",
+          "graph_endpoint": "",
+          "timeout": 30000,
+          "retry_count": 3,
+          "cache_enabled": true
+        }
+      }
+    },
+    "global_settings": {
+      "default_timeout": 30000,
+      "max_retry_count": 3,
+      "cache_duration": 3600,
+      "log_enabled": true,
+      "debug_mode": false
+    },
+    "usage_statistics": {
+      "total_systems": 1,
+      "enabled_systems": 0,
+      "total_data_sources": 2,
+      "last_updated_by": "system",
+      "configuration_count": 0
+    },
+    "metadata": {
+      "source": "RAGConfigView.vue",
+      "import_date": "2024-01-15T10:00:00.000Z",
+      "schema_version": "1.0",
+      "tags": ["rag", "config", "process_optimization", "knowledge_graph"],
+      "department": "智能制造",
+      "project": "课题二研究成果"
+    }
+  }
+} 

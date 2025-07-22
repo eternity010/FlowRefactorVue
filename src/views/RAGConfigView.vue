@@ -1,9 +1,14 @@
 <template>
   <div class="rag-config-container">
-    <el-card class="rag-config-card">
+    <el-card class="rag-config-card" v-loading="loading">
       <div slot="header" class="rag-config-header">
         <span>RAG配置</span>
-        <el-tag size="small" type="primary">版本 1.0</el-tag>
+        <div class="header-right">
+          <el-tag size="small" type="primary">版本 1.0</el-tag>
+          <span v-if="lastUpdated" class="last-updated">
+            最后更新：{{ formatDateTime(lastUpdated) }}
+          </span>
+        </div>
       </div>
       <div class="rag-config-content">
         <h2 class="rag-title">RAG (检索增强生成) 配置</h2>
@@ -74,12 +79,14 @@
             type="primary" 
             size="medium" 
             @click="applyAndReturn"
+            :loading="saving"
             icon="el-icon-check">
             应用并返回
           </el-button>
           <el-button 
             size="medium" 
             @click="cancelAndReturn"
+            :disabled="saving"
             icon="el-icon-close">
             取消
           </el-button>
@@ -90,13 +97,21 @@
 </template>
 
 <script>
+import { neuralNetworkApi } from '@/api/neuralNetworkApi'
+
 export default {
   name: 'RAGConfigView',
   mounted() {
     this.loadRAGStatus();
+    this.loadDataSources();
   },
   data() {
     return {
+      // 加载状态
+      loading: false,
+      saving: false,
+      lastUpdated: null,
+      
       // 多场景决策模型及知识图谱RAG配置 - 基于课题二研究成果
       processOptimizationConfig: [
         {
@@ -147,51 +162,137 @@ export default {
       // TODO: 实现具体的多场景决策模型及知识图谱配置功能
     },
     
-
+    // 加载数据源配置
+    async loadDataSources() {
+      try {
+        // 如果需要从API获取数据源配置，可以在这里实现
+        // const response = await neuralNetworkApi.getRAGDataSources('process_optimization');
+        // if (response.data && response.data.code === 200) {
+        //   this.processOptimizationConfig = response.data.data.data_sources || this.processOptimizationConfig;
+        // }
+        console.log('📊 数据源配置已加载');
+      } catch (error) {
+        console.error('❌ 加载数据源配置失败:', error);
+        // 使用默认配置，不影响用户体验
+      }
+    },
+    
+    // 格式化日期时间
+    formatDateTime(dateString) {
+      if (!dateString) return '未知';
+      try {
+        return new Date(dateString).toLocaleString('zh-CN');
+      } catch (error) {
+        return '未知';
+      }
+    },
     
     // 处理RAG启用状态变化
-    handleRAGStatusChange(ragType, status) {
+    async handleRAGStatusChange(ragType, status) {
       const ragNames = {
         processOptimization: '多场景决策模型及知识图谱RAG'
       };
       
-      if (status) {
-        this.$message.success(`${ragNames[ragType]} 已启用`);
-      } else {
-        this.$message.info(`${ragNames[ragType]} 已禁用`);
+      this.saving = true;
+      try {
+        // 映射前端状态到API格式
+        const ragTypeMapping = {
+          processOptimization: 'process_optimization'
+        };
+        
+        // 构建API需要的数据结构 - 只更新当前变化的状态
+        const enabledStatus = {};
+        enabledStatus[ragTypeMapping[ragType]] = status;
+        
+        // 调用API更新状态
+        const response = await neuralNetworkApi.updateRAGEnabledStatus(enabledStatus);
+        if (response.data && response.data.code === 200) {
+          this.lastUpdated = response.data.data.updated_at;
+          
+          if (status) {
+            this.$message.success(`${ragNames[ragType]} 已启用`);
+          } else {
+            this.$message.info(`${ragNames[ragType]} 已禁用`);
+          }
+          
+          console.log('✅ RAG状态更新成功:', enabledStatus);
+        }
+      } catch (error) {
+        console.error('❌ 更新RAG状态失败:', error);
+        this.$message.error('保存RAG设置失败，请重试');
+        
+        // 发生错误时恢复原状态
+        this.ragEnabledStatus[ragType] = !status;
+      } finally {
+        this.saving = false;
       }
-      
-      // 保存状态到localStorage
-      localStorage.setItem('ragEnabledStatus', JSON.stringify(this.ragEnabledStatus));
     },
     
     // 加载RAG启用状态
-    loadRAGStatus() {
-      const savedStatus = localStorage.getItem('ragEnabledStatus');
-      if (savedStatus) {
-        try {
-          this.ragEnabledStatus = { ...this.ragEnabledStatus, ...JSON.parse(savedStatus) };
-        } catch (error) {
-          console.error('加载RAG状态失败:', error);
+    async loadRAGStatus() {
+      this.loading = true;
+      try {
+        // 从API获取RAG启用状态
+        const response = await neuralNetworkApi.getRAGEnabledStatus();
+        if (response.data && response.data.code === 200) {
+          const data = response.data.data;
+          
+          // 映射API返回的数据结构到组件状态
+          this.ragEnabledStatus = {
+            processOptimization: data.enabled_status.process_optimization || false
+          };
+          
+          this.lastUpdated = data.last_updated;
+          console.log('✅ RAG启用状态加载成功:', this.ragEnabledStatus);
         }
+      } catch (error) {
+        console.error('❌ 加载RAG启用状态失败:', error);
+        this.$message.error('加载RAG配置失败，请检查网络连接');
+        
+        // 发生错误时使用默认值
+        this.ragEnabledStatus = {
+          processOptimization: false
+        };
+      } finally {
+        this.loading = false;
       }
     },
     
     // 应用设置并返回
-    applyAndReturn() {
-      // 保存当前的RAG配置状态
-      localStorage.setItem('ragEnabledStatus', JSON.stringify(this.ragEnabledStatus));
-      
-      // 统计启用的RAG数量
-      const enabledRAGs = Object.values(this.ragEnabledStatus).filter(status => status).length;
-      const totalRAGs = Object.keys(this.ragEnabledStatus).length;
-      
-      this.$message.success(`RAG配置已保存：${enabledRAGs}/${totalRAGs} 个RAG已启用`);
-      
-      // 延迟返回，让用户看到成功消息
-      setTimeout(() => {
-        this.goBack();
-      }, 1500);
+    async applyAndReturn() {
+      this.saving = true;
+      try {
+        // 映射前端状态到API格式
+        const ragTypeMapping = {
+          processOptimization: 'process_optimization'
+        };
+        
+        // 构建API需要的完整状态数据结构
+        const enabledStatus = {};
+        Object.keys(this.ragEnabledStatus).forEach(key => {
+          enabledStatus[ragTypeMapping[key]] = this.ragEnabledStatus[key];
+        });
+        
+        // 保存当前的RAG配置状态到API
+        const response = await neuralNetworkApi.updateRAGEnabledStatus(enabledStatus);
+        if (response.data && response.data.code === 200) {
+          // 统计启用的RAG数量
+          const enabledRAGs = Object.values(this.ragEnabledStatus).filter(status => status).length;
+          const totalRAGs = Object.keys(this.ragEnabledStatus).length;
+          
+          this.$message.success(`RAG配置已保存：${enabledRAGs}/${totalRAGs} 个RAG已启用`);
+          
+          // 延迟返回，让用户看到成功消息
+          setTimeout(() => {
+            this.goBack();
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('❌ 保存RAG配置失败:', error);
+        this.$message.error('保存RAG配置失败，请重试');
+      } finally {
+        this.saving = false;
+      }
     },
     
     // 取消并返回
@@ -200,11 +301,17 @@ export default {
         confirmButtonText: '确定取消',
         cancelButtonText: '继续配置',
         type: 'warning'
-      }).then(() => {
-        // 重新加载保存的状态，撤销当前更改
-        this.loadRAGStatus();
-        this.$message.info('已取消配置，返回上级页面');
-        this.goBack();
+      }).then(async () => {
+        try {
+          // 重新加载保存的状态，撤销当前更改
+          await this.loadRAGStatus();
+          this.$message.info('已取消配置，返回上级页面');
+          this.goBack();
+        } catch (error) {
+          console.error('❌ 重新加载RAG状态失败:', error);
+          this.$message.info('已取消配置，返回上级页面');
+          this.goBack();
+        }
       }).catch(() => {
         this.$message.info('继续配置RAG');
       });
@@ -235,6 +342,18 @@ export default {
   align-items: center;
   font-weight: bold;
   font-size: 16px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #909399;
+  font-weight: normal;
 }
 
 .rag-config-content {

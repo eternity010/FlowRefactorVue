@@ -67,8 +67,11 @@
               show-icon>
               <template slot="title">
                 <span style="font-size: 14px; font-weight: bold;">当前参数配置</span>
+                <span v-if="parameterLastUpdated" style="font-size: 12px; color: #909399; font-weight: normal; margin-left: 10px;">
+                  (更新于: {{ formatDateTime(parameterLastUpdated) }})
+                </span>
               </template>
-              <div class="param-summary-content">
+              <div class="param-summary-content" v-loading="parameterLoading">
                 <span class="param-item">地缘政治影响: {{ neuralNetworkParams.geoPoliticalWeight }}</span>
                 <span class="param-item">价格波动敏感度: {{ neuralNetworkParams.marketVolatilityFactor }}</span>
                 <span class="param-item">备用供应商覆盖: {{ (neuralNetworkParams.backupSupplierRatio * 100).toFixed(0) }}%</span>
@@ -88,25 +91,28 @@
               show-icon>
               <template slot="title">
                 <span style="font-size: 14px; font-weight: bold;">已启用的RAG配置</span>
+                <span v-if="ragLastUpdated" style="font-size: 12px; color: #909399; font-weight: normal; margin-left: 10px;">
+                  (更新于: {{ formatDateTime(ragLastUpdated) }})
+                </span>
               </template>
-                             <div class="rag-summary-content">
-                 <div class="rag-status-grid">
-                   <div class="rag-status-item">
-                     <i class="el-icon-pie-chart"></i>
-                     <span class="rag-label">启用状态:</span>
-                     <el-tag size="mini" :type="ragConfig.enabledCount > 0 ? 'success' : 'info'">
-                       {{ ragConfig.enabledCount }}/{{ ragConfig.totalCount }} 已启用
-                     </el-tag>
-                   </div>
-                   <div class="rag-status-item">
-                     <i class="el-icon-share"></i>
-                     <span class="rag-label">多场景决策模型及知识图谱:</span>
-                     <el-tag size="mini" :type="ragConfig.processOptimization ? 'success' : 'danger'">
-                       {{ ragConfig.processOptimization ? '已启用' : '未启用' }}
-                     </el-tag>
-                   </div>
-                 </div>
-               </div>
+              <div class="rag-summary-content" v-loading="ragConfigLoading">
+                <div class="rag-status-grid">
+                  <div class="rag-status-item">
+                    <i class="el-icon-pie-chart"></i>
+                    <span class="rag-label">启用状态:</span>
+                    <el-tag size="mini" :type="ragConfig.enabledCount > 0 ? 'success' : 'info'">
+                      {{ ragConfig.enabledCount }}/{{ ragConfig.totalCount }} 已启用
+                    </el-tag>
+                  </div>
+                  <div class="rag-status-item">
+                    <i class="el-icon-share"></i>
+                    <span class="rag-label">多场景决策模型及知识图谱:</span>
+                    <el-tag size="mini" :type="ragConfig.processOptimization ? 'success' : 'danger'">
+                      {{ ragConfig.processOptimization ? '已启用' : '未启用' }}
+                    </el-tag>
+                  </div>
+                </div>
+              </div>
             </el-alert>
           </div>
         </div>
@@ -302,6 +308,7 @@
 // import MermaidChart from '@/components/MermaidChart.vue'
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
+import { neuralNetworkApi } from '@/api/neuralNetworkApi'
 
 export default {
   name: 'ProcessOptimizationView',
@@ -333,6 +340,11 @@ export default {
         enabledCount: 0,
         totalCount: 1
       },
+      // 加载状态
+      parameterLoading: false,
+      ragConfigLoading: false,
+      parameterLastUpdated: null,
+      ragLastUpdated: null,
       // 添加mermaid相关属性
       mermaidLoaded: false,
       mermaidInitialized: false,
@@ -392,14 +404,24 @@ export default {
     // 组件挂载时自动加载数据
     await this.loadOptimizationData();
     // 加载已保存的神经网络参数
-    this.loadNeuralNetworkParams();
+    await this.loadNeuralNetworkParams();
     // 加载已保存的RAG配置
-    this.loadRAGConfig();
+    await this.loadRAGConfig();
     // 加载mermaid脚本
     this.loadMermaidScript();
   },
 
   methods: {
+    // 格式化日期时间
+    formatDateTime(dateString) {
+      if (!dateString) return '未知';
+      try {
+        return new Date(dateString).toLocaleString('zh-CN');
+      } catch (error) {
+        return '未知';
+      }
+    },
+
     // Mermaid相关方法
     loadMermaidScript() {
       if (window.mermaid) {
@@ -479,45 +501,73 @@ export default {
     },
 
     // 加载神经网络参数
-    loadNeuralNetworkParams() {
-      const savedParams = localStorage.getItem('neuralNetworkParams');
-      if (savedParams) {
-        try {
-          const params = JSON.parse(savedParams);
+    async loadNeuralNetworkParams() {
+      this.parameterLoading = true;
+      try {
+        // 从API获取当前神经网络参数
+        const response = await neuralNetworkApi.getCurrentParameters();
+        if (response.data && response.data.code === 200) {
+          const data = response.data.data;
+          
+          // 更新参数，排除last_updated字段
+          const { last_updated, ...params } = data;
           this.neuralNetworkParams = { ...this.neuralNetworkParams, ...params };
+          this.parameterLastUpdated = last_updated;
           this.showParameterSummary = true;
-          console.log('已加载保存的神经网络参数:', this.neuralNetworkParams);
-        } catch (error) {
-          console.error('加载神经网络参数失败:', error);
+          
+          console.log('✅ 神经网络参数加载成功:', this.neuralNetworkParams);
         }
+      } catch (error) {
+        console.error('❌ 加载神经网络参数失败:', error);
+        this.$message.warning('参数配置加载失败，使用默认值');
+        
+        // 发生错误时显示默认参数但不显示摘要
+        this.showParameterSummary = false;
+      } finally {
+        this.parameterLoading = false;
       }
     },
 
     // 加载RAG配置
-    loadRAGConfig() {
-      const savedRAGStatus = localStorage.getItem('ragEnabledStatus');
-      if (savedRAGStatus) {
-        try {
-          const ragStatus = JSON.parse(savedRAGStatus);
+    async loadRAGConfig() {
+      this.ragConfigLoading = true;
+      try {
+        // 从API获取RAG启用状态
+        const response = await neuralNetworkApi.getRAGEnabledStatus();
+        if (response.data && response.data.code === 200) {
+          const data = response.data.data;
+          const ragStatus = data.enabled_status;
+          
           // 计算启用的RAG数量
           const enabledCount = Object.values(ragStatus).filter(status => status).length;
           const totalCount = Object.keys(ragStatus).length;
           
           this.ragConfig = {
-            processOptimization: ragStatus.processOptimization || false,
+            processOptimization: ragStatus.process_optimization || false,
             enabledCount: enabledCount,
             totalCount: totalCount
           };
           
-          // 如果有启用的RAG则显示摘要
-          if (enabledCount > 0) {
-            this.showRAGSummary = true;
-          }
+          this.ragLastUpdated = data.last_updated;
           
-          console.log('已加载保存的RAG配置:', this.ragConfig);
-        } catch (error) {
-          console.error('加载RAG配置失败:', error);
+          // 只要数据加载成功就显示RAG摘要，无论是否启用
+          this.showRAGSummary = true;
+          
+          console.log('✅ RAG配置加载成功:', this.ragConfig);
         }
+      } catch (error) {
+        console.error('❌ 加载RAG配置失败:', error);
+        this.$message.warning('RAG配置加载失败，使用默认值');
+        
+        // 发生错误时使用默认值且不显示摘要
+        this.ragConfig = {
+          processOptimization: false,
+          enabledCount: 0,
+          totalCount: 1
+        };
+        this.showRAGSummary = false;
+      } finally {
+        this.ragConfigLoading = false;
       }
     },
 
@@ -743,6 +793,24 @@ export default {
     configureRAG() {
       // 跳转到RAG配置页面
       this.$router.push('/home/rag-config');
+    },
+
+    // 重新加载参数配置
+    async reloadParameterConfig() {
+      await this.loadNeuralNetworkParams();
+    },
+
+    // 重新加载RAG配置
+    async reloadRAGConfig() {
+      await this.loadRAGConfig();
+    },
+
+    // 重新加载所有配置
+    async reloadAllConfigs() {
+      await Promise.all([
+        this.loadNeuralNetworkParams(),
+        this.loadRAGConfig()
+      ]);
     }
   }
 }

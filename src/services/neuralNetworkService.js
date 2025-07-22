@@ -4,8 +4,8 @@ const { MongoClient } = require('mongodb');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DATABASE_NAME = 'maintenance_system';
 const NEURAL_NETWORK_COLLECTION = 'neural_network_parameters';
-const PARAMETER_HISTORY_COLLECTION = 'neural_network_parameter_history';
 const PARAMETER_CONFIGS_COLLECTION = 'neural_network_saved_configs';
+const RAG_CONFIG_COLLECTION = 'rag_config_data';
 
 /**
  * 神经网络参数服务类
@@ -15,8 +15,8 @@ class NeuralNetworkService {
     this.client = null;
     this.db = null;
     this.parametersCollection = null;
-    this.historyCollection = null;
     this.configsCollection = null;
+    this.ragConfigCollection = null;
     this.isConnected = false;
     
     // 默认参数配置
@@ -224,8 +224,8 @@ class NeuralNetworkService {
       
       this.db = this.client.db(DATABASE_NAME);
       this.parametersCollection = this.db.collection(NEURAL_NETWORK_COLLECTION);
-      this.historyCollection = this.db.collection(PARAMETER_HISTORY_COLLECTION);
       this.configsCollection = this.db.collection(PARAMETER_CONFIGS_COLLECTION);
+      this.ragConfigCollection = this.db.collection(RAG_CONFIG_COLLECTION);
       this.isConnected = true;
       
       console.log(`✅ 神经网络参数服务MongoDB连接成功: ${DATABASE_NAME}`);
@@ -263,19 +263,20 @@ class NeuralNetworkService {
   }
 
   /**
-   * 初始化默认参数
+   * 初始化默认参数和当前参数
    */
   async initializeDefaultParameters() {
     try {
-      const existingDocument = await this.parametersCollection.findOne({
+      // 初始化默认参数配置文档
+      const existingDefaultDocument = await this.parametersCollection.findOne({
         _id: 'default_neural_network_settings'
       });
 
-      if (!existingDocument) {
+      if (!existingDefaultDocument) {
         const defaultDocument = {
           _id: 'default_neural_network_settings',
           name: '神经网络默认参数配置',
-          description: '流程重构优化的神经网络参数设置',
+          description: '流程重构优化的神经网络参数默认设置',
           version: '1.0',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -288,8 +289,30 @@ class NeuralNetworkService {
         await this.parametersCollection.insertOne(defaultDocument);
         console.log('✅ 已初始化默认神经网络参数配置');
       }
+
+      // 初始化当前参数配置文档
+      const existingCurrentDocument = await this.parametersCollection.findOne({
+        _id: 'current_neural_network_settings'
+      });
+
+      if (!existingCurrentDocument) {
+        const currentDocument = {
+          _id: 'current_neural_network_settings',
+          name: '神经网络当前参数配置',
+          description: '用户当前设置的神经网络参数',
+          version: '1.0',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_active: true,
+          current_values: this.defaultParameters, // 初始值使用默认参数
+          source: 'default'
+        };
+
+        await this.parametersCollection.insertOne(currentDocument);
+        console.log('✅ 已初始化当前神经网络参数配置');
+      }
     } catch (error) {
-      console.error('❌ 初始化默认参数失败:', error);
+      console.error('❌ 初始化参数配置失败:', error);
     }
   }
 
@@ -300,18 +323,18 @@ class NeuralNetworkService {
     try {
       await this.ensureConnection();
       
-      const document = await this.parametersCollection.findOne({
-        _id: 'default_neural_network_settings'
+      const currentDocument = await this.parametersCollection.findOne({
+        _id: 'current_neural_network_settings'
       });
 
-      if (!document) {
-        throw new Error('未找到神经网络参数配置');
+      if (!currentDocument) {
+        throw new Error('未找到当前神经网络参数配置');
       }
 
       return {
         ...this.parameterDefinitions,
-        current_values: document.current_values || this.defaultParameters,
-        last_updated: document.updated_at
+        current_values: currentDocument.current_values || this.defaultParameters,
+        last_updated: currentDocument.updated_at
       };
     } catch (error) {
       console.error('获取神经网络参数失败:', error);
@@ -327,13 +350,43 @@ class NeuralNetworkService {
       await this.ensureConnection();
       
       const document = await this.parametersCollection.findOne(
-        { _id: 'default_neural_network_settings' },
-        { projection: { current_values: 1 } }
+        { _id: 'current_neural_network_settings' },
+        { projection: { current_values: 1, updated_at: 1 } }
       );
 
-      return document ? document.current_values : this.defaultParameters;
+      return document ? { 
+        ...document.current_values,
+        last_updated: document.updated_at
+      } : this.defaultParameters;
     } catch (error) {
       console.error('获取当前参数值失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取默认参数配置
+   */
+  async getDefaultNeuralNetworkParameters() {
+    try {
+      await this.ensureConnection();
+      
+      const document = await this.parametersCollection.findOne(
+        { _id: 'default_neural_network_settings' },
+        { projection: { current_values: 1, updated_at: 1, categories: 1 } }
+      );
+
+      if (!document) {
+        throw new Error('未找到默认神经网络参数配置');
+      }
+
+      return {
+        ...document.current_values,
+        last_updated: document.updated_at,
+        categories: document.categories
+      };
+    } catch (error) {
+      console.error('获取默认参数配置失败:', error);
       throw error;
     }
   }
@@ -357,7 +410,7 @@ class NeuralNetworkService {
       await this.ensureConnection();
       
       const document = await this.parametersCollection.findOne({
-        _id: 'default_neural_network_settings'
+        _id: 'current_neural_network_settings'
       });
 
       const categoryData = this.parameterDefinitions.categories[category];
@@ -394,27 +447,25 @@ class NeuralNetworkService {
         throw new Error(`参数验证失败: ${validationResult.errors.join(', ')}`);
       }
 
-      // 获取当前参数
+      // 获取当前用户参数
       const currentDocument = await this.parametersCollection.findOne({
-        _id: 'default_neural_network_settings'
+        _id: 'current_neural_network_settings'
       });
 
       const currentValues = currentDocument ? currentDocument.current_values : this.defaultParameters;
       const updatedValues = { ...currentValues, ...parameters };
 
-      // 更新数据库
+      // 更新用户当前参数配置
       const result = await this.parametersCollection.updateOne(
-        { _id: 'default_neural_network_settings' },
+        { _id: 'current_neural_network_settings' },
         { 
           $set: { 
             current_values: updatedValues,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            source: 'user_modified'
           }
         }
       );
-
-      // 记录历史
-      await this.recordParameterHistory(parameters, 'update');
 
       return {
         updated_parameters: parameters,
@@ -435,55 +486,62 @@ class NeuralNetworkService {
     try {
       await this.ensureConnection();
       
+      // 获取默认参数配置
+      const defaultDocument = await this.parametersCollection.findOne({
+        _id: 'default_neural_network_settings'
+      });
+      
+      const defaultValues = defaultDocument ? defaultDocument.current_values : this.defaultParameters;
       let resetParams;
       
       if (parameterKeys && Array.isArray(parameterKeys)) {
-        // 重置指定参数
+        // 重置指定参数到默认值
         resetParams = {};
         parameterKeys.forEach(key => {
-          if (this.defaultParameters.hasOwnProperty(key)) {
-            resetParams[key] = this.defaultParameters[key];
+          if (defaultValues.hasOwnProperty(key)) {
+            resetParams[key] = defaultValues[key];
           }
         });
         
+        // 获取当前用户参数
         const currentDocument = await this.parametersCollection.findOne({
-          _id: 'default_neural_network_settings'
+          _id: 'current_neural_network_settings'
         });
         
         const currentValues = currentDocument ? currentDocument.current_values : this.defaultParameters;
         const updatedValues = { ...currentValues, ...resetParams };
         
         await this.parametersCollection.updateOne(
-          { _id: 'default_neural_network_settings' },
+          { _id: 'current_neural_network_settings' },
           { 
             $set: { 
               current_values: updatedValues,
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              source: 'reset_partial'
             }
           }
         );
       } else {
-        // 重置所有参数
-        resetParams = this.defaultParameters;
+        // 重置所有参数到默认值
+        resetParams = defaultValues;
         
         await this.parametersCollection.updateOne(
-          { _id: 'default_neural_network_settings' },
+          { _id: 'current_neural_network_settings' },
           { 
             $set: { 
               current_values: resetParams,
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              source: 'reset_all'
             }
           }
         );
       }
 
-      // 记录历史
-      await this.recordParameterHistory(resetParams, 'reset');
-
       return {
         reset_parameters: resetParams,
+        all_parameters: resetParams,
         reset_count: Object.keys(resetParams).length,
-        reset_at: new Date().toISOString()
+        updated_at: new Date().toISOString()
       };
     } catch (error) {
       console.error('重置神经网络参数失败:', error);
@@ -592,19 +650,23 @@ class NeuralNetworkService {
     try {
       await this.ensureConnection();
       
-      const document = await this.parametersCollection.findOne({
+      // 获取当前用户设置
+      const currentDocument = await this.parametersCollection.findOne({
+        _id: 'current_neural_network_settings'
+      });
+
+      // 获取默认设置
+      const defaultDocument = await this.parametersCollection.findOne({
         _id: 'default_neural_network_settings'
       });
 
-      const currentValues = document ? document.current_values : this.defaultParameters;
+      const currentValues = currentDocument ? currentDocument.current_values : this.defaultParameters;
+      const defaultValues = defaultDocument ? defaultDocument.current_values : this.defaultParameters;
       
-      // 计算修改的参数数量
+      // 计算修改的参数数量（与默认值比较）
       const modifiedParameters = Object.keys(currentValues).filter(key => 
-        currentValues[key] !== this.defaultParameters[key]
+        currentValues[key] !== defaultValues[key]
       ).length;
-
-      // 获取历史记录数量
-      const historyCount = await this.historyCollection.countDocuments({});
 
       // 获取保存的配置数量
       const savedConfigsCount = await this.configsCollection.countDocuments({});
@@ -612,12 +674,13 @@ class NeuralNetworkService {
       return {
         total_parameters: Object.keys(this.defaultParameters).length,
         modified_parameters: modifiedParameters,
-        last_modified: document ? document.updated_at : null,
+        last_modified: currentDocument ? currentDocument.updated_at : null,
         parameter_categories: Object.keys(this.parameterDefinitions.categories).length,
         current_values: currentValues,
-        history_records: historyCount,
+        default_values: defaultValues,
         saved_configs: savedConfigsCount,
-        version: this.parameterDefinitions.metadata.version
+        version: this.parameterDefinitions.metadata.version,
+        source: currentDocument ? currentDocument.source : 'default'
       };
     } catch (error) {
       console.error('获取参数统计失败:', error);
@@ -681,53 +744,7 @@ class NeuralNetworkService {
     return this.validateParameters(parameters);
   }
 
-  /**
-   * 记录参数历史
-   */
-  async recordParameterHistory(parameters, action) {
-    try {
-      const historyRecord = {
-        _id: `history_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        action: action, // 'update', 'reset', 'import'
-        parameters: parameters,
-        timestamp: new Date().toISOString(),
-        parameter_count: Object.keys(parameters).length
-      };
 
-      await this.historyCollection.insertOne(historyRecord);
-    } catch (error) {
-      console.error('记录参数历史失败:', error);
-      // 不抛出错误，避免影响主要操作
-    }
-  }
-
-  /**
-   * 获取参数历史记录
-   */
-  async getNeuralNetworkParameterHistory(limit = 10, offset = 0) {
-    try {
-      await this.ensureConnection();
-      
-      const history = await this.historyCollection.find({})
-        .sort({ timestamp: -1 })
-        .skip(offset)
-        .limit(limit)
-        .toArray();
-
-      const total = await this.historyCollection.countDocuments({});
-
-      return {
-        history: history,
-        total: total,
-        limit: limit,
-        offset: offset,
-        has_more: (offset + limit) < total
-      };
-    } catch (error) {
-      console.error('获取参数历史记录失败:', error);
-      throw error;
-    }
-  }
 
   /**
    * 导出参数配置
@@ -812,18 +829,251 @@ class NeuralNetworkService {
         );
       }
 
-      // 记录历史
-      await this.recordParameterHistory(configData.current_values, 'import');
-
       return {
         imported_parameters: configData.current_values,
         import_mode: overwrite ? 'overwrite' : 'merge',
         imported_count: Object.keys(configData.current_values).length,
-        imported_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         modified_count: updateResult.modifiedCount
       };
     } catch (error) {
       console.error('导入参数配置失败:', error);
+      throw error;
+    }
+  }
+
+  // ==================== RAG配置相关方法 ====================
+
+  /**
+   * 获取RAG配置数据
+   */
+  async getRAGConfigData() {
+    try {
+      await this.ensureConnection();
+      
+      const document = await this.ragConfigCollection.findOne({
+        _id: 'default_rag_config'
+      });
+
+      if (!document) {
+        throw new Error('未找到RAG配置数据');
+      }
+
+      return document;
+    } catch (error) {
+      console.error('获取RAG配置数据失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取RAG启用状态
+   */
+  async getRAGEnabledStatus() {
+    try {
+      await this.ensureConnection();
+      
+      const document = await this.ragConfigCollection.findOne(
+        { _id: 'default_rag_config' },
+        { projection: { rag_systems: 1, updated_at: 1 } }
+      );
+
+      if (!document) {
+        throw new Error('未找到RAG配置数据');
+      }
+
+      // 构建启用状态对象
+      const enabledStatus = {};
+      Object.keys(document.rag_systems).forEach(systemKey => {
+        enabledStatus[systemKey] = document.rag_systems[systemKey].enabled || false;
+      });
+
+      return {
+        enabled_status: enabledStatus,
+        last_updated: document.updated_at
+      };
+    } catch (error) {
+      console.error('获取RAG启用状态失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 更新RAG启用状态
+   */
+  async updateRAGEnabledStatus(enabledStatus) {
+    try {
+      await this.ensureConnection();
+      
+      // 首先获取当前状态，确保只更新传入的字段
+      const currentDocument = await this.ragConfigCollection.findOne(
+        { _id: 'default_rag_config' },
+        { projection: { rag_systems: 1 } }
+      );
+
+      if (!currentDocument) {
+        throw new Error('未找到RAG配置文档');
+      }
+
+      // 构建更新操作，只更新传入的状态
+      const updateOps = {};
+      Object.keys(enabledStatus).forEach(systemKey => {
+        if (currentDocument.rag_systems[systemKey]) {
+          updateOps[`rag_systems.${systemKey}.enabled`] = enabledStatus[systemKey];
+        }
+      });
+      updateOps['updated_at'] = new Date().toISOString();
+
+      const result = await this.ragConfigCollection.updateOne(
+        { _id: 'default_rag_config' },
+        { $set: updateOps }
+      );
+
+      // 返回完整的当前状态
+      const updatedDocument = await this.ragConfigCollection.findOne(
+        { _id: 'default_rag_config' },
+        { projection: { rag_systems: 1, updated_at: 1 } }
+      );
+
+      const completeStatus = {};
+      Object.keys(updatedDocument.rag_systems).forEach(systemKey => {
+        completeStatus[systemKey] = updatedDocument.rag_systems[systemKey].enabled || false;
+      });
+
+      return {
+        updated_status: enabledStatus,
+        complete_status: completeStatus,
+        updated_at: new Date().toISOString(),
+        modified_count: result.modifiedCount
+      };
+    } catch (error) {
+      console.error('更新RAG启用状态失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取特定RAG系统的数据源配置
+   */
+  async getRAGDataSources(ragType) {
+    try {
+      await this.ensureConnection();
+      
+      const document = await this.ragConfigCollection.findOne(
+        { _id: 'default_rag_config' },
+        { projection: { [`rag_systems.${ragType}`]: 1 } }
+      );
+
+      if (!document || !document.rag_systems || !document.rag_systems[ragType]) {
+        throw new Error(`未找到RAG类型 ${ragType} 的配置`);
+      }
+
+      return document.rag_systems[ragType];
+    } catch (error) {
+      console.error(`获取RAG数据源 ${ragType} 失败:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 更新完整RAG配置
+   */
+  async updateRAGConfig(ragConfig) {
+    try {
+      await this.ensureConnection();
+      
+      const updateData = {
+        ...ragConfig,
+        updated_at: new Date().toISOString()
+      };
+
+      const result = await this.ragConfigCollection.updateOne(
+        { _id: 'default_rag_config' },
+        { $set: updateData }
+      );
+
+      return {
+        updated_config: ragConfig,
+        updated_at: updateData.updated_at,
+        modified_count: result.modifiedCount
+      };
+    } catch (error) {
+      console.error('更新RAG配置失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 重置RAG配置为默认值
+   */
+  async resetRAGConfig() {
+    try {
+      await this.ensureConnection();
+      
+      // 默认的RAG配置状态
+      const defaultEnabledStatus = {
+        process_optimization: false
+      };
+
+      const updateOps = {};
+      Object.keys(defaultEnabledStatus).forEach(systemKey => {
+        updateOps[`rag_systems.${systemKey}.enabled`] = defaultEnabledStatus[systemKey];
+      });
+      updateOps['updated_at'] = new Date().toISOString();
+
+      const result = await this.ragConfigCollection.updateOne(
+        { _id: 'default_rag_config' },
+        { $set: updateOps }
+      );
+
+      return {
+        reset_status: defaultEnabledStatus,
+        updated_at: new Date().toISOString(),
+        modified_count: result.modifiedCount
+      };
+    } catch (error) {
+      console.error('重置RAG配置失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取RAG配置统计信息
+   */
+  async getRAGConfigStats() {
+    try {
+      await this.ensureConnection();
+      
+      const document = await this.ragConfigCollection.findOne({
+        _id: 'default_rag_config'
+      });
+
+      if (!document) {
+        throw new Error('未找到RAG配置数据');
+      }
+
+      // 统计启用的RAG系统数量
+      const enabledSystems = Object.values(document.rag_systems).filter(system => system.enabled).length;
+      const totalSystems = Object.keys(document.rag_systems).length;
+      
+      // 统计数据源总数
+      let totalDataSources = 0;
+      Object.values(document.rag_systems).forEach(system => {
+        if (system.data_sources && Array.isArray(system.data_sources)) {
+          totalDataSources += system.data_sources.length;
+        }
+      });
+
+      return {
+        total_systems: totalSystems,
+        enabled_systems: enabledSystems,
+        total_data_sources: totalDataSources,
+        last_updated: document.updated_at,
+        version: document.version,
+        is_active: document.is_active
+      };
+    } catch (error) {
+      console.error('获取RAG配置统计失败:', error);
       throw error;
     }
   }

@@ -28,23 +28,11 @@
         
         <div class="settings-content">
           <!-- 状态信息 -->
-          <div class="status-info" v-if="lastUpdated || offlineMode">
-            <el-row :gutter="16">
-              <el-col :span="12" v-if="lastUpdated">
-                <div class="status-item">
-                  <span class="status-label">最后更新时间：</span>
-                  <span class="status-value">{{ formatDateTime(lastUpdated) }}</span>
-                </div>
-              </el-col>
-              <el-col :span="12" v-if="offlineMode">
-                <div class="status-item">
-                  <el-tag type="warning" size="small">
-                    <i class="el-icon-warning"></i>
-                    离线模式
-                  </el-tag>
-                </div>
-              </el-col>
-            </el-row>
+          <div class="status-info" v-if="lastUpdated">
+            <div class="status-item">
+              <span class="status-label">最后更新时间：</span>
+              <span class="status-value">{{ formatDateTime(lastUpdated) }}</span>
+            </div>
           </div>
           
           <div class="settings-description">
@@ -494,8 +482,7 @@ export default {
       // 界面状态
       loading: false,
       saving: false,
-      lastUpdated: null,
-      offlineMode: false
+      lastUpdated: null
     }
   },
   mounted() {
@@ -510,8 +497,7 @@ export default {
         if (response.data && response.data.code === 200) {
           const params = response.data.data;
           
-          // 检查是否为离线模式
-          this.offlineMode = params.offline_mode || false;
+          // 更新时间信息
           this.lastUpdated = params.last_updated || response.data.data.updated_at;
           
           // 更新参数值
@@ -524,28 +510,13 @@ export default {
           this.taktTimeVariance = params.taktTimeVariance || 0.05;
           this.overtimeCostCap = params.overtimeCostCap || 200;
           
-          if (this.offlineMode) {
-            this.$message.warning('离线模式：当前使用本地存储的参数');
-          } else {
-            this.$message.success('参数加载成功');
-          }
+          this.$message.success('参数加载成功');
         } else {
           throw new Error(response.data.message || '获取参数失败');
         }
       } catch (error) {
         console.error('加载参数失败:', error);
         this.$message.error('加载参数失败: ' + (error.message || '网络错误'));
-        
-        // 设置默认值作为备选
-        this.geoPoliticalWeight = 1.0;
-        this.marketVolatilityFactor = 0.8;
-        this.backupSupplierRatio = 0.3;
-        this.routeReevalFrequency = 7;
-        this.minimumInventoryRatio = 0.15;
-        this.costDelayTradeoff = 1.2;
-        this.taktTimeVariance = 0.05;
-        this.overtimeCostCap = 200;
-        this.offlineMode = true;
       } finally {
         this.loading = false;
       }
@@ -568,7 +539,6 @@ export default {
         
         if (response.data && response.data.code === 200) {
           this.lastUpdated = response.data.data.updated_at || new Date().toISOString();
-          this.offlineMode = response.data.data.offline_mode || false;
           return params;
         } else {
           throw new Error(response.data.message || '保存参数失败');
@@ -809,43 +779,48 @@ export default {
       }).then(async () => {
         this.loading = true;
         try {
-          // 调用重置API
-          const response = await neuralNetworkApi.resetParameters();
+          // 1. 读取默认参数配置
+          const defaultResponse = await neuralNetworkApi.getDefaultParameters();
           
-          if (response.data && response.data.code === 200) {
-            const resetParams = response.data.data.reset_parameters || response.data.data.all_parameters;
+          if (defaultResponse.data && defaultResponse.data.code === 200) {
+            const defaultParams = defaultResponse.data.data;
             
-            // 更新界面值
-            this.geoPoliticalWeight = resetParams.geoPoliticalWeight || 1.0;
-            this.marketVolatilityFactor = resetParams.marketVolatilityFactor || 0.8;
-            this.backupSupplierRatio = resetParams.backupSupplierRatio || 0.3;
-            this.routeReevalFrequency = resetParams.routeReevalFrequency || 7;
-            this.minimumInventoryRatio = resetParams.minimumInventoryRatio || 0.15;
-            this.costDelayTradeoff = resetParams.costDelayTradeoff || 1.2;
-            this.taktTimeVariance = resetParams.taktTimeVariance || 0.05;
-            this.overtimeCostCap = resetParams.overtimeCostCap || 200;
+            // 2. 更新界面值为默认值
+            this.geoPoliticalWeight = defaultParams.geoPoliticalWeight || 1.0;
+            this.marketVolatilityFactor = defaultParams.marketVolatilityFactor || 0.8;
+            this.backupSupplierRatio = defaultParams.backupSupplierRatio || 0.3;
+            this.routeReevalFrequency = defaultParams.routeReevalFrequency || 7;
+            this.minimumInventoryRatio = defaultParams.minimumInventoryRatio || 0.15;
+            this.costDelayTradeoff = defaultParams.costDelayTradeoff || 1.2;
+            this.taktTimeVariance = defaultParams.taktTimeVariance || 0.05;
+            this.overtimeCostCap = defaultParams.overtimeCostCap || 200;
             
-            this.lastUpdated = response.data.data.updated_at || new Date().toISOString();
-            this.offlineMode = response.data.data.offline_mode || false;
+            // 3. 保存默认值到current文档
+            const resetParams = {
+              geoPoliticalWeight: this.geoPoliticalWeight,
+              marketVolatilityFactor: this.marketVolatilityFactor,
+              backupSupplierRatio: this.backupSupplierRatio,
+              routeReevalFrequency: this.routeReevalFrequency,
+              minimumInventoryRatio: this.minimumInventoryRatio,
+              costDelayTradeoff: this.costDelayTradeoff,
+              taktTimeVariance: this.taktTimeVariance,
+              overtimeCostCap: this.overtimeCostCap
+            };
             
-            this.$message.success('所有参数已重置为默认值');
+            const updateResponse = await neuralNetworkApi.updateParameters(resetParams);
+            
+            if (updateResponse.data && updateResponse.data.code === 200) {
+              this.lastUpdated = updateResponse.data.data.updated_at || new Date().toISOString();
+              this.$message.success('所有参数已重置为默认值');
+            } else {
+              throw new Error(updateResponse.data.message || '保存重置参数失败');
+            }
           } else {
-            throw new Error(response.data.message || '重置参数失败');
+            throw new Error(defaultResponse.data.message || '获取默认参数失败');
           }
         } catch (error) {
           console.error('重置参数失败:', error);
           this.$message.error('重置参数失败: ' + (error.message || '网络错误'));
-          
-          // 备选方案：手动设置默认值
-          this.geoPoliticalWeight = 1.0;
-          this.marketVolatilityFactor = 0.8;
-          this.backupSupplierRatio = 0.3;
-          this.routeReevalFrequency = 7;
-          this.minimumInventoryRatio = 0.15;
-          this.costDelayTradeoff = 1.2;
-          this.taktTimeVariance = 0.05;
-          this.overtimeCostCap = 200;
-          this.$message.info('已在本地重置为默认值');
         } finally {
           this.loading = false;
         }

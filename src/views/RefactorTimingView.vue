@@ -541,7 +541,7 @@ export default {
       // 数据加载状态
       isLoading: true,
       loadError: null,
-      // 业务态势全景感知数据
+      // 业务态势全景感知数据（使用本地数据）
       businessSituationData: {
         overallScore: 78,
         marketActivity: 85,
@@ -553,50 +553,21 @@ export default {
       llmAnalysisData: {
         hasData: false,
         processInfo: {
-          currentProcess: '弹性资源规划 ➜ 预测性补给模型 ➜ 需求波动预测 ➜ 贝叶斯网络建模 ➜ 安全库存计算 ➜ 补给路径仿真 ➜ 动态补给路线',
-          processId: 'proc_run_20250701_XYZ123'
+          currentProcess: '',
+          processId: ''
         },
-                 environmentAnalysisText: `🔍 关联新闻事件（影响需求波动预测节点）：
-• [BBC] 红海航运危机持续（2024-07-01）：全球30%集装箱船改道好望角，亚欧航线补给周期延长12-15天
-• [Reuters] 中国制造业PMI超预期回升至51.8（2024-06-30），原材料进口需求激增
-• [Al Jazeera] 中东地缘政治紧张升级，原油价格单周上涨8%（影响路径仿真燃料成本）
-
-📊 关键市场指标（影响安全库存计算）：
-┌──────────┬────────────┬──────────┬────────────┐
-│ 数据源   │ 指标       │ 当前值   │ 72h波动率  │
-├──────────┼────────────┼──────────┼────────────┤
-│ NYSE     │ 零售业ETF(XRT) │ $78.42   │ +3.2% ▲   │
-│ LME      │ 铜期货价格    │ $9,842/吨 │ +5.7% ▲   │
-│ Forex    │ 美元指数(DXY) │ 104.85   │ -0.8% ▼   │
-│ Oil      │ 布伦特原油    │ $89.12/桶 │ +8.1% ▲   │
-└──────────┴────────────┴──────────┴────────────┘`,
-        similarProcesses: [
-          { rank: 1, id: 'proc_run_20250628_0f3925', pathMatch: 0.95, riskMatch: 0.91, overall: 0.93, isReference: true },
-          { rank: 2, id: 'proc_run_20250628_144c4a', pathMatch: 0.95, riskMatch: 0.79, overall: 0.87, isReference: false },
-          { rank: 3, id: 'proc_run_20250628_ce6dce', pathMatch: 0.95, riskMatch: 0.76, overall: 0.85, isReference: false }
-        ],
-        referenceProcessTime: '2 249',
-        nodeAnalysis: [
-          { seq: 1, name: '弹性资源规划', riskFactor: 'risk_02_cpu_pressure=0.62', riskScore: 0.62, duration: 260 },
-          { seq: 2, name: '预测性补给模型', riskFactor: 'risk_06_config_drift=0.41', riskScore: 0.41, duration: 380 },
-          { seq: 3, name: '需求波动预测', riskFactor: 'risk_07_source_api_latency=0.85', riskScore: 0.85, duration: 560 },
-          { seq: 4, name: '贝叶斯网络建模', riskFactor: '（低风险）', riskScore: 0.2, duration: 490 },
-          { seq: 5, name: '安全库存计算', riskFactor: 'risk_01_high_data_volume=0.48', riskScore: 0.48, duration: 300 },
-          { seq: 6, name: '补给路径仿真', riskFactor: 'risk_03_memory_leak=0.70', riskScore: 0.70, duration: 120 },
-          { seq: 7, name: '动态补给路线', riskFactor: 'risk_05_network_latency=0.55', riskScore: 0.55, duration: 240 }
-        ],
+        environmentAnalysisText: '',
+        similarProcesses: [],
+        referenceProcessTime: '',
+        nodeAnalysis: [],
         timePrediction: {
-          totalTime: '2 350',
-          confidenceInterval: '2 200 s – 2 500 s',
-          difference: '+101 s (+4.5 %)'
+          totalTime: '',
+          confidenceInterval: '',
+          difference: ''
         },
-        recommendations: [
-          '对 "需求波动预测" 节点（风险值最高 0.85）提前准备备用计算资源。',
-          '若"补给路径仿真" 出现持续内存泄漏，可考虑拆分子任务或采用动态扩缩容。',
-          '当总耗时超过 2 500 s 时触发告警并重评资源分配策略。'
-        ]
+        recommendations: []
       },
-      // 大模型联网状态
+      // 大模型联网状态（使用本地数据）
       aiCollectionStatus: {
         enabled: false,
         lastCollectionTime: '未收集',
@@ -613,70 +584,16 @@ export default {
       isLoadingModelOutput: false,
       loadingText: '正在加载联网数据...',
       loadingTimer: null,
-      modelOutputContent: `==================== 流程智能分析报告 ====================  
-当前待执行流程：弹性资源规划 ➜ 预测性补给模型 ➜ 需求波动预测 ➜ 贝叶斯网络建模 ➜ 安全库存计算 ➜ 补给路径仿真 ➜ 动态补给路线  
-流程实例 ID      ：proc_run_20250701_XYZ123
-
-📌 一、外部环境智能感知（大模型实时检索）
-🔍 关联新闻事件（影响需求波动预测节点）：
-• [BBC] 红海航运危机持续（2024-07-01）：全球30%集装箱船改道好望角，亚欧航线补给周期延长12-15天
-• [Reuters] 中国制造业PMI超预期回升至51.8（2024-06-30），原材料进口需求激增
-• [Al Jazeera] 中东地缘政治紧张升级，原油价格单周上涨8%（影响路径仿真燃料成本）
-
-📊 关键市场指标（影响安全库存计算）：
-┌──────────┬────────────┬──────────┬────────────┐
-│ 数据源 │ 指标 │ 当前值 │ 72h波动率 │
-├──────────┼────────────┼──────────┼────────────┤
-│ NYSE │ 零售业ETF(XRT) │ $78.42 │ +3.2% ▲ │
-│ LME │ 铜期货价格 │ $9,842/吨 │ +5.7% ▲ │
-│ Forex │ 美元指数(DXY) │ 104.85 │ -0.8% ▼ │
-│ Oil │ 布伦特原油 │ $89.12/桶 │ +8.1% ▲ │
-└──────────┴────────────┴──────────┴────────────┘
-
-📌 二、相似历史流程检索（基于路径、上下文变量、风险因子向量）  
-┌────┬──────────────────────────┬──────────────┬──────────┬────────────┐  
-│Rank│ 历史流程 ID               │ 路径匹配度   │ 风险向量相似度 │ 综合相似度 │  
-├────┼──────────────────────────┼──────────────┼──────────┼────────────┤  
-│ 1  │ proc_run_20250628_0f3925 │   0.95       │  0.91    │  0.93 ★    │  
-│ 2  │ proc_run_20250628_144c4a │   0.95       │  0.79    │  0.87      │  
-│ 3  │ proc_run_20250628_ce6dce │   0.95       │  0.76    │  0.85      │  
-└────┴──────────────────────────┴──────────────┴──────────┴────────────┘  
-（★ 作为最相似参考流程）
-
-★ 参考流程总耗时：2 249 s（≈ 37 min 29 s）  
-
-📌 三、节点级风险评估 & 耗时预测  
-┌────┬────────────────┬──────────────┬──────────────────────────────┬────────────┐  
-│序号│ 节点名称         │ 主要风险因子 │ 风险得分 (0-1)              │ 预测耗时(s) │  
-├────┼────────────────┼──────────────┼──────────────────────────────┼────────────┤  
-│ 1  │ 弹性资源规划     │ risk_02_cpu_pressure=0.62                │      260 │  
-│ 2  │ 预测性补给模型   │ risk_06_config_drift=0.41                │      380 │  
-│ 3  │ 需求波动预测     │ risk_07_source_api_latency=0.85, …       │      560 │  
-│ 4  │ 贝叶斯网络建模   │ （低风险）                               │      490 │  
-│ 5  │ 安全库存计算     │ risk_01_high_data_volume=0.48            │      300 │  
-│ 6  │ 补给路径仿真     │ risk_03_memory_leak=0.70                 │      120 │  
-│ 7  │ 动态补给路线     │ risk_05_network_latency=0.55             │      240 │  
-└────┴────────────────┴──────────────┴──────────────────────────────┴────────────┘  
-
-📌 四、流程总耗时预测  
-• 节点耗时合计（风险加权）： 2 350 s  
-• 统计置信区间 (95% CI)： 2 200 s  –  2 500 s  
-• 相对最相似历史流程差异： +101 s (+4.5 %)
-
-===========================================================  
-⚠️ 建议  
-1. 对 "需求波动预测" 节点（风险值最高 0.85）提前准备备用计算资源。  
-2. 若"补给路径仿真" 出现持续内存泄漏，可考虑拆分子任务或采用动态扩缩容。  
-3. 当总耗时超过 2 500 s 时触发告警并重评资源分配策略。`
+      modelOutputContent: ''
     }
   },
   mounted() {
-    this.checkAICollectionStatus();
+    this.loadAICollectionStatus();
     this.loadRefactorTimingData();
   },
   activated() {
-    // 页面激活时检查AI收集状态
-    this.checkAICollectionStatus();
+    // 页面激活时加载AI收集状态（本地数据）
+    this.loadAICollectionStatus();
   },
   beforeDestroy() {
     // 清理定时器
@@ -792,31 +709,40 @@ export default {
       }
     },
 
-    // 检查AI收集状态
-    checkAICollectionStatus() {
+    // 检查AI收集状态（使用本地数据）
+    loadAICollectionStatus() {
       const aiData = localStorage.getItem('aiCollectionData');
       if (aiData) {
-        const data = JSON.parse(aiData);
-        
-        // 判断数据是否为最新：比较最后收集时间与当前时间的差值
-        let dataFreshness = '需要更新';
-        if (data.lastCollectionTime) {
-          const lastCollectionDate = new Date(data.lastCollectionTime);
-          const currentDate = new Date();
-          const timeDiffInHours = (currentDate - lastCollectionDate) / (1000 * 60 * 60);
+        try {
+          const data = JSON.parse(aiData);
           
-          // 如果时间差小于1小时，则认为数据是最新的
-          if (timeDiffInHours < 1) {
-            dataFreshness = '最新';
+          // 判断数据是否为最新：比较最后收集时间与当前时间的差值
+          let dataFreshness = '需要更新';
+          if (data.lastCollectionTime) {
+            const lastCollectionDate = new Date(data.lastCollectionTime);
+            const currentDate = new Date();
+            const timeDiffInHours = (currentDate - lastCollectionDate) / (1000 * 60 * 60);
+            
+            // 如果时间差小于1小时，则认为数据是最新的
+            if (timeDiffInHours < 1) {
+              dataFreshness = '最新';
+            }
           }
+          
+          this.aiCollectionStatus = {
+            enabled: true,
+            lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
+            collectedSources: data.collectedSources || 0,
+            dataFreshness: dataFreshness
+          };
+          
+          console.log('AI收集状态加载完成（来自localStorage）');
+        } catch (error) {
+          console.error('❌ 解析AI收集数据失败:', error);
+          // 保持默认状态
         }
-        
-        this.aiCollectionStatus = {
-          enabled: true,
-          lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
-          collectedSources: data.collectedSources || 0,
-          dataFreshness: dataFreshness
-        };
+      } else {
+        console.log('AI收集状态加载完成（使用默认值）');
       }
     },
     // 显示风险弹窗
@@ -931,6 +857,12 @@ export default {
         if (result.success && result.data) {
           // 更新大模型分析结果数据
           this.updateLLMAnalysisDataFromMongoDB(result.data);
+          
+          // 获取模型输出内容
+          const modelOutputResult = await planningTimeApi.getModelOutputContent();
+          if (modelOutputResult.success && modelOutputResult.data) {
+            this.modelOutputContent = modelOutputResult.data.content || '';
+          }
           
           // 显示成功消息
           this.$message({

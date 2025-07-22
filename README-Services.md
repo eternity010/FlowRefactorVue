@@ -171,6 +171,7 @@ Vue组件 → neuralNetworkApi → apiServer → neuralNetworkService → MongoD
 |------|------|------|----------|
 | `/api/neural-network/parameters` | GET | 获取所有参数配置 | `getNeuralNetworkParameters()` |
 | `/api/neural-network/parameters/current` | GET | 获取当前参数值 | `getCurrentNeuralNetworkParameters()` |
+| `/api/neural-network/parameters/default` | GET | 获取默认参数配置 | `getDefaultNeuralNetworkParameters()` |
 | `/api/neural-network/parameters/definitions` | GET | 获取参数定义信息 | `getNeuralNetworkParameterDefinitions()` |
 | `/api/neural-network/parameters/category/:category` | GET | 获取特定类别参数 | `getNeuralNetworkParametersByCategory()` |
 | `/api/neural-network/parameters` | PUT | 更新参数配置 | `updateNeuralNetworkParameters()` |
@@ -229,6 +230,9 @@ const planningData = await planningTimeApi.getPlanningTimeData()
 // 获取神经网络参数
 const currentParams = await neuralNetworkApi.getCurrentParameters()
 
+// 获取默认参数配置
+const defaultParams = await neuralNetworkApi.getDefaultParameters()
+
 // 更新神经网络参数
 const updateResult = await neuralNetworkApi.updateParameters({
   geoPoliticalWeight: 1.5,
@@ -265,6 +269,7 @@ const llmAnalysis = await planningTimeService.getLLMAnalysisData()
 
 // 神经网络参数操作
 const currentParams = await neuralNetworkService.getCurrentNeuralNetworkParameters()
+const defaultParams = await neuralNetworkService.getDefaultNeuralNetworkParameters()
 const updateResult = await neuralNetworkService.updateNeuralNetworkParameters({
   geoPoliticalWeight: 1.5
 })

@@ -681,6 +681,25 @@ app.get('/api/neural-network/parameters/current', async (req, res) => {
   }
 });
 
+// 获取默认参数配置
+app.get('/api/neural-network/parameters/default', async (req, res) => {
+  try {
+    const data = await neuralNetworkService.getDefaultNeuralNetworkParameters();
+    res.json({
+      code: 200,
+      message: '获取成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '获取默认参数配置失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
 // 获取参数定义信息
 app.get('/api/neural-network/parameters/definitions', async (req, res) => {
   try {
@@ -925,26 +944,7 @@ app.post('/api/neural-network/parameters/validate', async (req, res) => {
   }
 });
 
-// 获取参数历史记录
-app.get('/api/neural-network/parameters/history', async (req, res) => {
-  try {
-    const { limit = 10, offset = 0 } = req.query;
-    const data = await neuralNetworkService.getNeuralNetworkParameterHistory(parseInt(limit), parseInt(offset));
-    
-    res.json({
-      code: 200,
-      message: '获取成功',
-      data: data
-    });
-  } catch (error) {
-    res.status(500).json({
-      code: 500,
-      message: '获取参数历史记录失败',
-      data: null,
-      error: error.message
-    });
-  }
-});
+
 
 // 导出参数配置
 app.get('/api/neural-network/parameters/export', async (req, res) => {
@@ -990,6 +990,163 @@ app.post('/api/neural-network/parameters/import', async (req, res) => {
     res.status(500).json({
       code: 500,
       message: '导入参数配置失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// ==================== RAG配置 API 路由 ====================
+
+// 获取完整RAG配置数据
+app.get('/api/rag-config', async (req, res) => {
+  try {
+    const data = await neuralNetworkService.getRAGConfigData();
+    res.json({
+      code: 200,
+      message: '获取成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '获取RAG配置失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取RAG启用状态
+app.get('/api/rag-config/status', async (req, res) => {
+  try {
+    const data = await neuralNetworkService.getRAGEnabledStatus();
+    res.json({
+      code: 200,
+      message: '获取成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '获取RAG启用状态失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 更新RAG启用状态
+app.put('/api/rag-config/status', async (req, res) => {
+  try {
+    const { enabled_status } = req.body;
+    
+    if (!enabled_status || typeof enabled_status !== 'object') {
+      return res.status(400).json({
+        code: 400,
+        message: '启用状态格式错误',
+        data: null
+      });
+    }
+    
+    const data = await neuralNetworkService.updateRAGEnabledStatus(enabled_status);
+    res.json({
+      code: 200,
+      message: 'RAG启用状态更新成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '更新RAG启用状态失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取特定RAG系统的数据源配置
+app.get('/api/rag-config/data-sources/:ragType', async (req, res) => {
+  try {
+    const { ragType } = req.params;
+    const data = await neuralNetworkService.getRAGDataSources(ragType);
+    
+    res.json({
+      code: 200,
+      message: '获取成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: `获取RAG类型 ${req.params.ragType} 的数据源失败`,
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 更新完整RAG配置
+app.put('/api/rag-config', async (req, res) => {
+  try {
+    const ragConfig = req.body;
+    
+    if (!ragConfig || typeof ragConfig !== 'object') {
+      return res.status(400).json({
+        code: 400,
+        message: 'RAG配置格式错误',
+        data: null
+      });
+    }
+    
+    const data = await neuralNetworkService.updateRAGConfig(ragConfig);
+    res.json({
+      code: 200,
+      message: 'RAG配置更新成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '更新RAG配置失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 重置RAG配置为默认值
+app.post('/api/rag-config/reset', async (req, res) => {
+  try {
+    const data = await neuralNetworkService.resetRAGConfig();
+    res.json({
+      code: 200,
+      message: 'RAG配置重置成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '重置RAG配置失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取RAG配置统计信息
+app.get('/api/rag-config/stats', async (req, res) => {
+  try {
+    const data = await neuralNetworkService.getRAGConfigStats();
+    res.json({
+      code: 200,
+      message: '获取成功',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 500,
+      message: '获取RAG配置统计失败',
       data: null,
       error: error.message
     });

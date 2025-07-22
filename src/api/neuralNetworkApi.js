@@ -39,22 +39,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-// 模拟网络延迟
-const mockDelay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 简化的默认参数配置（用于离线模式）
-const getDefaultParameters = () => {
-  return {
-    geoPoliticalWeight: 1.0,
-    marketVolatilityFactor: 0.8,
-    backupSupplierRatio: 0.3,
-    routeReevalFrequency: 7,
-    minimumInventoryRatio: 0.15,
-    costDelayTradeoff: 1.2,
-    taktTimeVariance: 0.05,
-    overtimeCostCap: 200
-  };
-};
 
 /**
  * 神经网络参数 API 客户端
@@ -70,26 +55,8 @@ export const neuralNetworkApi = {
       const response = await apiClient.get('/neural-network/parameters');
       return response;
     } catch (error) {
-      console.warn('🔄 神经网络参数服务不可用，使用本地存储数据');
-      await mockDelay();
-      
-      const savedParams = JSON.parse(localStorage.getItem('neuralNetworkParams') || '{}');
-      const defaultParams = getDefaultParameters();
-      const currentParams = { ...defaultParams, ...savedParams };
-      
-      return {
-        data: {
-          code: 200,
-          message: '获取成功（离线模式）',
-          data: {
-            current_values: currentParams,
-            last_updated: localStorage.getItem('neuralNetworkParams_lastModified') || new Date().toISOString(),
-            offline_mode: true
-          }
-        },
-        status: 200,
-        statusText: 'OK'
-      };
+      console.error('❌ 神经网络参数服务不可用:', error.message);
+      throw new Error('无法连接到参数服务器，请检查网络连接或联系系统管理员');
     }
   },
 
@@ -102,22 +69,8 @@ export const neuralNetworkApi = {
       const response = await apiClient.get('/neural-network/parameters/current');
       return response;
     } catch (error) {
-      console.warn('🔄 参数服务不可用，使用本地存储数据');
-      await mockDelay();
-      
-      const savedParams = JSON.parse(localStorage.getItem('neuralNetworkParams') || '{}');
-      const defaultParams = getDefaultParameters();
-      const currentParams = { ...defaultParams, ...savedParams };
-      
-      return {
-        data: {
-          code: 200,
-          message: '获取成功（离线模式）',
-          data: currentParams
-        },
-        status: 200,
-        statusText: 'OK'
-      };
+      console.error('❌ 当前参数获取失败:', error.message);
+      throw new Error('无法获取当前参数设置，请检查服务器连接');
     }
   },
 
@@ -130,18 +83,22 @@ export const neuralNetworkApi = {
       const response = await apiClient.get('/neural-network/parameters/definitions');
       return response;
     } catch (error) {
-      console.warn('🔄 参数定义服务不可用');
-      await mockDelay();
-      
-      return {
-        data: {
-          code: 503,
-          message: '参数定义服务不可用，请检查服务器连接',
-          data: null
-        },
-        status: 503,
-        statusText: 'Service Unavailable'
-      };
+      console.error('❌ 参数定义服务不可用:', error.message);
+      throw new Error('无法获取参数定义，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 获取默认参数配置
+   * @returns {Promise} 默认参数配置
+   */
+  async getDefaultParameters() {
+    try {
+      const response = await apiClient.get('/neural-network/parameters/default');
+      return response;
+    } catch (error) {
+      console.error('❌ 默认参数获取失败:', error.message);
+      throw new Error('无法获取默认参数设置，请检查服务器连接');
     }
   },
 
@@ -155,18 +112,8 @@ export const neuralNetworkApi = {
       const response = await apiClient.get(`/neural-network/parameters/category/${category}`);
       return response;
     } catch (error) {
-      console.warn('🔄 分类参数服务不可用');
-      await mockDelay();
-      
-      return {
-        data: {
-          code: 503,
-          message: '分类参数服务不可用，请检查服务器连接',
-          data: null
-        },
-        status: 503,
-        statusText: 'Service Unavailable'
-      };
+      console.error('❌ 分类参数服务不可用:', error.message);
+      throw new Error('无法获取分类参数，请检查服务器连接');
     }
   },
 
@@ -180,41 +127,8 @@ export const neuralNetworkApi = {
       const response = await apiClient.put('/neural-network/parameters', { parameters });
       return response;
     } catch (error) {
-      console.warn('🔄 参数更新服务不可用，使用本地存储');
-      await mockDelay();
-      
-      // 保存到localStorage（简单验证）
-      if (!parameters || typeof parameters !== 'object') {
-        return {
-          data: {
-            code: 400,
-            message: '参数格式错误',
-            data: null
-          },
-          status: 400,
-          statusText: 'Bad Request'
-        };
-      }
-      
-      const savedParams = JSON.parse(localStorage.getItem('neuralNetworkParams') || '{}');
-      const updatedParams = { ...savedParams, ...parameters };
-      localStorage.setItem('neuralNetworkParams', JSON.stringify(updatedParams));
-      localStorage.setItem('neuralNetworkParams_lastModified', new Date().toISOString());
-      
-      return {
-        data: {
-          code: 200,
-          message: '参数更新成功（离线模式）',
-          data: {
-            updated_parameters: parameters,
-            all_parameters: updatedParams,
-            updated_at: new Date().toISOString(),
-            offline_mode: true
-          }
-        },
-        status: 200,
-        statusText: 'OK'
-      };
+      console.error('❌ 参数更新失败:', error.message);
+      throw new Error('无法更新参数设置，请检查服务器连接');
     }
   },
 
@@ -229,46 +143,8 @@ export const neuralNetworkApi = {
       const response = await apiClient.post('/neural-network/parameters/reset', payload);
       return response;
     } catch (error) {
-      console.warn('🔄 参数重置服务不可用，使用本地操作');
-      await mockDelay();
-      
-      const defaultParams = getDefaultParameters();
-      let resetParams;
-      
-      if (parameterKeys && Array.isArray(parameterKeys)) {
-        // 重置指定参数
-        resetParams = {};
-        parameterKeys.forEach(key => {
-          if (defaultParams.hasOwnProperty(key)) {
-            resetParams[key] = defaultParams[key];
-          }
-        });
-        
-        const savedParams = JSON.parse(localStorage.getItem('neuralNetworkParams') || '{}');
-        const updatedParams = { ...savedParams, ...resetParams };
-        localStorage.setItem('neuralNetworkParams', JSON.stringify(updatedParams));
-      } else {
-        // 重置所有参数
-        resetParams = defaultParams;
-        localStorage.setItem('neuralNetworkParams', JSON.stringify(resetParams));
-      }
-      
-      localStorage.setItem('neuralNetworkParams_lastModified', new Date().toISOString());
-      
-      return {
-        data: {
-          code: 200,
-          message: '参数重置成功（离线模式）',
-          data: {
-            reset_parameters: resetParams,
-            reset_count: Object.keys(resetParams).length,
-            reset_at: new Date().toISOString(),
-            offline_mode: true
-          }
-        },
-        status: 200,
-        statusText: 'OK'
-      };
+      console.error('❌ 参数重置失败:', error.message);
+      throw new Error('无法重置参数设置，请检查服务器连接');
     }
   },
 
@@ -320,15 +196,7 @@ export const neuralNetworkApi = {
     return await apiClient.get('/neural-network/parameters/stats');
   },
 
-  /**
-   * 获取参数历史记录
-   * @param {number} limit - 限制数量
-   * @param {number} offset - 偏移量
-   * @returns {Promise} 历史记录
-   */
-  async getParameterHistory(limit = 10, offset = 0) {
-    return await apiClient.get(`/neural-network/parameters/history?limit=${limit}&offset=${offset}`);
-  },
+
 
   /**
    * 导出参数配置
@@ -350,8 +218,94 @@ export const neuralNetworkApi = {
       config_data: configData,
       overwrite: overwrite
     });
-  }
-};
+  },
 
-// 导出默认值，供离线模式使用
-export { getDefaultParameters }; 
+  // ==================== RAG配置相关API ====================
+
+  /**
+   * 获取RAG配置数据
+   * @returns {Promise} RAG配置数据
+   */
+  async getRAGConfig() {
+    try {
+      const response = await apiClient.get('/rag-config');
+      return response;
+    } catch (error) {
+      console.error('❌ RAG配置获取失败:', error.message);
+      throw new Error('无法获取RAG配置，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 获取RAG启用状态
+   * @returns {Promise} RAG启用状态
+   */
+  async getRAGEnabledStatus() {
+    try {
+      const response = await apiClient.get('/rag-config/status');
+      return response;
+    } catch (error) {
+      console.error('❌ RAG启用状态获取失败:', error.message);
+      throw new Error('无法获取RAG启用状态，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 更新RAG启用状态
+   * @param {Object} enabledStatus - RAG启用状态对象
+   * @returns {Promise} 更新结果
+   */
+  async updateRAGEnabledStatus(enabledStatus) {
+    try {
+      const response = await apiClient.put('/rag-config/status', { enabled_status: enabledStatus });
+      return response;
+    } catch (error) {
+      console.error('❌ RAG启用状态更新失败:', error.message);
+      throw new Error('无法更新RAG启用状态，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 获取RAG数据源配置
+   * @param {string} ragType - RAG类型 (process_optimization)
+   * @returns {Promise} 数据源配置
+   */
+  async getRAGDataSources(ragType) {
+    try {
+      const response = await apiClient.get(`/rag-config/data-sources/${ragType}`);
+      return response;
+    } catch (error) {
+      console.error('❌ RAG数据源获取失败:', error.message);
+      throw new Error('无法获取RAG数据源配置，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 更新RAG配置
+   * @param {Object} ragConfig - RAG配置数据
+   * @returns {Promise} 更新结果
+   */
+  async updateRAGConfig(ragConfig) {
+    try {
+      const response = await apiClient.put('/rag-config', ragConfig);
+      return response;
+    } catch (error) {
+      console.error('❌ RAG配置更新失败:', error.message);
+      throw new Error('无法更新RAG配置，请检查服务器连接');
+    }
+  },
+
+  /**
+   * 重置RAG配置为默认值
+   * @returns {Promise} 重置结果
+   */
+  async resetRAGConfig() {
+    try {
+      const response = await apiClient.post('/rag-config/reset');
+      return response;
+    } catch (error) {
+      console.error('❌ RAG配置重置失败:', error.message);
+      throw new Error('无法重置RAG配置，请检查服务器连接');
+    }
+  }
+}; 
