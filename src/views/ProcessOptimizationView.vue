@@ -96,23 +96,23 @@
                 </span>
               </template>
               <div class="rag-summary-content" v-loading="ragConfigLoading">
-                <div class="rag-status-grid">
-                  <div class="rag-status-item">
-                    <i class="el-icon-pie-chart"></i>
-                    <span class="rag-label">启用状态:</span>
-                    <el-tag size="mini" :type="ragConfig.enabledCount > 0 ? 'success' : 'info'">
-                      {{ ragConfig.enabledCount }}/{{ ragConfig.totalCount }} 已启用
-                    </el-tag>
-                  </div>
-                  <div class="rag-status-item">
-                    <i class="el-icon-share"></i>
-                    <span class="rag-label">多场景决策模型及知识图谱:</span>
-                    <el-tag size="mini" :type="ragConfig.processOptimization ? 'success' : 'danger'">
-                      {{ ragConfig.processOptimization ? '已启用' : '未启用' }}
-                    </el-tag>
-                  </div>
-                </div>
-              </div>
+                 <div class="rag-status-grid">
+                   <div class="rag-status-item">
+                     <i class="el-icon-pie-chart"></i>
+                     <span class="rag-label">启用状态:</span>
+                     <el-tag size="mini" :type="ragConfig.enabledCount > 0 ? 'success' : 'info'">
+                       {{ ragConfig.enabledCount }}/{{ ragConfig.totalCount }} 已启用
+                     </el-tag>
+                   </div>
+                   <div class="rag-status-item">
+                     <i class="el-icon-share"></i>
+                     <span class="rag-label">多场景决策模型及知识图谱:</span>
+                     <el-tag size="mini" :type="ragConfig.processOptimization ? 'success' : 'danger'">
+                       {{ ragConfig.processOptimization ? '已启用' : '未启用' }}
+                     </el-tag>
+                   </div>
+                 </div>
+               </div>
             </el-alert>
           </div>
         </div>
@@ -517,7 +517,7 @@ export default {
           
           console.log('✅ 神经网络参数加载成功:', this.neuralNetworkParams);
         }
-      } catch (error) {
+        } catch (error) {
         console.error('❌ 加载神经网络参数失败:', error);
         this.$message.warning('参数配置加载失败，使用默认值');
         
@@ -551,11 +551,11 @@ export default {
           this.ragLastUpdated = data.last_updated;
           
           // 只要数据加载成功就显示RAG摘要，无论是否启用
-          this.showRAGSummary = true;
+            this.showRAGSummary = true;
           
           console.log('✅ RAG配置加载成功:', this.ragConfig);
         }
-      } catch (error) {
+        } catch (error) {
         console.error('❌ 加载RAG配置失败:', error);
         this.$message.warning('RAG配置加载失败，使用默认值');
         

@@ -4,7 +4,7 @@
       <div slot="header" class="rag-config-header">
         <span>RAG配置</span>
         <div class="header-right">
-          <el-tag size="small" type="primary">版本 1.0</el-tag>
+        <el-tag size="small" type="primary">版本 1.0</el-tag>
           <span v-if="lastUpdated" class="last-updated">
             最后更新：{{ formatDateTime(lastUpdated) }}
           </span>
@@ -208,13 +208,13 @@ export default {
         const response = await neuralNetworkApi.updateRAGEnabledStatus(enabledStatus);
         if (response.data && response.data.code === 200) {
           this.lastUpdated = response.data.data.updated_at;
-          
-          if (status) {
-            this.$message.success(`${ragNames[ragType]} 已启用`);
-          } else {
-            this.$message.info(`${ragNames[ragType]} 已禁用`);
-          }
-          
+      
+      if (status) {
+        this.$message.success(`${ragNames[ragType]} 已启用`);
+      } else {
+        this.$message.info(`${ragNames[ragType]} 已禁用`);
+      }
+      
           console.log('✅ RAG状态更新成功:', enabledStatus);
         }
       } catch (error) {
@@ -245,7 +245,7 @@ export default {
           this.lastUpdated = data.last_updated;
           console.log('✅ RAG启用状态加载成功:', this.ragEnabledStatus);
         }
-      } catch (error) {
+        } catch (error) {
         console.error('❌ 加载RAG启用状态失败:', error);
         this.$message.error('加载RAG配置失败，请检查网络连接');
         
@@ -276,16 +276,16 @@ export default {
         // 保存当前的RAG配置状态到API
         const response = await neuralNetworkApi.updateRAGEnabledStatus(enabledStatus);
         if (response.data && response.data.code === 200) {
-          // 统计启用的RAG数量
-          const enabledRAGs = Object.values(this.ragEnabledStatus).filter(status => status).length;
-          const totalRAGs = Object.keys(this.ragEnabledStatus).length;
-          
-          this.$message.success(`RAG配置已保存：${enabledRAGs}/${totalRAGs} 个RAG已启用`);
-          
-          // 延迟返回，让用户看到成功消息
-          setTimeout(() => {
-            this.goBack();
-          }, 1500);
+      // 统计启用的RAG数量
+      const enabledRAGs = Object.values(this.ragEnabledStatus).filter(status => status).length;
+      const totalRAGs = Object.keys(this.ragEnabledStatus).length;
+      
+      this.$message.success(`RAG配置已保存：${enabledRAGs}/${totalRAGs} 个RAG已启用`);
+      
+      // 延迟返回，让用户看到成功消息
+      setTimeout(() => {
+        this.goBack();
+      }, 1500);
         }
       } catch (error) {
         console.error('❌ 保存RAG配置失败:', error);
@@ -303,14 +303,14 @@ export default {
         type: 'warning'
       }).then(async () => {
         try {
-          // 重新加载保存的状态，撤销当前更改
+        // 重新加载保存的状态，撤销当前更改
           await this.loadRAGStatus();
           this.$message.info('已取消配置，返回上级页面');
           this.goBack();
         } catch (error) {
           console.error('❌ 重新加载RAG状态失败:', error);
-          this.$message.info('已取消配置，返回上级页面');
-          this.goBack();
+        this.$message.info('已取消配置，返回上级页面');
+        this.goBack();
         }
       }).catch(() => {
         this.$message.info('继续配置RAG');

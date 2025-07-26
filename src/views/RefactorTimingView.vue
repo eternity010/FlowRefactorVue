@@ -714,27 +714,27 @@ export default {
       const aiData = localStorage.getItem('aiCollectionData');
       if (aiData) {
         try {
-          const data = JSON.parse(aiData);
+        const data = JSON.parse(aiData);
+        
+        // 判断数据是否为最新：比较最后收集时间与当前时间的差值
+        let dataFreshness = '需要更新';
+        if (data.lastCollectionTime) {
+          const lastCollectionDate = new Date(data.lastCollectionTime);
+          const currentDate = new Date();
+          const timeDiffInHours = (currentDate - lastCollectionDate) / (1000 * 60 * 60);
           
-          // 判断数据是否为最新：比较最后收集时间与当前时间的差值
-          let dataFreshness = '需要更新';
-          if (data.lastCollectionTime) {
-            const lastCollectionDate = new Date(data.lastCollectionTime);
-            const currentDate = new Date();
-            const timeDiffInHours = (currentDate - lastCollectionDate) / (1000 * 60 * 60);
-            
-            // 如果时间差小于1小时，则认为数据是最新的
-            if (timeDiffInHours < 1) {
-              dataFreshness = '最新';
-            }
+          // 如果时间差小于1小时，则认为数据是最新的
+          if (timeDiffInHours < 1) {
+            dataFreshness = '最新';
           }
-          
-          this.aiCollectionStatus = {
-            enabled: true,
-            lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
-            collectedSources: data.collectedSources || 0,
-            dataFreshness: dataFreshness
-          };
+        }
+        
+        this.aiCollectionStatus = {
+          enabled: true,
+          lastCollectionTime: data.lastCollectionTime || new Date().toLocaleString('zh-CN'),
+          collectedSources: data.collectedSources || 0,
+          dataFreshness: dataFreshness
+        };
           
           console.log('AI收集状态加载完成（来自localStorage）');
         } catch (error) {

@@ -3,6 +3,7 @@ const cors = require('cors');
 const FlowDataService = require('./flowDataService');
 const PlanningTimeService = require('./planningTimeService');
 const NeuralNetworkService = require('./neuralNetworkService');
+const ProcessOptimizationService = require('./processOptimizationService');
 
 const app = express();
 const PORT = 3001;
@@ -15,6 +16,7 @@ app.use(express.json());
 const flowDataService = new FlowDataService();
 const planningTimeService = new PlanningTimeService();
 const neuralNetworkService = new NeuralNetworkService();
+const processOptimizationService = new ProcessOptimizationService();
 
 // 初始化数据库连接
 async function initializeService() {
@@ -1148,6 +1150,254 @@ app.get('/api/rag-config/stats', async (req, res) => {
       code: 500,
       message: '获取RAG配置统计失败',
       data: null,
+      error: error.message
+    });
+  }
+});
+
+// ========== 流程优化路由 (新增) ==========
+
+// 获取所有优化案例
+app.get('/api/process-optimization', async (req, res) => {
+  try {
+    const result = await processOptimizationService.getAllOptimizations();
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取优化案例成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取优化案例失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取优化案例失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 根据ID获取特定优化案例
+app.get('/api/process-optimization/:id', async (req, res) => {
+  try {
+    const optimizationId = req.params.id;
+    const result = await processOptimizationService.getOptimizationById(optimizationId);
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取优化案例成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取优化案例失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取优化案例失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取优化案例的流程图数据
+app.get('/api/process-optimization/:id/flowcharts', async (req, res) => {
+  try {
+    const optimizationId = req.params.id;
+    const result = await processOptimizationService.getOptimizationFlowcharts(optimizationId);
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取流程图数据成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取流程图数据失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取流程图数据失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取优化案例的资源变化分析
+app.get('/api/process-optimization/:id/resources', async (req, res) => {
+  try {
+    const optimizationId = req.params.id;
+    const result = await processOptimizationService.getOptimizationResources(optimizationId);
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取资源变化分析成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取资源变化分析失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取资源变化分析失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取优化案例的甘特图数据
+app.get('/api/process-optimization/:id/gantt', async (req, res) => {
+  try {
+    const optimizationId = req.params.id;
+    const result = await processOptimizationService.getOptimizationGantt(optimizationId);
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取甘特图数据成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取甘特图数据失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取甘特图数据失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 搜索优化案例
+app.get('/api/process-optimization/search', async (req, res) => {
+  try {
+    const keyword = req.query.keyword;
+    if (!keyword) {
+      return res.status(400).json({
+        code: 400,
+        message: '搜索关键词不能为空',
+        data: null
+      });
+    }
+
+    const result = await processOptimizationService.searchOptimizations(keyword);
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '搜索优化案例成功',
+        data: result.data
+      });
+    } else {
+      res.status(404).json({
+        code: 404,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('搜索优化案例失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '搜索优化案例失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 获取优化数据统计
+app.get('/api/process-optimization/stats', async (req, res) => {
+  try {
+    const result = await processOptimizationService.getOptimizationStats();
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '获取优化数据统计成功',
+        data: result.data
+      });
+    } else {
+      res.status(500).json({
+        code: 500,
+        message: result.error,
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error('获取优化数据统计失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '获取优化数据统计失败',
+      data: null,
+      error: error.message
+    });
+  }
+});
+
+// 检查数据库连接状态
+app.get('/api/process-optimization/connection', async (req, res) => {
+  try {
+    const result = await processOptimizationService.checkConnection();
+    
+    if (result.success) {
+      res.json({
+        code: 200,
+        message: '数据库连接正常',
+        data: result.data
+      });
+    } else {
+      res.status(503).json({
+        code: 503,
+        message: '数据库连接异常',
+        data: result.data,
+        error: result.error
+      });
+    }
+  } catch (error) {
+    console.error('检查数据库连接失败:', error);
+    res.status(500).json({
+      code: 500,
+      message: '检查数据库连接失败',
+      data: { connected: false },
       error: error.message
     });
   }

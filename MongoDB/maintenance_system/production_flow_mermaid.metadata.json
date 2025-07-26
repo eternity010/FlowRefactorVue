@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"b2bbdf3e1b2f4af5b751c3f1629c0ddd","collectionName":"production_flow_mermaid","type":"collection"}

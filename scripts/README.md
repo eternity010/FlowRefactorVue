@@ -564,3 +564,140 @@ db.process_optimization_flows.aggregate([
 - 趋势图表显示业务发展轨迹
 - 对比分析不同流程的表现差异
 - 预测分析基于历史数据预测未来趋势 
+
+# 数据导入脚本说明
+
+本目录包含了用于将项目数据导入到MongoDB数据库的各种脚本。
+
+## 📁 脚本文件列表
+
+### 流程数据导入脚本
+- `import-flownodesdata-to-mongodb.js` - 导入流程节点数据
+- `import-processflowdata-to-mongodb.js` - 导入流程数据
+- `import-subprocesscardsdata-to-mongodb.js` - 导入子流程卡片数据
+
+### Mermaid流程图导入脚本
+- `import-marketingflowmermaid-to-mongodb.js` - 导入营销流程图
+- `import-operationflowmermaid-to-mongodb.js` - 导入运营流程图
+- `import-productionflowmermaid-to-mongodb.js` - 导入生产流程图
+- `import-purchaseflowmermaid-to-mongodb.js` - 导入采购流程图
+
+### 分析数据导入脚本
+- `import-llm-analysis-data-to-mongodb.js` - 导入LLM分析数据
+- `import-planning-time-data-to-mongodb.js` - 导入规划时间数据
+- `import-refactor-timing-data-to-mongodb.js` - 导入重构时机数据
+- `import-management-totaldata-to-mongodb.js` - 导入管理总数据
+
+### 流程优化导入脚本 (新增)
+- `import-process-optimization-to-mongodb.js` - 导入流程优化案例数据
+
+### 通用导入脚本
+- `import-to-mongodb.js` - 通用数据导入脚本
+
+## 🚀 使用方法
+
+### 单独运行脚本
+```bash
+# 导入流程优化数据
+node scripts/import-process-optimization-to-mongodb.js
+
+# 导入规划时间数据
+node scripts/import-planning-time-data-to-mongodb.js
+
+# 导入LLM分析数据
+node scripts/import-llm-analysis-data-to-mongodb.js
+```
+
+### 批量运行脚本
+```bash
+# 运行所有导入脚本
+node scripts/import-to-mongodb.js
+```
+
+## 📊 脚本功能说明
+
+### `import-process-optimization-to-mongodb.js`
+**新增的流程优化数据导入脚本**
+
+**功能特性：**
+- 导入5个流程优化案例（Optimization1-5）
+- 包含完整的流程图数据（before、after、after2、llm版本）
+- 包含详细的资源变化分析
+- 包含甘特图和项目计划数据
+- 自动数据验证和完整性检查
+- 创建必要的数据库索引
+
+**数据结构：**
+```javascript
+{
+  _id: "Optimization1",
+  id: "Optimization1",
+  title: "采购流程重构优化",
+  description: "原流程缺乏人员风险管控...",
+  flowcharts: {
+    before: "graph TD\n...",    // 原始流程图
+    after: "graph TD\n...",     // 强化学习平衡方案
+    after2: "graph TD\n...",    // 强化学习资源优先方案
+    llm: "graph TD\n..."        // LLM智能重构方案
+  },
+  resourceChanges: { /* 详细资源变化分析 */ },
+  resourceChanges2: { /* 简化版资源分析 */ },
+  ganttData: { /* 甘特图数据 */ },
+  ganttData2: { /* 简化版甘特图 */ },
+  createdAt: ISODate,
+  updatedAt: ISODate,
+  source: "processOptimizationFlowData.js",
+  version: "1.0"
+}
+```
+
+**验证功能：**
+- 数据完整性检查
+- 统计包含资源分析的案例数量
+- 统计包含甘特图的案例数量  
+- 统计包含LLM流程图的案例数量
+
+## 🗄️ 数据库集合
+
+### 主要集合
+- `processflowdata` - 流程数据
+- `subprocesscardsdata` - 子流程卡片数据
+- `planning_time_data` - 规划时间数据
+- `refactor_timing_data` - 重构时机数据
+- `llm_analysis_data` - LLM分析数据
+- `process_optimization_flow_data` - 流程优化案例数据 (新增)
+
+### Mermaid流程图集合
+- `marketingflowmermaid` - 营销流程图
+- `operationflowmermaid` - 运营流程图
+- `productionflowmermaid` - 生产流程图
+- `purchaseflowmermaid` - 采购流程图
+
+## ⚠️ 注意事项
+
+1. **数据库连接**: 确保MongoDB服务正在运行（默认端口27017）
+2. **数据库名称**: 所有脚本使用 `maintenance_system` 数据库
+3. **数据清理**: 大部分脚本会清空现有数据后重新导入
+4. **错误处理**: 脚本包含完整的错误处理和日志输出
+5. **索引创建**: 脚本会自动创建必要的数据库索引
+
+## 🔧 环境要求
+
+- Node.js 14+
+- MongoDB 4.0+
+- 项目依赖包（mongodb driver）
+
+## 📝 日志输出
+
+所有脚本都包含详细的日志输出：
+- ✅ 成功操作
+- ❌ 错误信息
+- 📊 统计数据
+- 🔍 验证结果
+
+## 🆘 故障排除
+
+1. **连接失败**: 检查MongoDB服务状态
+2. **权限错误**: 确保有数据库写入权限
+3. **数据格式错误**: 检查源数据文件格式
+4. **内存不足**: 大量数据导入时可能需要增加Node.js内存限制 

@@ -1,119 +1,228 @@
-import processOptimizationFlowData from '@/data/processOptimizationFlowData.js';
+import axios from 'axios'
 
-// 模拟网络延迟
-const mockDelay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
+// API基础URL
+const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:3001'
 
-// 模拟 axios 请求的 API 服务
-export const processOptimizationApi = {
-  // 获取所有流程优化数据
-  async getAllOptimizations() {
-    await mockDelay();
-    
-    // 模拟 axios 响应格式
-    return {
-      data: {
-        code: 200,
-        message: '获取成功',
-        data: processOptimizationFlowData
-      },
-      status: 200,
-      statusText: 'OK'
-    };
-  },
-
-  // 根据ID获取单个流程优化数据
-  async getOptimizationById(id) {
-    await mockDelay();
-    
-    const optimization = processOptimizationFlowData[id];
-    
-    if (!optimization) {
-      return {
-        data: {
-          code: 404,
-          message: '数据不存在',
-          data: null
-        },
-        status: 404,
-        statusText: 'Not Found'
-      };
-    }
-    
-    return {
-      data: {
-        code: 200,
-        message: '获取成功',
-        data: optimization
-      },
-      status: 200,
-      statusText: 'OK'
-    };
-  },
-
-  // 获取流程优化列表（只返回基本信息）
-  async getOptimizationList() {
-    await mockDelay();
-    
-    const list = Object.keys(processOptimizationFlowData).map(key => ({
-      id: key,
-      title: processOptimizationFlowData[key].title,
-      description: processOptimizationFlowData[key].description
-    }));
-    
-    return {
-      data: {
-        code: 200,
-        message: '获取成功',
-        data: list
-      },
-      status: 200,
-      statusText: 'OK'
-    };
-  },
-
-  // 获取资源变化分析数据
-  async getResourceChanges(id) {
-    await mockDelay();
-    
-    const optimization = processOptimizationFlowData[id];
-    
-    if (!optimization || !optimization.resourceChanges) {
-      return {
-        data: {
-          code: 404,
-          message: '资源分析数据不存在',
-          data: null
-        },
-        status: 404,
-        statusText: 'Not Found'
-      };
-    }
-    
-    return {
-      data: {
-        code: 200,
-        message: '获取成功',
-        data: optimization.resourceChanges
-      },
-      status: 200,
-      statusText: 'OK'
-    };
+// 创建axios实例
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
   }
-};
+})
 
-// 如果需要使用真实的 axios，可以这样封装
-/*
-import axios from 'axios';
+// 请求拦截器
+apiClient.interceptors.request.use(
+  config => {
+    console.log(`🚀 发送请求: ${config.method.toUpperCase()} ${config.url}`)
+    return config
+  },
+  error => {
+    console.error('❌ 请求拦截器错误:', error)
+    return Promise.reject(error)
+  }
+)
 
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 10000
-});
+// 响应拦截器
+apiClient.interceptors.response.use(
+  response => {
+    console.log(`✅ 收到响应: ${response.config.url}`)
+    return response
+  },
+  error => {
+    console.error('❌ 响应错误:', (error.response && error.response.data) || error.message)
+    return Promise.reject(error)
+  }
+)
 
+// 流程优化API方法
 export const processOptimizationApi = {
-  getAllOptimizations: () => api.get('/optimizations'),
-  getOptimizationById: (id) => api.get(`/optimizations/${id}`),
-  getOptimizationList: () => api.get('/optimizations/list'),
-  getResourceChanges: (id) => api.get(`/optimizations/${id}/resource-changes`)
-};
-*/ 
+  // 获取所有优化案例
+  async getAllOptimizations() {
+    try {
+      const response = await apiClient.get('/api/process-optimization')
+      
+      if (response.data.code === 200) {
+        console.log('✅ 获取所有优化案例成功')
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取优化案例失败')
+      }
+    } catch (error) {
+      console.error('❌ 获取所有优化案例失败:', error)
+      throw new Error(`获取优化案例失败: ${error.message}`)
+    }
+  },
+
+  // 根据ID获取特定优化案例
+  async getOptimizationById(optimizationId) {
+    try {
+      const response = await apiClient.get(`/api/process-optimization/${optimizationId}`)
+      
+      if (response.data.code === 200) {
+        console.log(`✅ 获取优化案例成功: ${optimizationId}`)
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取优化案例失败')
+      }
+    } catch (error) {
+      console.error(`❌ 获取优化案例失败 (${optimizationId}):`, error)
+      throw new Error(`获取优化案例失败: ${error.message}`)
+    }
+  },
+
+  // 获取优化案例的流程图数据
+  async getOptimizationFlowcharts(optimizationId) {
+    try {
+      const response = await apiClient.get(`/api/process-optimization/${optimizationId}/flowcharts`)
+      
+      if (response.data.code === 200) {
+        console.log(`✅ 获取流程图数据成功: ${optimizationId}`)
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取流程图数据失败')
+      }
+    } catch (error) {
+      console.error(`❌ 获取流程图数据失败 (${optimizationId}):`, error)
+      throw new Error(`获取流程图数据失败: ${error.message}`)
+    }
+  },
+
+  // 获取优化案例的资源变化分析
+  async getOptimizationResources(optimizationId) {
+    try {
+      const response = await apiClient.get(`/api/process-optimization/${optimizationId}/resources`)
+      
+      if (response.data.code === 200) {
+        console.log(`✅ 获取资源变化分析成功: ${optimizationId}`)
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取资源变化分析失败')
+      }
+    } catch (error) {
+      console.error(`❌ 获取资源变化分析失败 (${optimizationId}):`, error)
+      throw new Error(`获取资源变化分析失败: ${error.message}`)
+    }
+  },
+
+  // 获取优化案例的甘特图数据
+  async getOptimizationGantt(optimizationId) {
+    try {
+      const response = await apiClient.get(`/api/process-optimization/${optimizationId}/gantt`)
+      
+      if (response.data.code === 200) {
+        console.log(`✅ 获取甘特图数据成功: ${optimizationId}`)
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取甘特图数据失败')
+      }
+    } catch (error) {
+      console.error(`❌ 获取甘特图数据失败 (${optimizationId}):`, error)
+      throw new Error(`获取甘特图数据失败: ${error.message}`)
+    }
+  },
+
+  // 搜索优化案例
+  async searchOptimizations(keyword) {
+    try {
+      const response = await apiClient.get('/api/process-optimization/search', {
+        params: { keyword }
+      })
+      
+      if (response.data.code === 200) {
+        console.log(`✅ 搜索优化案例成功: ${keyword}`)
+        return {
+          data: {
+            code: 200,
+            message: '搜索成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '搜索优化案例失败')
+      }
+    } catch (error) {
+      console.error(`❌ 搜索优化案例失败 (${keyword}):`, error)
+      throw new Error(`搜索优化案例失败: ${error.message}`)
+    }
+  },
+
+  // 获取优化数据统计
+  async getOptimizationStats() {
+    try {
+      const response = await apiClient.get('/api/process-optimization/stats')
+      
+      if (response.data.code === 200) {
+        console.log('✅ 获取优化数据统计成功')
+        return {
+          data: {
+            code: 200,
+            message: '获取成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '获取优化数据统计失败')
+      }
+    } catch (error) {
+      console.error('❌ 获取优化数据统计失败:', error)
+      throw new Error(`获取优化数据统计失败: ${error.message}`)
+    }
+  },
+
+  // 检查数据库连接状态
+  async checkConnection() {
+    try {
+      const response = await apiClient.get('/api/process-optimization/connection')
+      
+      if (response.data.code === 200) {
+        console.log('✅ 检查数据库连接状态成功')
+        return {
+          data: {
+            code: 200,
+            message: '连接状态检查成功',
+            data: response.data.data
+          }
+        }
+      } else {
+        throw new Error(response.data.message || '检查数据库连接状态失败')
+      }
+    } catch (error) {
+      console.error('❌ 检查数据库连接状态失败:', error)
+      throw new Error(`检查数据库连接状态失败: ${error.message}`)
+    }
+  }
+}
+
+export default processOptimizationApi 

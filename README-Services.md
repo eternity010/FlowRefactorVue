@@ -8,18 +8,19 @@
 
 ```
 src/services/
-├── flowDataService.js       # 流程数据库服务
-├── planningTimeService.js   # 规划时间数据服务
-├── neuralNetworkService.js  # 神经网络参数服务
-├── apiServer.js            # Express API服务器
-└── index.js                # 服务层统一导出
+├── flowDataService.js         # 流程数据库服务
+├── planningTimeService.js     # 规划时间数据服务
+├── neuralNetworkService.js    # 神经网络参数服务
+├── processOptimizationService.js # 流程优化服务 (新增)
+├── apiServer.js              # Express API服务器
+└── index.js                  # 服务层统一导出
 
 src/api/
-├── planningTimeApi.js      # 规划时间API客户端
-├── processDataApi.js       # 流程数据API客户端
+├── planningTimeApi.js        # 规划时间API客户端
+├── processDataApi.js         # 流程数据API客户端
 ├── processOptimizationApi.js # 流程优化API客户端
-├── subProcessDataApi.js    # 子流程数据API客户端
-└── neuralNetworkApi.js     # 神经网络参数API客户端
+├── subProcessDataApi.js      # 子流程数据API客户端
+└── neuralNetworkApi.js       # 神经网络参数API客户端
 ```
 
 ## 各文件职责
@@ -52,7 +53,14 @@ src/api/
 - 配置导入导出
 - 离线模式支持
 
-#### 5. `subProcessDataApi.js` - 子流程数据API客户端
+#### 5. `processOptimizationApi.js` - 流程优化API客户端 (新增)
+- 流程优化案例数据获取
+- 流程图数据管理（before、after、after2、llm）
+- 资源变化分析数据
+- 甘特图数据管理
+- 优化案例搜索功能
+
+#### 6. `subProcessDataApi.js` - 子流程数据API客户端
 - 子流程数据获取
 - Mermaid流程图数据管理
 
@@ -85,7 +93,17 @@ src/api/
   - 配置管理和导入导出
   - 统计信息生成
 
-#### 4. `apiServer.js` - Express API服务器
+#### 4. `processOptimizationService.js` - 流程优化服务 (新增)
+- **运行环境**: Node.js
+- **技术栈**: MongoDB Driver
+- **主要职责**:
+  - 流程优化案例CRUD操作
+  - 流程图数据管理（before、after、after2、llm版本）
+  - 资源变化分析数据处理
+  - 甘特图数据管理
+  - 优化案例搜索和统计
+
+#### 5. `apiServer.js` - Express API服务器
 - **运行环境**: Node.js
 - **技术栈**: Express.js, CORS
 - **主要职责**:
@@ -100,11 +118,11 @@ src/api/
 ```
 前端组件
     ↓
-API客户端 (processDataApi, planningTimeApi, neuralNetworkApi, subProcessDataApi)
+API客户端 (processDataApi, planningTimeApi, neuralNetworkApi, processOptimizationApi, subProcessDataApi)
     ↓
 apiServer.js (Express API服务器)
     ↓
-后端服务 (flowDataService, planningTimeService, neuralNetworkService)
+后端服务 (flowDataService, planningTimeService, neuralNetworkService, processOptimizationService)
     ↓
 MongoDB数据库
 ```
@@ -124,6 +142,11 @@ Vue组件 → planningTimeApi → apiServer → planningTimeService → MongoDB
 #### 神经网络参数流
 ```
 Vue组件 → neuralNetworkApi → apiServer → neuralNetworkService → MongoDB
+```
+
+#### 流程优化数据流 (新增)
+```
+Vue组件 → processOptimizationApi → apiServer → processOptimizationService → MongoDB
 ```
 
 ## API端点列表
@@ -186,6 +209,19 @@ Vue组件 → neuralNetworkApi → apiServer → neuralNetworkService → MongoD
 | `/api/neural-network/parameters/export` | GET | 导出参数配置 | `exportNeuralNetworkParameters()` |
 | `/api/neural-network/parameters/import` | POST | 导入参数配置 | `importNeuralNetworkParameters()` |
 
+### 流程优化API (processOptimizationService) - 新增
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/process-optimization` | GET | 获取所有优化案例 | `getAllOptimizations()` |
+| `/api/process-optimization/:id` | GET | 获取特定优化案例 | `getOptimizationById()` |
+| `/api/process-optimization/:id/flowcharts` | GET | 获取流程图数据 | `getOptimizationFlowcharts()` |
+| `/api/process-optimization/:id/resources` | GET | 获取资源变化分析 | `getOptimizationResources()` |
+| `/api/process-optimization/:id/gantt` | GET | 获取甘特图数据 | `getOptimizationGantt()` |
+| `/api/process-optimization/search` | GET | 搜索优化案例 | `searchOptimizations()` |
+| `/api/process-optimization/stats` | GET | 获取优化数据统计 | `getOptimizationStats()` |
+| `/api/process-optimization/connection` | GET | 检查数据库连接 | `checkConnection()` |
+
 ## 统一响应格式
 
 所有API端点都返回统一的响应格式：
@@ -214,6 +250,7 @@ import { processDataApi } from '@/api/processDataApi'
 import { subProcessDataApi } from '@/api/subProcessDataApi'
 import { planningTimeApi } from '@/api/planningTimeApi'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
+import { processOptimizationApi } from '@/api/processOptimizationApi'
 
 // 获取流程数据
 const flowData = await processDataApi.getFlowDataByType('purchase')
@@ -244,6 +281,27 @@ const stats = await neuralNetworkApi.getParameterStats()
 
 // 检查连接状态
 const connectionStatus = await processDataApi.checkConnection()
+
+// 获取流程优化案例
+const optimizations = await processOptimizationApi.getAllOptimizations()
+
+// 获取特定优化案例
+const optimization1 = await processOptimizationApi.getOptimizationById('Optimization1')
+
+// 获取流程图数据
+const flowcharts = await processOptimizationApi.getOptimizationFlowcharts('Optimization1')
+
+// 获取资源变化分析
+const resources = await processOptimizationApi.getOptimizationResources('Optimization1')
+
+// 获取甘特图数据
+const ganttData = await processOptimizationApi.getOptimizationGantt('Optimization1')
+
+// 搜索优化案例
+const searchResults = await processOptimizationApi.searchOptimizations('采购流程')
+
+// 获取优化数据统计
+const stats = await processOptimizationApi.getOptimizationStats()
 ```
 
 ### 后端使用 (API服务器)
@@ -251,11 +309,13 @@ const connectionStatus = await processDataApi.checkConnection()
 const FlowDataService = require('./flowDataService')
 const PlanningTimeService = require('./planningTimeService')
 const NeuralNetworkService = require('./neuralNetworkService')
+const ProcessOptimizationService = require('./processOptimizationService')
 
 // 创建服务实例
 const flowDataService = new FlowDataService()
 const planningTimeService = new PlanningTimeService()
 const neuralNetworkService = new NeuralNetworkService()
+const processOptimizationService = new ProcessOptimizationService()
 
 // 流程数据操作
 const flowResult = await flowDataService.getFlowDataByType('purchase')
@@ -274,6 +334,15 @@ const updateResult = await neuralNetworkService.updateNeuralNetworkParameters({
   geoPoliticalWeight: 1.5
 })
 const paramStats = await neuralNetworkService.getNeuralNetworkParameterStats()
+
+// 流程优化数据操作
+const allOptimizations = await processOptimizationService.getAllOptimizations()
+const optimization1 = await processOptimizationService.getOptimizationById('Optimization1')
+const flowchartData = await processOptimizationService.getOptimizationFlowcharts('Optimization1')
+const resourceData = await processOptimizationService.getOptimizationResources('Optimization1')
+const ganttData = await processOptimizationService.getOptimizationGantt('Optimization1')
+const searchResults = await processOptimizationService.searchOptimizations('采购')
+const optimizationStats = await processOptimizationService.getOptimizationStats()
 ```
 
 ## 错误处理
@@ -398,6 +467,7 @@ curl http://localhost:3001/api/database-stats
 9. **流程数据集合**: `processflowdata`, `subprocesscardsdata`, `mermaid_flows`
 10. **规划时间集合**: `planning_time_data`, `refactor_timing_data`, `llm_analysis_data`
 11. **参数配置集合**: `neural_network_parameters`, `neural_network_parameter_history`, `neural_network_saved_configs`
+12. **流程优化集合**: `process_optimization_flow_data` (新增)
 
 ### 开发建议
 12. **渐进增强**: 前端应优雅处理API服务不可用的情况
@@ -434,16 +504,16 @@ curl http://localhost:3001/api/database-stats
 ┌─────────────▼───────────────▼───────────────────▼───────────┐
 │                   后端服务层                                │
 ├─────────────────────────────────────────────────────────────┤
-│flowDataService  │planningTimeService│neuralNetworkService   │
-│  流程数据管理   │    规划时间管理    │   参数配置管理         │
+│flowDataService  │planningTimeService│neuralNetworkService│processOptimizationService│
+│  流程数据管理   │    规划时间管理    │   参数配置管理      │     流程优化管理        │
 └─────────────┬───────────────┬───────────────────┬───────────┘
               │               │                   │
 ┌─────────────▼───────────────▼───────────────────▼───────────┐
 │                    MongoDB 数据库                           │
 ├─────────────────────────────────────────────────────────────┤
-│ processflowdata │ planning_time_data │ neural_network_*      │
-│ subprocessdata  │ refactor_timing    │ parameter_history     │
-│ mermaid_flows   │ llm_analysis_data  │ saved_configs         │
+│ processflowdata │ planning_time_data │ neural_network_*      │ process_optimization_* │
+│ subprocessdata  │ refactor_timing    │ parameter_history     │ flow_data             │
+│ mermaid_flows   │ llm_analysis_data  │ saved_configs         │                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 

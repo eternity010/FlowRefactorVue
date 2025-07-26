@@ -6,8 +6,17 @@ export { processDataApi } from '../api/processDataApi';
 export { subProcessDataApi } from '../api/subProcessDataApi';
 
 // 后端数据库服务类
-export { default as FlowDataService } from './flowDataService';
-export { default as PlanningTimeService } from './planningTimeService';
+const FlowDataService = require('./flowDataService');
+const PlanningTimeService = require('./planningTimeService');
+const NeuralNetworkService = require('./neuralNetworkService');
+const ProcessOptimizationService = require('./processOptimizationService');
+
+module.exports = {
+  FlowDataService,
+  PlanningTimeService,
+  NeuralNetworkService,
+  ProcessOptimizationService
+};
 
 // API服务器
 export { startServer, app } from './apiServer';
