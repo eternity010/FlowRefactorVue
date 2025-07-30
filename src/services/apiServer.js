@@ -4,6 +4,8 @@ const FlowDataService = require('./flowDataService');
 const PlanningTimeService = require('./planningTimeService');
 const NeuralNetworkService = require('./neuralNetworkService');
 const ProcessOptimizationService = require('./processOptimizationService');
+const LLMService = require('./llmService');
+const RiskDataService = require('./riskDataService');
 
 const app = express();
 const PORT = 3001;
@@ -17,6 +19,8 @@ const flowDataService = new FlowDataService();
 const planningTimeService = new PlanningTimeService();
 const neuralNetworkService = new NeuralNetworkService();
 const processOptimizationService = new ProcessOptimizationService();
+const llmService = new LLMService();
+const riskDataService = new RiskDataService();
 
 // 初始化数据库连接
 async function initializeService() {
@@ -24,6 +28,7 @@ async function initializeService() {
     await flowDataService.connect();
     await planningTimeService.connect();
     await neuralNetworkService.connect();
+    await riskDataService.connect();
     console.log('✅ API服务已连接到MongoDB');
   } catch (error) {
     console.error('❌ 数据库连接失败:', error);
@@ -1403,6 +1408,324 @@ app.get('/api/process-optimization/connection', async (req, res) => {
   }
 });
 
+// ================================
+// 风险数据相关API
+// ================================
+
+// 获取所有风险数据
+app.get('/api/risk-data', async (req, res) => {
+  try {
+    const result = await riskDataService.getAllRiskData();
+    sendResponse(res, result, '获取风险数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 检查风险数据库连接状态
+app.get('/api/risk-data/connection', async (req, res) => {
+  try {
+    const result = await riskDataService.checkConnection();
+    res.json({
+      success: result.success,
+      data: result.data,
+      message: result.success ? '风险数据库连接正常' : '风险数据库连接异常'
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// LLM大模型相关API
+// ================================
+
+// 单轮对话
+app.post('/api/llm/chat', async (req, res) => {
+  try {
+    const { message, systemMessage } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        error: '消息内容不能为空'
+      });
+    }
+
+    const result = await llmService.chat(message, systemMessage);
+    sendResponse(res, result, '对话失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 多轮对话
+app.post('/api/llm/chat-history', async (req, res) => {
+  try {
+    const { messages } = req.body;
+    
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({
+        success: false,
+        error: '消息历史格式不正确，需要提供消息数组'
+      });
+    }
+
+    if (messages.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '消息数组不能为空，至少需要包含一条消息'
+      });
+    }
+
+    // 验证消息格式
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      if (!msg.role || !msg.content) {
+        return res.status(400).json({
+          success: false,
+          error: `消息${i + 1}格式错误，需要包含role和content字段`
+        });
+      }
+    }
+
+    const result = await llmService.chatWithHistory(messages);
+    sendResponse(res, result, '多轮对话失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 流程分析
+app.post('/api/llm/analyze-process', async (req, res) => {
+  try {
+    const { processData } = req.body;
+    
+    if (!processData) {
+      return res.status(400).json({
+        success: false,
+        error: '流程数据不能为空'
+      });
+    }
+
+    const result = await llmService.analyzeProcess(processData);
+    sendResponse(res, result, '流程分析失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 风险评估
+app.post('/api/llm/assess-risks', async (req, res) => {
+  try {
+    const { riskData } = req.body;
+    
+    if (!riskData) {
+      return res.status(400).json({
+        success: false,
+        error: '风险数据不能为空'
+      });
+    }
+
+    const result = await llmService.assessRisks(riskData);
+    sendResponse(res, result, '风险评估失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 智能推荐
+app.post('/api/llm/recommendations', async (req, res) => {
+  try {
+    const { contextData } = req.body;
+    
+    if (!contextData) {
+      return res.status(400).json({
+        success: false,
+        error: '上下文数据不能为空'
+      });
+    }
+
+    const result = await llmService.getRecommendations(contextData);
+    sendResponse(res, result, '获取推荐失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 检查连接状态
+app.get('/api/llm/connection', async (req, res) => {
+  try {
+    const result = await llmService.checkConnection();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      connected: false,
+      message: '连接检查失败',
+      error: error.message
+    });
+  }
+});
+
+// 风险数据结构化分析
+app.post('/api/llm/analyze-risk-structure', async (req, res) => {
+  try {
+    console.log('🔄 开始执行风险数据结构化分析...');
+    
+    // 1. 从数据库获取风险数据
+    const riskDataResult = await riskDataService.getAllRiskData();
+    
+    if (!riskDataResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: '获取风险数据失败: ' + riskDataResult.error
+      });
+    }
+
+    const riskData = riskDataResult.data;
+    console.log(`✅ 成功获取 ${riskData.length} 条风险数据`);
+    
+    if (!riskData || !Array.isArray(riskData) || riskData.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '数据库中没有风险数据'
+      });
+    }
+
+    // 选择一个高置信度样本进行分析
+    const highConfidenceRecord = riskData
+      .sort((a, b) => parseInt(b.confidence) - parseInt(a.confidence))[0];
+
+    if (!highConfidenceRecord || !highConfidenceRecord.purchase) {
+      return res.status(400).json({
+        success: false,
+        error: '风险数据格式不正确，缺少purchase字段'
+      });
+    }
+
+    const analysisData = {
+      analysisRequest: "请分析采购流程各环节的风险等级",
+      purchaseSteps: highConfidenceRecord.purchase,
+      confidence: highConfidenceRecord.confidence
+    };
+
+    // 系统提示词，要求严格JSON输出
+    const systemMessage = `你是专业的风险评估专家。请分析采购流程数据，并严格按照以下JSON格式输出结果：
+
+{
+  "riskClassification": {
+    "highRisk": {
+      "threshold": "风险值范围",
+      "steps": ["环节1", "环节2"],
+      "description": "高风险特征描述"
+    },
+    "mediumRisk": {
+      "threshold": "风险值范围", 
+      "steps": ["环节1", "环节2"],
+      "description": "中风险特征描述"
+    },
+    "lowRisk": {
+      "threshold": "风险值范围",
+      "steps": ["环节1", "环节2"],
+      "description": "低风险特征描述"
+    }
+  },
+  "summary": {
+    "totalSteps": 8,
+    "highRiskCount": 0,
+    "mediumRiskCount": 0, 
+    "lowRiskCount": 0,
+    "criticalStep": "风险最高的环节",
+    "recommendation": "主要建议"
+  }
+}
+
+请只输出JSON格式，不要添加任何其他文字说明。`;
+
+    const analysisResult = await llmService.chat(
+      `请分析以下采购流程风险数据：\n${JSON.stringify(analysisData, null, 2)}`,
+      systemMessage
+    );
+
+    if (analysisResult.success) {
+      try {
+        // 尝试解析JSON
+        let parsedResult;
+        let rawContent = analysisResult.data.content.trim();
+
+        // 直接尝试解析
+        try {
+          parsedResult = JSON.parse(rawContent);
+        } catch (e1) {
+          // 去除```包裹以及```json标记
+          const cleaned = rawContent
+            .replace(/```json\s*/gi, '')
+            .replace(/```/g, '')
+            .trim();
+          parsedResult = JSON.parse(cleaned); // 如果仍然失败会抛异常交给外层catch
+        }
+        
+        res.json({
+          success: true,
+          data: {
+            originalData: riskData,
+            analysis: {
+              riskAnalysis: parsedResult,
+              usage: analysisResult.data.usage,
+              model: analysisResult.data.model,
+              timestamp: analysisResult.data.timestamp
+            },
+            dataInfo: {
+              totalRecords: riskData.length,
+              dataSource: '风险数据库',
+              analyzedRecord: {
+                confidence: highConfidenceRecord.confidence,
+                hasData: true
+              }
+            }
+          }
+        });
+      } catch (parseError) {
+        // 如果JSON解析失败，返回原始内容
+        res.json({
+          success: false,
+          error: 'LLM输出格式不是有效的JSON',
+          rawContent: analysisResult.data.content,
+          usage: analysisResult.data.usage
+        });
+      }
+    } else {
+      res.status(500).json({
+        success: false,
+        error: analysisResult.error
+      });
+    }
+
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取使用统计（占位符，后续可扩展）
+app.get('/api/llm/usage-stats', async (req, res) => {
+  try {
+    // 这里可以后续添加使用统计逻辑
+    res.json({
+      success: true,
+      data: {
+        totalCalls: 0,
+        totalTokens: 0,
+        todayCalls: 0,
+        todayTokens: 0,
+        message: '统计功能待开发'
+      }
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // 启动服务器
 function startServer() {
   app.listen(PORT, async () => {
@@ -1417,6 +1740,7 @@ process.on('SIGINT', async () => {
   await flowDataService.disconnect();
   await planningTimeService.disconnect();
   await neuralNetworkService.disconnect();
+  await riskDataService.disconnect();
   process.exit(0);
 });
 

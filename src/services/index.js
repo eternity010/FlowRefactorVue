@@ -1,25 +1,10 @@
-// 服务层统一导出文件
+// 前端API客户端统一导出文件
 
 // 前端API客户端
 export { planningTimeApi } from '../api/planningTimeApi';
 export { processDataApi } from '../api/processDataApi';
 export { subProcessDataApi } from '../api/subProcessDataApi';
-
-// 后端数据库服务类
-const FlowDataService = require('./flowDataService');
-const PlanningTimeService = require('./planningTimeService');
-const NeuralNetworkService = require('./neuralNetworkService');
-const ProcessOptimizationService = require('./processOptimizationService');
-
-module.exports = {
-  FlowDataService,
-  PlanningTimeService,
-  NeuralNetworkService,
-  ProcessOptimizationService
-};
-
-// API服务器
-export { startServer, app } from './apiServer';
+export { llmApi } from '../api/llmApi';
 
 // 服务层说明
 /**

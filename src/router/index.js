@@ -13,6 +13,7 @@ import PlanningTimeView from '@/views/PlanningTimeView'
 import AIDataCollectionView from '@/views/AIDataCollectionView'
 import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
+import LLMChatView from '@/views/LLMChatView'
 
 Vue.use(Router)
 
@@ -81,6 +82,11 @@ export default new Router({
           path: 'rag-config',
           name: 'RAGConfigView',
           component: RAGConfigView
+        },
+        {
+          path: 'llm-chat',
+          name: 'LLMChatView',
+          component: LLMChatView
         }
       ]
     },

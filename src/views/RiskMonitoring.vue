@@ -330,6 +330,80 @@
           </el-col>
         </el-row>
       </div>
+
+      <!-- 风险热力图分析 -->
+      <div class="heatmap-section">
+        <el-card shadow="hover" class="section-card">
+          <div slot="header" class="section-header">
+            <div class="section-title">
+              <i class="el-icon-data-analysis"></i> 采购流程风险热力图分析
+            </div>
+            <div class="section-actions">
+              <el-select v-model="heatmapView" size="small" style="width: 120px" @change="renderHeatmap">
+                <el-option label="风险值" value="cvar"></el-option>
+                <el-option label="风险等级" value="level"></el-option>
+              </el-select>
+              <el-button 
+                type="primary" 
+                size="small" 
+                icon="el-icon-refresh" 
+                @click="refreshHeatmap"
+                :loading="riskDataLoading"
+                style="margin-left: 10px;">
+                刷新
+              </el-button>
+            </div>
+          </div>
+          
+          <!-- 加载状态 -->
+          <div v-if="riskDataLoading" class="loading-container">
+            <el-loading-component></el-loading-component>
+            <p>正在加载风险数据...</p>
+          </div>
+          
+          <!-- 错误状态 -->
+          <div v-else-if="riskDataError" class="error-container">
+            <i class="el-icon-warning" style="color: #F56C6C; font-size: 48px;"></i>
+            <h3>数据加载失败</h3>
+            <p>{{ riskDataError }}</p>
+            <el-button type="primary" @click="loadRiskData">重试</el-button>
+          </div>
+          
+          <!-- 数据为空状态 -->
+          <div v-else-if="!riskData || riskData.length === 0" class="empty-container">
+            <i class="el-icon-data-analysis" style="color: #909399; font-size: 48px;"></i>
+            <h3>暂无风险数据</h3>
+            <p>请检查数据库连接或数据导入状态</p>
+          </div>
+          
+          <!-- 热力图内容 -->
+          <div v-else-if="canRenderHeatmap" class="heatmap-container" style="height: 500px">
+            <div id="riskHeatmap" style="width: 100%; height: 100%"></div>
+          </div>
+          
+          <div v-if="canRenderHeatmap" class="heatmap-legend">
+            <div class="legend-title">风险等级说明：</div>
+            <div class="legend-items">
+              <div class="legend-item">
+                <div class="legend-color high-risk"></div>
+                <span>高风险 (>150)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color medium-risk"></div>
+                <span>中风险 (80-150)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color low-risk"></div>
+                <span>低风险 (50-80)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color safe-risk"></div>
+                <span>安全 (<50)</span>
+              </div>
+            </div>
+          </div>
+        </el-card>
+      </div>
     </div>
 
     <!-- Risk Detail Dialog -->
@@ -532,6 +606,7 @@ import {
   riskReportData
 } from '@/data/riskFactors'
 import { downloadRiskDataCsv, downloadRiskReportCsv } from '@/utils/exportRiskData'
+import { riskDataApi } from '@/api/riskDataApi'
 
 export default {
   name: 'RiskMonitoring',
@@ -558,6 +633,7 @@ export default {
         alert: 0
       },
       chartView: 'cvar',
+      heatmapView: 'cvar',
       currentPage: 1,
       pageSize: 10,
       processOptions: [
@@ -583,7 +659,11 @@ export default {
         red: 1,
         yellow: -2,
         normal: 1
-      }
+      },
+      // 新增：风险数据API相关
+      riskData: [],
+      riskDataLoading: false,
+      riskDataError: null
     }
   },
   computed: {
@@ -596,19 +676,60 @@ export default {
         hour: '2-digit', 
         minute: '2-digit'
       });
+    },
+    // 检查热力图是否可以渲染
+    canRenderHeatmap() {
+      return !this.riskDataLoading && 
+             !this.riskDataError && 
+             this.riskData && 
+             this.riskData.length > 0;
     }
   },
-  mounted() {
+  async mounted() {
+    await this.loadRiskData()
     this.filterRisks()
     this.renderCharts()
   },
+  watch: {
+    // 监听风险数据变化，自动渲染热力图
+    canRenderHeatmap(newVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          this.renderHeatmap()
+        })
+      }
+    }
+  },
   methods: {
+    // 加载风险数据
+    async loadRiskData() {
+      this.riskDataLoading = true
+      this.riskDataError = null
+      
+      try {
+        const response = await riskDataApi.getAllRiskData()
+        if (response.success) {
+          this.riskData = response.data
+          console.log('✅ 风险数据加载成功:', this.riskData.length, '条记录')
+        } else {
+          this.riskDataError = response.error || '获取风险数据失败'
+          console.error('❌ 风险数据加载失败:', this.riskDataError)
+        }
+      } catch (error) {
+        this.riskDataError = error.message || '网络请求失败'
+        console.error('❌ 风险数据加载异常:', error)
+      } finally {
+        this.riskDataLoading = false
+      }
+    },
+    
     refreshData() {
       this.$message({
         message: '数据已刷新',
         type: 'success'
       });
-      // 在实际项目中，这里应该调用API来刷新数据
+      // 刷新风险数据
+      this.loadRiskData()
       this.filterRisks()
       this.renderCharts()
     },
@@ -856,6 +977,12 @@ export default {
     renderCharts() {
       this.renderCVaRChart();
       this.renderDistributionChart();
+      // 只有在数据加载完成且有效时才渲染热力图
+      if (this.canRenderHeatmap) {
+        this.$nextTick(() => {
+          this.renderHeatmap();
+        });
+      }
     },
     renderCVaRChart() {
       const chartDom = document.getElementById('cvarChart')
@@ -1321,6 +1448,266 @@ export default {
       window.addEventListener('resize', function() {
         myChart.resize()
       })
+    },
+    
+    // 渲染风险热力图
+    renderHeatmap() {
+      const chartDom = document.getElementById('riskHeatmap')
+      if (!chartDom) {
+        console.warn('⚠️ 热力图DOM元素不存在')
+        return;
+      }
+      
+      // 检查是否有风险数据
+      if (!this.riskData || this.riskData.length === 0) {
+        console.warn('⚠️ 没有风险数据，无法渲染热力图')
+        return;
+      }
+      
+      // 确保DOM元素已经渲染完成
+      this.$nextTick(() => {
+        const myChart = echarts.init(chartDom)
+        
+        // 准备热力图数据
+        const heatmapData = this.prepareHeatmapData()
+        
+        const option = {
+          title: {
+            text: this.getHeatmapTitle(),
+            left: 'center',
+            textStyle: {
+              fontSize: 16
+            }
+          },
+          tooltip: {
+            position: 'top',
+            formatter: (params) => {
+              const processName = this.getProcessName(params.data[0])
+              const confidence = params.data[1]
+              const value = params.data[2]
+              
+              let valueText = ''
+              if (this.heatmapView === 'cvar') {
+                valueText = `CVaR值: ${value.toFixed(2)}`
+              } else {
+                valueText = `风险等级: ${this.getRiskLevelText(value)}`
+              }
+              
+              return `${processName}<br/>置信度: ${confidence}<br/>${valueText}`
+            }
+          },
+          grid: {
+            height: '70%',
+            top: '15%',
+            left: '15%',
+            right: '5%'
+          },
+          xAxis: {
+            type: 'category',
+            data: this.getProcessNames(),
+            splitArea: {
+              show: true
+            },
+            axisLabel: {
+              interval: 0,
+              rotate: 45,
+              fontSize: 12
+            }
+          },
+          yAxis: {
+            type: 'category',
+            data: this.getConfidenceLevels(),
+            splitArea: {
+              show: true
+            },
+            axisLabel: {
+              fontSize: 11,
+              width: 100,
+              overflow: 'truncate'
+            }
+          },
+          visualMap: {
+            min: this.getVisualMapMin(),
+            max: this.getVisualMapMax(),
+            calculable: true,
+            orient: 'horizontal',
+            left: 'center',
+            bottom: '5%',
+            inRange: {
+              color: this.getHeatmapColors()
+            },
+            text: ['高', '低'],
+            textStyle: {
+              color: '#333'
+            }
+          },
+          series: [{
+            name: this.getHeatmapTitle(),
+            type: 'heatmap',
+            data: heatmapData,
+            label: {
+              show: true,
+              fontSize: 10,
+              color: '#333'
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }]
+        }
+        
+        option && myChart.setOption(option)
+        
+        window.addEventListener('resize', function() {
+          myChart.resize()
+        })
+      })
+    },
+    
+    // 准备热力图数据
+    prepareHeatmapData() {
+      const data = []
+      const processes = this.getProcessNames()
+      const confidenceLevels = this.getConfidenceLevels()
+      
+      processes.forEach((process, processIndex) => {
+        confidenceLevels.forEach((confidence, confidenceIndex) => {
+          const value = this.getHeatmapValue(process, confidence)
+          if (value !== null) {
+            data.push([processIndex, confidenceIndex, value])
+          }
+        })
+      })
+      
+      return data
+    },
+    
+    // 获取热力图数值
+    getHeatmapValue(process, confidence) {
+      // 找到对应置信度的风险数据
+      const riskRecord = this.riskData.find(record => record.confidence === confidence)
+      
+      if (!riskRecord || !riskRecord.purchase) return null
+      
+      // 根据视图类型返回不同的值
+      switch (this.heatmapView) {
+        case 'cvar':
+          // 返回该流程的CVaR值（这里用风险值代替）
+          return riskRecord.purchase[process] || 0
+        case 'level':
+          // 返回风险等级数值
+          const riskValue = riskRecord.purchase[process] || 0
+          return this.getRiskLevelValue(riskValue)
+        default:
+          return riskRecord.purchase[process] || 0
+      }
+    },
+    
+    // 获取风险等级数值
+    getRiskLevelValue(riskValue) {
+      if (riskValue > 150) return 0.9  // 高风险
+      if (riskValue > 80) return 0.6   // 中风险
+      if (riskValue > 50) return 0.4   // 低风险
+      return 0.2  // 安全
+    },
+    
+    // 获取风险等级文本
+    getRiskLevelText(value) {
+      if (value >= 0.8) return '高风险'
+      if (value >= 0.6) return '中风险'
+      if (value >= 0.4) return '低风险'
+      return '安全'
+    },
+    
+    // 获取流程名称列表（从风险数据中提取）
+    getProcessNames() {
+      if (!this.riskData || this.riskData.length === 0) return []
+      
+      // 从第一条记录中获取采购流程的所有环节
+      const firstRecord = this.riskData[0]
+      if (firstRecord && firstRecord.purchase) {
+        return Object.keys(firstRecord.purchase)
+      }
+      return []
+    },
+    
+    // 获取置信度级别列表
+    getConfidenceLevels() {
+      if (!this.riskData || this.riskData.length === 0) return []
+      
+      // 返回所有置信度级别，按数值排序
+      return this.riskData
+        .map(record => record.confidence)
+        .sort((a, b) => parseInt(a) - parseInt(b))
+    },
+    
+    // 获取流程名称
+    getProcessName(processIndex) {
+      const processes = this.getProcessNames()
+      return processes[processIndex] || ''
+    },
+    
+    // 获取热力图标题
+    getHeatmapTitle() {
+      switch (this.heatmapView) {
+        case 'cvar':
+          return '采购流程风险值热力图'
+        case 'level':
+          return '采购流程风险等级热力图'
+        default:
+          return '采购流程风险热力图'
+      }
+    },
+    
+    // 获取视觉映射最小值
+    getVisualMapMin() {
+      switch (this.heatmapView) {
+        case 'cvar':
+          return 0   // 风险值范围
+        case 'level':
+          return 0   // 风险等级0-1
+        default:
+          return 0
+      }
+    },
+    
+    // 获取视觉映射最大值
+    getVisualMapMax() {
+      switch (this.heatmapView) {
+        case 'cvar':
+          return 800 // 风险值范围（根据数据调整）
+        case 'level':
+          return 1   // 风险等级0-1
+        default:
+          return 1
+      }
+    },
+    
+    // 获取热力图颜色
+    getHeatmapColors() {
+      switch (this.heatmapView) {
+        case 'cvar':
+          return ['#67C23A', '#E6A23C', '#F56C6C']
+        case 'level':
+          return ['#67C23A', '#E6A23C', '#F56C6C']
+        default:
+          return ['#67C23A', '#E6A23C', '#F56C6C']
+      }
+    },
+    
+    // 刷新热力图
+    async refreshHeatmap() {
+      await this.loadRiskData()
+      if (this.canRenderHeatmap) {
+        this.renderHeatmap()
+        this.$message({
+          message: '热力图已刷新',
+          type: 'success'
+        })
+      }
     }
   }
 }
@@ -1814,5 +2201,127 @@ export default {
 
 .preview-result p {
   margin: 0;
+}
+
+/* 热力图样式 */
+.heatmap-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.heatmap-container {
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #fff;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #909399;
+}
+
+.loading-container p {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* 错误状态样式 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  text-align: center;
+  color: #606266;
+}
+
+.error-container h3 {
+  margin: 15px 0 10px 0;
+  color: #F56C6C;
+}
+
+.error-container p {
+  margin: 0 0 20px 0;
+  color: #909399;
+}
+
+/* 空状态样式 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  text-align: center;
+  color: #606266;
+}
+
+.empty-container h3 {
+  margin: 15px 0 10px 0;
+  color: #909399;
+}
+
+.empty-container p {
+  margin: 0;
+  color: #909399;
+}
+
+.heatmap-legend {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+}
+
+.legend-title {
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #606266;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #dcdfe6;
+}
+
+.legend-color.high-risk {
+  background-color: #F56C6C;
+}
+
+.legend-color.medium-risk {
+  background-color: #E6A23C;
+}
+
+.legend-color.low-risk {
+  background-color: #409EFF;
+}
+
+.legend-color.safe-risk {
+  background-color: #67C23A;
 }
 </style> 

@@ -71,6 +71,12 @@
             <span>流程重构优化</span>
           </el-menu-item>
           
+          <!-- 大模型对话 (独立菜单项) -->
+          <el-menu-item index="6">
+            <i class="el-icon-chat-line-square menu-icon"></i>
+            <span>大模型对话</span>
+          </el-menu-item>
+          
         </el-menu>
       </el-aside>
 
@@ -117,6 +123,9 @@ export default {
           break
         case '5':
           this.$router.push('/home/process-optimization')
+          break
+        case '6':
+          this.$router.push('/home/llm-chat')
           break
         // 其他菜单项的路由可以在这里添加
       }

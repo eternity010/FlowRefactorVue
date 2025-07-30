@@ -413,8 +413,7 @@
               </div>
             </div>
           </div>
-          
-          <!-- 建议 -->
+
           <div class="section recommendations-section">
             <div class="section-title">
               <i class="el-icon-warning"></i>
@@ -424,6 +423,181 @@
               <div v-for="(rec, index) in llmAnalysisData.recommendations" :key="index" class="recommendation-item">
                 <span class="recommendation-number">{{ index + 1 }}.</span>
                 <span class="recommendation-text">{{ rec }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 大模型风险分析结果展示 -->
+          <div class="section risk-level-analysis-section">
+            <div class="section-title">
+              <i class="el-icon-data-analysis"></i>
+              <span>大模型风险分析结果</span>
+              <el-tag v-if="riskLevelAnalysis.hasData" size="mini" type="success">已分析</el-tag>
+              <el-tag v-else size="mini" type="info">待分析</el-tag>
+            </div>
+            
+            <!-- 空状态 -->
+            <div v-if="!riskLevelAnalysis.hasData" class="empty-analysis-state">
+              <div class="empty-text">
+                <i class="el-icon-magic-stick" style="font-size: 24px; color: #C0C4CC; margin-bottom: 8px;"></i>
+                <div>暂无大模型风险分析结果</div>
+                <el-button 
+                  type="primary" 
+                  size="small" 
+                  @click="performRiskLevelAnalysis"
+                  :loading="riskLevelAnalysis.loading"
+                  style="margin-top: 10px;">
+                  {{ riskLevelAnalysis.loading ? '分析中...' : '执行大模型风险分析' }}
+                </el-button>
+              </div>
+            </div>
+
+            <!-- 分析结果展示 -->
+            <div v-if="riskLevelAnalysis.hasData" class="analysis-result-content">
+              <!-- 分析概要 -->
+              <div class="analysis-summary">
+                <div class="summary-item">
+                  <span class="label">分析时间:</span>
+                  <span class="value">{{ riskLevelAnalysis.timestamp }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">数据来源:</span>
+                  <span class="value">风险数据库 ({{ riskLevelAnalysis.dataCount }} 条记录)</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">分析模型:</span>
+                  <span class="value">{{ riskLevelAnalysis.model || '火山引擎Ark' }}</span>
+                </div>
+              </div>
+
+              <!-- 风险分类展示 -->
+              <div v-if="riskLevelAnalysis.riskClassification" class="risk-classification-content">
+                <!-- 风险分类标题 -->
+                <div class="classification-header">
+                  <i class="el-icon-warning"></i>
+                  <span>风险等级分类结果</span>
+                </div>
+
+                <!-- 高风险区域 -->
+                <div class="risk-level-item high-risk">
+                  <div class="risk-level-title high">
+                    <i class="el-icon-warning"></i>
+                    <span>高风险环节 ({{ riskLevelAnalysis.riskClassification.highRisk.steps.length }}个)</span>
+                    <el-tag size="mini" type="danger">阈值: {{ riskLevelAnalysis.riskClassification.highRisk.threshold }}</el-tag>
+                  </div>
+                  <div class="risk-level-description">{{ riskLevelAnalysis.riskClassification.highRisk.description }}</div>
+                  <div class="risk-steps-list">
+                    <div v-for="(step, index) in riskLevelAnalysis.riskClassification.highRisk.steps" 
+                         :key="index" class="risk-step-item">
+                      <i class="el-icon-warning"></i>
+                      <span>{{ step }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 中风险区域 -->
+                <div class="risk-level-item medium-risk">
+                  <div class="risk-level-title medium">
+                    <i class="el-icon-info"></i>
+                    <span>中风险环节 ({{ riskLevelAnalysis.riskClassification.mediumRisk.steps.length }}个)</span>
+                    <el-tag size="mini" type="warning">阈值: {{ riskLevelAnalysis.riskClassification.mediumRisk.threshold }}</el-tag>
+                  </div>
+                  <div class="risk-level-description">{{ riskLevelAnalysis.riskClassification.mediumRisk.description }}</div>
+                  <div class="risk-steps-list">
+                    <div v-for="(step, index) in riskLevelAnalysis.riskClassification.mediumRisk.steps" 
+                         :key="index" class="risk-step-item">
+                      <i class="el-icon-info"></i>
+                      <span>{{ step }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 低风险区域 -->
+                <div class="risk-level-item low-risk">
+                  <div class="risk-level-title low">
+                    <i class="el-icon-success"></i>
+                    <span>低风险环节 ({{ riskLevelAnalysis.riskClassification.lowRisk.steps.length }}个)</span>
+                    <el-tag size="mini" type="success">阈值: {{ riskLevelAnalysis.riskClassification.lowRisk.threshold }}</el-tag>
+                  </div>
+                  <div class="risk-level-description">{{ riskLevelAnalysis.riskClassification.lowRisk.description }}</div>
+                  <div class="risk-steps-list">
+                    <div v-for="(step, index) in riskLevelAnalysis.riskClassification.lowRisk.steps" 
+                         :key="index" class="risk-step-item">
+                      <i class="el-icon-success"></i>
+                      <span>{{ step }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 风险分析摘要 -->
+              <div v-if="riskLevelAnalysis.riskSummary" class="risk-summary-content">
+                <div class="summary-header">
+                  <i class="el-icon-data-analysis"></i>
+                  <span>风险分析摘要</span>
+                </div>
+                <div class="summary-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">总环节数:</span>
+                    <span class="stat-value">{{ riskLevelAnalysis.riskSummary.totalSteps }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">高风险环节:</span>
+                    <span class="stat-value high-risk">{{ riskLevelAnalysis.riskSummary.highRiskCount }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">中风险环节:</span>
+                    <span class="stat-value medium-risk">{{ riskLevelAnalysis.riskSummary.mediumRiskCount }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">低风险环节:</span>
+                    <span class="stat-value low-risk">{{ riskLevelAnalysis.riskSummary.lowRiskCount }}</span>
+                  </div>
+                </div>
+                <div class="summary-details">
+                  <div class="detail-item">
+                    <span class="detail-label">关键风险环节:</span>
+                    <span class="detail-value">{{ riskLevelAnalysis.riskSummary.criticalStep }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">主要建议:</span>
+                    <span class="detail-value">{{ riskLevelAnalysis.riskSummary.recommendation }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 原始API响应数据 -->
+              <div class="raw-response-container">
+                <div class="raw-response-header">
+                  <span>原始API响应数据</span>
+                  <div class="header-actions">
+                    <el-button 
+                      type="text" 
+                      size="mini" 
+                      @click="toggleRawResponse"
+                      style="margin-right: 10px;">
+                      <i class="el-icon-view"></i> {{ showRawResponse ? '隐藏' : '显示' }}
+                    </el-button>
+                    <el-button 
+                      type="text" 
+                      size="mini" 
+                      @click="copyAnalysisResult">
+                      <i class="el-icon-document-copy"></i> 复制
+                    </el-button>
+                  </div>
+                </div>
+                <div v-if="showRawResponse" class="raw-response-content">
+                  <pre class="raw-response-text">{{ riskLevelAnalysis.rawResponse }}</pre>
+                </div>
+              </div>
+
+              <!-- 错误信息展示 -->
+              <div v-if="riskLevelAnalysis.error" class="analysis-error">
+                <div class="error-header">
+                  <i class="el-icon-warning" style="color: #F56C6C;"></i>
+                  <span>分析过程中出现问题</span>
+                </div>
+                <div class="error-content">{{ riskLevelAnalysis.error }}</div>
               </div>
             </div>
           </div>
@@ -491,6 +665,8 @@
 
 <script>
 import { planningTimeApi } from '@/api/planningTimeApi';
+import { llmApi } from '@/api/llmApi'; // 新增
+import axios from 'axios'; // 新增
 import RiskMonitoringDialog from '@/components/RiskMonitoringDialog.vue';
 
 export default {
@@ -514,7 +690,10 @@ export default {
         totalRisks: 0,
         highRisks: 0,
         mediumRisks: 0,
-        lowRisks: 0
+        lowRisks: 0,
+        highRiskSteps: [],
+        mediumRiskSteps: [],
+        lowRiskSteps: []
       },
       subprocessData: {
         totalSubprocesses: 0,
@@ -576,6 +755,10 @@ export default {
       },
       // 弹窗相关
       riskDialogVisible: false,
+      /*  新增加载与错误状态  */
+      riskClassificationLoading: false,
+      riskClassificationError: null,
+      // 模型输出弹窗相关
       modelOutputDialogVisible: false,
       displayedContent: '',
       isAnimating: false,
@@ -584,7 +767,20 @@ export default {
       isLoadingModelOutput: false,
       loadingText: '正在加载联网数据...',
       loadingTimer: null,
-      modelOutputContent: ''
+      modelOutputContent: '',
+      // 新增：风险等级分析相关数据
+      riskLevelAnalysis: {
+        hasData: false,
+        loading: false,
+        timestamp: '',
+        dataCount: 0,
+        model: '',
+        rawResponse: '',
+        error: null,
+        riskClassification: null,
+        riskSummary: null
+      },
+      showRawResponse: false
     }
   },
   mounted() {
@@ -647,7 +843,10 @@ export default {
             totalRisks: mongoData.riskData.totalRisks || 0,
             highRisks: mongoData.riskData.highRisks || 0,
             mediumRisks: mongoData.riskData.mediumRisks || 0,
-            lowRisks: mongoData.riskData.lowRisks || 0
+            lowRisks: mongoData.riskData.lowRisks || 0,
+            highRiskSteps: mongoData.riskData.highRiskSteps || [],
+            mediumRiskSteps: mongoData.riskData.mediumRiskSteps || [],
+            lowRiskSteps: mongoData.riskData.lowRiskSteps || []
           };
         }
 
@@ -745,8 +944,53 @@ export default {
         console.log('AI收集状态加载完成（使用默认值）');
       }
     },
+    /* ===== 新增: 获取风险等级分类 ===== */
+    async fetchRiskClassification() {
+      try {
+        this.riskClassificationLoading = true;
+        this.riskClassificationError = null;
+
+        // 1. 获取全部风险数据
+        const apiBase = process.env.VUE_APP_API_URL || 'http://localhost:3001';
+        const riskResp = await axios.get(`${apiBase}/api/risk-data`);
+        if (!riskResp.data.success) {
+          throw new Error(riskResp.data.error || '获取风险数据失败');
+        }
+
+        const riskRecords = riskResp.data.data;
+
+        // 2. 调用大模型风险结构化分析API
+        const llmResp = await llmApi.analyzeRiskStructure(riskRecords);
+        if (!llmResp.success) {
+          throw new Error(llmResp.error || '大模型分析失败');
+        }
+
+        const analysis = llmResp.data.riskAnalysis;
+
+        // 3. 更新riskData对象
+        this.riskData.totalRisks = analysis.summary.totalSteps;
+        this.riskData.highRisks = analysis.riskClassification.highRisk.steps.length;
+        this.riskData.mediumRisks = analysis.riskClassification.mediumRisk.steps.length;
+        this.riskData.lowRisks = analysis.riskClassification.lowRisk.steps.length;
+        this.riskData.highRiskSteps = analysis.riskClassification.highRisk.steps;
+        this.riskData.mediumRiskSteps = analysis.riskClassification.mediumRisk.steps;
+        this.riskData.lowRiskSteps = analysis.riskClassification.lowRisk.steps;
+
+        console.log('✅ 风险等级分类获取成功');
+        console.log('ℹ️ 原始风险数据:', riskRecords);
+        console.log('ℹ️ 大模型风险分析结果:', analysis);
+      } catch (error) {
+        console.error('❌ 获取风险等级分类失败:', error);
+        this.riskClassificationError = error.message;
+        this.$message.error('风险等级分析失败: ' + error.message);
+      } finally {
+        this.riskClassificationLoading = false;
+      }
+    },
     // 显示风险弹窗
-    showRiskDialog() {
+    async showRiskDialog() {
+      // 首先确保已经加载风险等级分类
+      await this.fetchRiskClassification();
       this.riskDialogVisible = true;
     },
     // 关闭风险弹窗
@@ -1082,6 +1326,109 @@ export default {
       if (riskScore >= 0.3) return 'info';
       return 'success';
     },
+
+    // ==================== 新增：风险等级分析方法 ====================
+    
+    /**
+     * 执行风险等级分析
+     * 调用统一的风险分析API
+     */
+    async performRiskLevelAnalysis() {
+      try {
+        this.riskLevelAnalysis.loading = true;
+        this.riskLevelAnalysis.error = null;
+        
+        console.log('🔄 开始执行风险等级分析...');
+        
+        // 调用统一的风险分析API（内部会自动获取风险数据）
+        const apiBase = process.env.VUE_APP_API_URL || 'http://localhost:3001';
+        const response = await axios.post(`${apiBase}/api/llm/analyze-risk-structure`);
+        
+        if (!response.data.success) {
+          throw new Error(response.data.error || '风险分析失败');
+        }
+
+        console.log('✅ 风险等级分析完成');
+
+        // 更新分析结果
+        this.updateRiskLevelAnalysisData(response.data.data);
+        this.$message.success('风险等级分析完成');
+        
+      } catch (error) {
+        console.error('❌ 风险等级分析失败:', error);
+        this.riskLevelAnalysis.error = error.message;
+        this.$message.error('风险等级分析失败: ' + error.message);
+      } finally {
+        this.riskLevelAnalysis.loading = false;
+      }
+    },
+
+    /**
+     * 更新风险等级分析数据
+     */
+    updateRiskLevelAnalysisData(analysisData) {
+      try {
+        // 解析风险分类数据
+        const riskAnalysis = analysisData.analysis.riskAnalysis;
+        
+        this.riskLevelAnalysis = {
+          hasData: true,
+          loading: false,
+          timestamp: new Date(analysisData.analysis.timestamp).toLocaleString('zh-CN'),
+          dataCount: analysisData.dataInfo.totalRecords || 0,
+          model: analysisData.analysis.model || '火山引擎Ark',
+          rawResponse: JSON.stringify(analysisData, null, 2),
+          error: null,
+          riskClassification: riskAnalysis.riskClassification || null,
+          riskSummary: riskAnalysis.summary || null
+        };
+        
+        console.log('✅ 风险等级分析数据更新完成');
+        console.log('📊 风险分类数据:', this.riskLevelAnalysis.riskClassification);
+        console.log('📈 风险摘要数据:', this.riskLevelAnalysis.riskSummary);
+      } catch (error) {
+        console.error('❌ 解析风险分析数据失败:', error);
+        this.riskLevelAnalysis.error = '解析分析结果失败: ' + error.message;
+      }
+    },
+
+    /**
+     * 切换原始响应显示状态
+     */
+    toggleRawResponse() {
+      this.showRawResponse = !this.showRawResponse;
+    },
+
+    /**
+     * 复制分析结果到剪贴板
+     */
+    copyAnalysisResult() {
+      try {
+        // 创建临时textarea元素
+        const textarea = document.createElement('textarea');
+        textarea.value = this.riskLevelAnalysis.rawResponse;
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        // 复制到剪贴板
+        document.execCommand('copy');
+        
+        this.$message({
+          message: '风险等级分析结果已复制到剪贴板',
+          type: 'success'
+        });
+      } catch (err) {
+        this.$message({
+          message: '复制失败，请手动复制',
+          type: 'error'
+        });
+      } finally {
+        // 移除临时元素
+        if (document.body.contains(textarea)) {
+          document.body.removeChild(textarea);
+        }
+      }
+    }
 
   }
 }
@@ -2128,6 +2475,89 @@ export default {
   color: #606266;
 }
 
+/* 风险等级分类区域样式 */
+.risk-section {
+  border-left-color: #F56C6C; /* 使用红色作为风险分类的背景色 */
+  margin-bottom: 25px;
+}
+
+.risk-section .section-title i {
+  color: #F56C6C;
+}
+
+.risk-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+}
+
+.risk-level-item {
+  padding: 10px 15px;
+  background-color: #fdf6ec; /* 浅黄色背景 */
+  border-radius: 4px;
+  border: 1px solid #faecd8; /* 浅黄色边框 */
+}
+
+.risk-level-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.risk-level-title.high {
+  color: #F56C6C; /* 红色 */
+}
+
+.risk-level-title.medium {
+  color: #E6A23C; /* 橙色 */
+}
+
+.risk-level-title.low {
+  color: #67C23A; /* 绿色 */
+}
+
+.risk-level-title i {
+  font-size: 16px;
+}
+
+.risk-level-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.6;
+}
+
+.risk-level-item li {
+  position: relative;
+  padding-left: 15px;
+  margin-bottom: 3px;
+}
+
+.risk-level-item li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #F56C6C; /* 红色圆点 */
+  font-weight: bold;
+}
+
+.risk-level-item.medium li::before {
+  color: #E6A23C; /* 橙色圆点 */
+}
+
+.risk-level-item.low li::before {
+  color: #67C23A; /* 绿色圆点 */
+}
+
 .main-content {
   margin-bottom: 25px;
 }
@@ -2145,6 +2575,386 @@ export default {
 .fade-in-enter-to {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ==================== 新增：风险等级分析样式 ==================== */
+
+/* 风险等级分析区域 */
+.risk-level-analysis-section {
+  border-left-color: #7C3AED; /* 紫色 */
+}
+
+.risk-level-analysis-section .section-title i {
+  color: #7C3AED;
+}
+
+/* 空状态样式 */
+.empty-analysis-state {
+  text-align: center;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+}
+
+.empty-analysis-state .empty-text {
+  color: #606266;
+  font-size: 14px;
+}
+
+/* 分析结果内容样式 */
+.analysis-result-content {
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+  overflow: hidden;
+}
+
+/* 分析概要样式 */
+.analysis-summary {
+  padding: 15px;
+  background-color: #fafbfc;
+  border-bottom: 1px solid #EBEEF5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.analysis-summary .summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analysis-summary .label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.analysis-summary .value {
+  font-size: 13px;
+  color: #303133;
+  font-weight: 600;
+}
+
+/* 原始响应容器样式 */
+.raw-response-container {
+  padding: 0;
+}
+
+.raw-response-header {
+  padding: 12px 15px;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #EBEEF5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.raw-response-content {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.raw-response-text {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #606266;
+  margin: 0;
+  padding: 20px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #fafbfc;
+  border: none;
+}
+
+/* 错误信息样式 */
+.analysis-error {
+  padding: 15px;
+  background-color: #fef0f0;
+  border-top: 1px solid #fbc4c4;
+}
+
+.analysis-error .error-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #F56C6C;
+  margin-bottom: 8px;
+}
+
+.analysis-error .error-content {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.5;
+  padding-left: 20px;
+}
+
+/* 风险分类内容样式 */
+.risk-classification-content {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+  margin-bottom: 20px;
+}
+
+.classification-header {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #F5F7FA;
+}
+
+.classification-header i {
+  margin-right: 8px;
+  color: #F56C6C;
+  font-size: 18px;
+}
+
+/* 风险等级项目样式 */
+.risk-level-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #EBEEF5;
+  background-color: #fafbfc;
+}
+
+.risk-level-item.high-risk {
+  border-left: 4px solid #F56C6C;
+  background-color: #fef0f0;
+}
+
+.risk-level-item.medium-risk {
+  border-left: 4px solid #E6A23C;
+  background-color: #fdf6ec;
+}
+
+.risk-level-item.low-risk {
+  border-left: 4px solid #67C23A;
+  background-color: #f0f9eb;
+}
+
+.risk-level-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.risk-level-title.high {
+  color: #F56C6C;
+}
+
+.risk-level-title.medium {
+  color: #E6A23C;
+}
+
+.risk-level-title.low {
+  color: #67C23A;
+}
+
+.risk-level-title i {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.risk-level-description {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+}
+
+.risk-steps-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.risk-step-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #606266;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.risk-step-item i {
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+.high-risk .risk-step-item i {
+  color: #F56C6C;
+}
+
+.medium-risk .risk-step-item i {
+  color: #E6A23C;
+}
+
+.low-risk .risk-step-item i {
+  color: #67C23A;
+}
+
+/* 风险摘要内容样式 */
+.risk-summary-content {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+  margin-bottom: 20px;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #F5F7FA;
+}
+
+.summary-header i {
+  margin-right: 8px;
+  color: #409EFF;
+  font-size: 18px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #fafbfc;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.stat-value.high-risk {
+  color: #F56C6C;
+}
+
+.stat-value.medium-risk {
+  color: #E6A23C;
+}
+
+.stat-value.low-risk {
+  color: #67C23A;
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 13px;
+  color: #303133;
+  line-height: 1.5;
+  padding: 8px 12px;
+  background-color: #fafbfc;
+  border-radius: 4px;
+  border: 1px solid #EBEEF5;
+}
+
+/* 原始响应头部操作按钮 */
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .analysis-summary {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .raw-response-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .raw-response-text {
+    font-size: 11px;
+    padding: 15px;
+  }
+
+  .risk-level-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-steps-list {
+    flex-direction: column;
+  }
+
+  .risk-step-item {
+    width: 100%;
+  }
 }
 
 </style> 

@@ -11,7 +11,9 @@ src/services/
 ├── flowDataService.js         # 流程数据库服务
 ├── planningTimeService.js     # 规划时间数据服务
 ├── neuralNetworkService.js    # 神经网络参数服务
-├── processOptimizationService.js # 流程优化服务 (新增)
+├── processOptimizationService.js # 流程优化服务
+├── riskDataService.js         # 风险数据服务 (新增)
+├── llmService.js             # 大模型服务 (新增)
 ├── apiServer.js              # Express API服务器
 └── index.js                  # 服务层统一导出
 
@@ -20,7 +22,9 @@ src/api/
 ├── processDataApi.js         # 流程数据API客户端
 ├── processOptimizationApi.js # 流程优化API客户端
 ├── subProcessDataApi.js      # 子流程数据API客户端
-└── neuralNetworkApi.js       # 神经网络参数API客户端
+├── neuralNetworkApi.js       # 神经网络参数API客户端
+├── riskDataApi.js           # 风险数据API客户端 (新增)
+└── llmApi.js                # 大模型API客户端 (新增)
 ```
 
 ## 各文件职责
@@ -64,6 +68,18 @@ src/api/
 - 子流程数据获取
 - Mermaid流程图数据管理
 
+#### 7. `riskDataApi.js` - 风险数据API客户端 (新增)
+- 风险数据获取和管理
+- 风险数据库连接状态检查
+- 风险数据统计和分析
+
+#### 8. `llmApi.js` - 大模型API客户端 (新增)
+- 单轮和多轮对话功能
+- 流程分析和风险评估调用
+- 智能推荐获取
+- 大模型连接状态检查
+- 使用统计获取
+
 ### 后端服务层 (src/services/)
 
 #### 1. `flowDataService.js` - 流程数据库服务
@@ -93,7 +109,7 @@ src/api/
   - 配置管理和导入导出
   - 统计信息生成
 
-#### 4. `processOptimizationService.js` - 流程优化服务 (新增)
+#### 4. `processOptimizationService.js` - 流程优化服务
 - **运行环境**: Node.js
 - **技术栈**: MongoDB Driver
 - **主要职责**:
@@ -103,7 +119,26 @@ src/api/
   - 甘特图数据管理
   - 优化案例搜索和统计
 
-#### 5. `apiServer.js` - Express API服务器
+#### 5. `riskDataService.js` - 风险数据服务 (新增)
+- **运行环境**: Node.js
+- **技术栈**: MongoDB Driver
+- **主要职责**:
+  - 风险数据提取和管理
+  - 连接maintenance_system数据库的risk_data集合
+  - 风险数据统一访问接口
+  - 数据库连接状态监控
+
+#### 6. `llmService.js` - 大模型服务 (新增)
+- **运行环境**: Node.js
+- **技术栈**: OpenAI SDK, 火山引擎Ark API
+- **主要职责**:
+  - 单轮和多轮对话管理
+  - 流程分析和风险评估
+  - 智能推荐和优化建议
+  - 流式响应处理
+  - API连接状态检查
+
+#### 7. `apiServer.js` - Express API服务器
 - **运行环境**: Node.js
 - **技术栈**: Express.js, CORS
 - **主要职责**:
@@ -118,13 +153,13 @@ src/api/
 ```
 前端组件
     ↓
-API客户端 (processDataApi, planningTimeApi, neuralNetworkApi, processOptimizationApi, subProcessDataApi)
+API客户端 (processDataApi, planningTimeApi, neuralNetworkApi, processOptimizationApi, subProcessDataApi, riskDataApi, llmApi)
     ↓
 apiServer.js (Express API服务器)
     ↓
-后端服务 (flowDataService, planningTimeService, neuralNetworkService, processOptimizationService)
+后端服务 (flowDataService, planningTimeService, neuralNetworkService, processOptimizationService, riskDataService, llmService)
     ↓
-MongoDB数据库
+MongoDB数据库 / 火山引擎Ark API
 ```
 
 ### 具体数据流
@@ -144,9 +179,19 @@ Vue组件 → planningTimeApi → apiServer → planningTimeService → MongoDB
 Vue组件 → neuralNetworkApi → apiServer → neuralNetworkService → MongoDB
 ```
 
-#### 流程优化数据流 (新增)
+#### 流程优化数据流
 ```
 Vue组件 → processOptimizationApi → apiServer → processOptimizationService → MongoDB
+```
+
+#### 风险数据流 (新增)
+```
+Vue组件 → riskDataApi → apiServer → riskDataService → MongoDB(risk_data)
+```
+
+#### 大模型服务流 (新增)
+```
+Vue组件 → llmApi → apiServer → llmService → 火山引擎Ark API
 ```
 
 ## API端点列表
@@ -209,7 +254,7 @@ Vue组件 → processOptimizationApi → apiServer → processOptimizationServic
 | `/api/neural-network/parameters/export` | GET | 导出参数配置 | `exportNeuralNetworkParameters()` |
 | `/api/neural-network/parameters/import` | POST | 导入参数配置 | `importNeuralNetworkParameters()` |
 
-### 流程优化API (processOptimizationService) - 新增
+### 流程优化API (processOptimizationService)
 
 | 端点 | 方法 | 描述 | 后端方法 |
 |------|------|------|----------|
@@ -221,6 +266,25 @@ Vue组件 → processOptimizationApi → apiServer → processOptimizationServic
 | `/api/process-optimization/search` | GET | 搜索优化案例 | `searchOptimizations()` |
 | `/api/process-optimization/stats` | GET | 获取优化数据统计 | `getOptimizationStats()` |
 | `/api/process-optimization/connection` | GET | 检查数据库连接 | `checkConnection()` |
+
+### 风险数据API (riskDataService) - 新增
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/risk-data` | GET | 获取所有风险数据 | `getAllRiskData()` |
+| `/api/risk-data/connection` | GET | 检查数据库连接状态 | `checkConnection()` |
+
+### 大模型API (llmService) - 新增
+
+| 端点 | 方法 | 描述 | 后端方法 |
+|------|------|------|----------|
+| `/api/llm/chat` | POST | 单轮对话 | `chat()` |
+| `/api/llm/chat-history` | POST | 多轮对话 | `chatWithHistory()` |
+| `/api/llm/analyze-process` | POST | 流程分析 | `analyzeProcess()` |
+| `/api/llm/assess-risks` | POST | 风险评估 | `assessRisks()` |
+| `/api/llm/recommendations` | POST | 智能推荐 | `getRecommendations()` |
+| `/api/llm/connection` | GET | 检查连接状态 | `checkConnection()` |
+| `/api/llm/usage-stats` | GET | 获取使用统计 | 统计功能 |
 
 ## 统一响应格式
 
@@ -251,6 +315,8 @@ import { subProcessDataApi } from '@/api/subProcessDataApi'
 import { planningTimeApi } from '@/api/planningTimeApi'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
 import { processOptimizationApi } from '@/api/processOptimizationApi'
+import { riskDataApi } from '@/api/riskDataApi'
+import { llmApi } from '@/api/llmApi'
 
 // 获取流程数据
 const flowData = await processDataApi.getFlowDataByType('purchase')
@@ -302,6 +368,48 @@ const searchResults = await processOptimizationApi.searchOptimizations('采购�
 
 // 获取优化数据统计
 const stats = await processOptimizationApi.getOptimizationStats()
+
+// 获取风险数据
+const riskData = await riskDataApi.getAllRiskData()
+
+// 检查风险数据库连接
+const riskConnection = await riskDataApi.checkConnection()
+
+// 大模型对话
+const chatResult = await llmApi.chat('分析采购流程风险', '你是专业的风险评估专家')
+
+// 多轮对话
+const historyResult = await llmApi.chatWithHistory([
+  { role: 'user', content: '你好' },
+  { role: 'assistant', content: '你好！我可以帮您分析流程风险。' },
+  { role: 'user', content: '分析一下采购流程的主要风险点' }
+])
+
+// 流程分析
+const processAnalysis = await llmApi.analyzeProcess({
+  processName: '采购流程',
+  steps: ['需求确认', '供应商选择', '合同签订', '验收入库'],
+  riskFactors: ['质量风险', '交期风险', '成本风险']
+})
+
+// 风险评估
+const riskAssessment = await llmApi.assessRisks({
+  riskData: riskData,
+  analysisType: '采购流程风险评估'
+})
+
+// 智能推荐
+const recommendations = await llmApi.getRecommendations({
+  currentRiskLevel: '高风险',
+  targetRiskLevel: '中风险',
+  constraints: ['成本控制', '时间限制']
+})
+
+// 检查大模型连接
+const llmConnection = await llmApi.checkConnection()
+
+// 获取使用统计
+const llmStats = await llmApi.getUsageStats()
 ```
 
 ### 后端使用 (API服务器)
@@ -310,12 +418,16 @@ const FlowDataService = require('./flowDataService')
 const PlanningTimeService = require('./planningTimeService')
 const NeuralNetworkService = require('./neuralNetworkService')
 const ProcessOptimizationService = require('./processOptimizationService')
+const RiskDataService = require('./riskDataService')
+const LLMService = require('./llmService')
 
 // 创建服务实例
 const flowDataService = new FlowDataService()
 const planningTimeService = new PlanningTimeService()
 const neuralNetworkService = new NeuralNetworkService()
 const processOptimizationService = new ProcessOptimizationService()
+const riskDataService = new RiskDataService()
+const llmService = new LLMService()
 
 // 流程数据操作
 const flowResult = await flowDataService.getFlowDataByType('purchase')
@@ -343,6 +455,30 @@ const resourceData = await processOptimizationService.getOptimizationResources('
 const ganttData = await processOptimizationService.getOptimizationGantt('Optimization1')
 const searchResults = await processOptimizationService.searchOptimizations('采购')
 const optimizationStats = await processOptimizationService.getOptimizationStats()
+
+// 风险数据操作
+const allRiskData = await riskDataService.getAllRiskData()
+const riskConnection = await riskDataService.checkConnection()
+
+// 大模型服务操作
+const chatResult = await llmService.chat('你好', '你是人工智能助手')
+const chatHistory = await llmService.chatWithHistory([
+  { role: 'user', content: '你好' },
+  { role: 'assistant', content: '你好！有什么可以帮助你的？' },
+  { role: 'user', content: '分析一下采购流程' }
+])
+const processAnalysis = await llmService.analyzeProcess({
+  processName: '采购流程',
+  steps: ['需求确认', '供应商选择', '合同签订', '验收入库']
+})
+const riskAssessment = await llmService.assessRisks({
+  riskFactors: ['供应商风险', '质量风险', '交期风险']
+})
+const recommendations = await llmService.getRecommendations({
+  currentState: '流程存在瓶颈',
+  targetState: '提高效率'
+})
+const llmConnection = await llmService.checkConnection()
 ```
 
 ## 错误处理
@@ -434,6 +570,24 @@ npm run api-server
 node src/services/apiServer.js
 ```
 
+### 数据导入和测试
+```bash
+# 导入风险数据
+npm run import-risk-data
+
+# 测试风险数据API
+npm run test-risk-data
+
+# 测试大模型服务
+npm run test-llm-service
+
+# 测试风险数据分析
+npm run test-risk-analysis
+
+# 测试结构化风险分析
+npm run test-structured-risk
+```
+
 ### 检查服务状态
 ```bash
 # 检查流程数据API
@@ -447,6 +601,12 @@ curl http://localhost:3001/api/neural-network/parameters/current
 
 # 检查服务器健康状态
 curl http://localhost:3001/api/database-stats
+
+# 检查风险数据API
+curl http://localhost:3001/api/risk-data/connection
+
+# 检查大模型API
+curl http://localhost:3001/api/llm/connection
 ```
 
 ## 注意事项
@@ -458,22 +618,28 @@ curl http://localhost:3001/api/database-stats
 4. **环境变量**: 可通过 `VUE_APP_API_URL` 配置API基础URL
 
 ### 服务特性
-5. **服务分离**: 三个独立的后端服务管理不同类型的数据
+5. **服务分离**: 六个独立的后端服务管理不同类型的数据
 6. **错误处理**: 所有API调用都有统一的错误处理机制
 7. **响应格式**: 流程数据使用 `{success, data}` 格式，神经网络参数使用 `{code, message, data}` 格式
 8. **离线支持**: 神经网络参数API支持离线模式，使用localStorage作为备份
+9. **大模型集成**: 支持火山引擎Ark API，提供智能分析能力
+10. **风险数据管理**: 专门的风险数据服务，支持批量数据提取
 
 ### 数据库集合
 9. **流程数据集合**: `processflowdata`, `subprocesscardsdata`, `mermaid_flows`
 10. **规划时间集合**: `planning_time_data`, `refactor_timing_data`, `llm_analysis_data`
 11. **参数配置集合**: `neural_network_parameters`, `neural_network_parameter_history`, `neural_network_saved_configs`
-12. **流程优化集合**: `process_optimization_flow_data` (新增)
+12. **流程优化集合**: `process_optimization_flow_data`
+13. **风险数据集合**: `risk_data` (新增)
 
 ### 开发建议
 12. **渐进增强**: 前端应优雅处理API服务不可用的情况
 13. **参数验证**: 神经网络参数在前后端都有验证机制
 14. **历史记录**: 参数变更会自动记录历史，便于追踪
 15. **配置管理**: 支持导入导出参数配置，便于环境迁移
+16. **大模型使用**: 建议设置合理的超时时间和重试机制
+17. **风险数据分析**: 结合大模型服务进行智能风险分析
+18. **API密钥管理**: 妥善保管火山引擎API密钥，避免泄露
 
 ## 服务架构图
 
@@ -504,16 +670,16 @@ curl http://localhost:3001/api/database-stats
 ┌─────────────▼───────────────▼───────────────────▼───────────┐
 │                   后端服务层                                │
 ├─────────────────────────────────────────────────────────────┤
-│flowDataService  │planningTimeService│neuralNetworkService│processOptimizationService│
-│  流程数据管理   │    规划时间管理    │   参数配置管理      │     流程优化管理        │
+│flowDataService │planningTimeService│neuralNetworkService│processOptimizationService│riskDataService│llmService   │
+│  流程数据管理  │    规划时间管理    │   参数配置管理      │     流程优化管理        │  风险数据管理  │ 大模型服务   │
 └─────────────┬───────────────┬───────────────────┬───────────┘
               │               │                   │
 ┌─────────────▼───────────────▼───────────────────▼───────────┐
 │                    MongoDB 数据库                           │
 ├─────────────────────────────────────────────────────────────┤
-│ processflowdata │ planning_time_data │ neural_network_*      │ process_optimization_* │
-│ subprocessdata  │ refactor_timing    │ parameter_history     │ flow_data             │
-│ mermaid_flows   │ llm_analysis_data  │ saved_configs         │                        │
+│ processflowdata │ planning_time_data │ neural_network_*     │ process_optimization_* │ risk_data            │
+│ subprocessdata  │ refactor_timing    │ parameter_history    │ flow_data             │                      │
+│ mermaid_flows   │ llm_analysis_data  │ saved_configs        │                       │                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 

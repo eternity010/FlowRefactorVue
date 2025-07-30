@@ -22,7 +22,17 @@
     "import-marketing-mermaid": "node scripts/import-marketingflowmermaid-to-mongodb.js",
     "import-operation-mermaid": "node scripts/import-operationflowmermaid-to-mongodb.js",
     "import-production-mermaid": "node scripts/import-productionflowmermaid-to-mongodb.js",
-    "import-purchase-mermaid": "node scripts/import-purchaseflowmermaid-to-mongodb.js"
+    "import-purchase-mermaid": "node scripts/import-purchaseflowmermaid-to-mongodb.js",
+    "test-llm": "node scripts/test-llm-api.js",
+    "test-llm-service": "node scripts/test-llm-service.js",
+    "test-llm-chat-history": "node scripts/test-llm-chat-history.js",
+    "import-risk-data": "node scripts/import-risk-data-to-mongodb.js",
+    "test-risk-data": "node scripts/test-risk-data-api.js",
+    "test-risk-analysis": "node scripts/test-risk-analysis-with-llm.js",
+    "test-single-risk": "node scripts/test-single-risk-analysis.js",
+    "test-structured-risk": "node scripts/test-structured-risk-analysis.js",
+    "test-risk-structure-api": "node scripts/test-risk-structure-api.js",
+    "demo-risk-api": "node scripts/demo-risk-structure-api.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",
@@ -39,6 +49,7 @@
     "metaeditor-mxgraph": "^2.0.7",
     "mongodb": "^6.17.0",
     "mxgraph": "^4.2.2",
+    "openai": "^5.10.2",
     "vue": "^2.5.2",
     "vue-flowchart": "^0.1.1",
     "vue-router": "^3.0.1"
