@@ -70,34 +70,63 @@
     <!-- 添加实现流程图区域 -->
     <el-divider content-position="left">实现流程</el-divider>
     
-    <div v-if="implementationData" class="flow-section">
-      <div class="flow-control">
-        <div v-if="hasBackupFlow" class="backup-flow-switch">
-          <span class="switch-label">{{ showBackupFlow ? '备用流程' : '主流程' }}</span>
-          <el-switch
-            v-model="showBackupFlow"
-            active-color="#13ce66"
-            inactive-color="#409EFF"
-            @change="handleFlowTypeChange"
-          ></el-switch>
+    <!-- 数据加载中 -->
+    <div v-if="loading" class="loading-section">
+      <el-card class="loading-card">
+        <div class="loading-content">
+          <i class="el-icon-loading"></i>
+          <p>正在加载实现流程数据...</p>
         </div>
-        <el-tag v-if="showBackupFlow" type="success" effect="dark" size="small" class="backup-tag">
-          <i class="el-icon-info"></i> 当前显示备用实现流程
-        </el-tag>
-      </div>
-      
-      <transition name="flow-fade" mode="out-in">
-        <implementation-flow-chart
-          :key="showBackupFlow ? 'backup' : 'main'"
-          :flowData="currentFlowData.flowData"
-          :stepsData="currentFlowData.steps"
-          :title="currentFlowData.title"
-          :description="currentFlowData.description"
-        />
-      </transition>
+      </el-card>
     </div>
-    <div v-else class="empty-flow-section">
-      <el-empty description="该节点暂无实现流程图"></el-empty>
+    
+    <!-- 加载出错 -->
+    <div v-else-if="hasError" class="error-section">
+      <el-card class="error-card">
+        <div class="error-content">
+          <i class="el-icon-warning"></i>
+          <p>数据加载失败</p>
+          <el-button type="primary" size="small" @click="loadNodeData">重新加载</el-button>
+        </div>
+      </el-card>
+    </div>
+    
+    <!-- 数据加载完成且有流程数据 -->
+    <div v-else-if="dataLoaded && currentFlowData && currentFlowData.mermaidDefinition" class="flow-section">
+      <div class="mermaid-container">
+        <div class="flow-header">
+          <h3>{{ nodeTitle }} - 实现流程</h3>
+          <p v-if="currentFlowData.description" class="flow-description">
+            {{ currentFlowData.description }}
+          </p>
+        </div>
+        
+        <!-- 确保Mermaid定义有效后再渲染 -->
+        <mermaid-chart 
+          v-if="currentFlowData.mermaidDefinition && currentFlowData.mermaidDefinition.trim()"
+          :code="currentFlowData.mermaidDefinition"
+          class="node-flow-chart"
+        />
+        <div v-else class="invalid-mermaid">
+          <el-alert title="流程图数据格式错误" type="warning" show-icon :closable="false"></el-alert>
+        </div>
+        
+        <div class="flow-info" v-if="nodeDetails">
+          <el-tag size="small" type="info">
+            节点ID: {{ nodeDetails.nodeId }}
+          </el-tag>
+          <el-tag size="small" type="primary" v-if="nodeDetails.description">
+            {{ nodeDetails.description }}
+          </el-tag>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 数据加载完成但无流程数据 -->
+    <div v-else-if="dataLoaded" class="empty-flow-section">
+      <el-empty description="该节点暂无实现流程图">
+        <el-button type="primary" size="small" @click="loadFlowData">重新加载流程数据</el-button>
+      </el-empty>
     </div>
     
     <!-- 添加甘特图区域 -->
@@ -128,22 +157,15 @@
 </template>
 
 <script>
-import { getNodeDetails } from '@/data/flowNodesData';
-import { 
-  getNodeImplementation, 
-  getNodeBackupImplementation, 
-  hasNodeBackupImplementation, 
-  updateBackupFlowStatus,
-  getBackupFlowStatus 
-} from '@/data/implementations';
-import ImplementationFlowChart from '@/components/ImplementationFlowChart.vue';
+import { nodeDetailApi } from '@/api/nodeDetailApi';
+import MermaidChart from '@/components/MermaidChart.vue';
 import NodeResources from '@/components/NodeResources.vue';
 import GanttChart from '@/components/GanttChart.vue';
 
 export default {
   name: 'NodeDetailView',
   components: {
-    ImplementationFlowChart,
+    MermaidChart,
     NodeResources,
     GanttChart
   },
@@ -153,44 +175,22 @@ export default {
       nodeTitle: '',
       nodeType: '',
       nodeDetails: null,
-      implementationData: null,
-      backupImplementationData: null,
-      showBackupFlow: false,
-      hasBackupFlow: false,
-      ganttData: null
+      currentFlowData: null,
+      ganttData: null,
+      loading: false,
+      dataLoaded: false,  // 标记数据是否加载完成
+      hasError: false     // 标记是否有加载错误
     }
   },
-  computed: {
-    currentFlowData() {
-      return this.showBackupFlow ? this.backupImplementationData : this.implementationData;
-    }
-  },
-  created() {
+
+  async created() {
     // 从路由查询参数中获取节点ID和标题
     this.nodeId = this.$route.query.id || '';
     this.nodeTitle = this.$route.query.title || '节点详情';
     this.nodeType = this.$route.query.type || '';
-    // 获取节点详细信息
-    this.nodeDetails = getNodeDetails(this.nodeType, this.nodeId);
     
-    // 获取节点实现流程数据
-    this.implementationData = getNodeImplementation(this.nodeType, this.nodeId);
-    
-    // 获取甘特图数据
-    if (this.implementationData && this.implementationData.ganttData) {
-      this.ganttData = this.implementationData.ganttData;
-    }
-    
-    // 检查并获取备用实现流程
-    this.hasBackupFlow = hasNodeBackupImplementation(this.nodeType, this.nodeId);
-    if (this.hasBackupFlow) {
-      this.backupImplementationData = getNodeBackupImplementation(this.nodeType, this.nodeId);
-      
-      // 根据当前数据状态设置开关状态
-      if (this.implementationData && this.implementationData.isBackupEnabled) {
-        this.showBackupFlow = true;
-      }
-    }
+    // 加载节点数据
+    await this.loadNodeData();
   },
   methods: {
     goBack() {
@@ -215,28 +215,7 @@ export default {
       };
       return classMap[level] || '';
     },
-    handleFlowTypeChange(val) {
-      // 切换流程类型时的处理逻辑
-      console.log('切换到' + (val ? '备用流程' : '主流程'));
-      
-      // 更新数据模型中的备用流程状态
-      const success = updateBackupFlowStatus(this.nodeType, this.nodeId, val);
-      
-      if (success) {
-        // 提示用户
-        this.$message({
-          type: 'success',
-          message: '已' + (val ? '启用' : '禁用') + '备用流程'
-        });
-      } else {
-        // 如果更新失败，回滚UI状态
-        this.showBackupFlow = !val;
-        this.$message({
-          type: 'error',
-          message: '更新备用流程状态失败'
-        });
-      }
-    },
+
     viewDetailedResources() {
       // 跳转到资源详情页面
       this.$router.push({
@@ -247,6 +226,96 @@ export default {
           title: this.nodeTitle
         }
       });
+    },
+    
+    // 加载节点数据
+    async loadNodeData() {
+      this.loading = true;
+      this.hasError = false;
+      this.dataLoaded = false;
+      
+      try {
+        // 先加载节点详情，再加载流程数据
+        console.log('🔄 开始加载节点数据...');
+        
+        // 第一步：加载节点基本信息
+        await this.loadNodeDetails();
+        
+        // 第二步：只有节点详情加载成功后，才加载流程数据
+        if (this.nodeDetails) {
+          await this.loadFlowData();
+          this.dataLoaded = true;
+          console.log('✅ 节点数据加载完成');
+        } else {
+          console.warn('⚠️ 节点详情加载失败，跳过流程数据加载');
+          this.hasError = true;
+        }
+        
+      } catch (error) {
+        console.error('❌ 加载节点数据失败:', error);
+        this.hasError = true;
+        this.$message({
+          type: 'error',
+          message: '加载节点数据失败: ' + (error.message || '未知错误')
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    // 加载节点基本信息
+    async loadNodeDetails() {
+      try {
+        console.log('🔄 开始加载节点详情:', { nodeType: this.nodeType, nodeId: this.nodeId });
+        const response = await nodeDetailApi.getNodeDetail(this.nodeType, this.nodeId);
+        console.log('📥 节点详情API响应:', response);
+        
+        if (response.success) {
+          this.nodeDetails = response.data;
+          console.log('✅ 节点详情加载成功:', this.nodeDetails);
+        } else {
+          console.error('获取节点详情失败:', response.error);
+          this.$message.error('获取节点详情失败: ' + response.error);
+        }
+      } catch (error) {
+        console.error('加载节点详情失败:', error);
+        this.$message.error('加载节点详情失败: ' + error.message);
+      }
+    },
+    
+    // 加载流程数据
+    async loadFlowData() {
+      try {
+        console.log('🔄 开始加载流程数据:', { nodeType: this.nodeType, nodeId: this.nodeId });
+        
+        // 获取当前流程数据
+        const currentResponse = await nodeDetailApi.getNodeCurrentFlow(this.nodeType, this.nodeId);
+        console.log('📥 当前流程API响应:', currentResponse);
+        
+        if (currentResponse.success && currentResponse.data) {
+          // 验证返回的数据结构
+          const data = currentResponse.data;
+          if (data.mermaidDefinition && typeof data.mermaidDefinition === 'string') {
+            this.currentFlowData = data;
+            console.log('✅ 当前流程数据加载成功:', {
+              nodeId: data.nodeId,
+              description: data.description,
+              hasValidMermaid: !!data.mermaidDefinition.trim()
+            });
+          } else {
+            console.warn('⚠️ 流程数据格式不正确:', data);
+            throw new Error('流程图数据格式不正确');
+          }
+        } else {
+          const errorMsg = currentResponse.error || '服务器返回空数据';
+          console.error('获取当前流程失败:', errorMsg);
+          throw new Error(errorMsg);
+        }
+      } catch (error) {
+        console.error('❌ 加载流程数据失败:', error);
+        // 不在这里直接抛出错误，让上层方法处理
+        throw error;
+      }
     }
   }
 }
@@ -360,26 +429,7 @@ export default {
   justify-content: center;
 }
 
-.flow-control {
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.backup-flow-switch {
-  display: flex;
-  align-items: center;
-}
-
-.switch-label {
-  margin-right: 10px;
-  font-weight: 500;
-}
-
-.backup-tag {
-  margin-left: 10px;
-}
 
 .resource-section {
   position: relative;
@@ -415,5 +465,136 @@ export default {
   margin-top: 30px;
   display: flex;
   justify-content: center;
+}
+
+/* 加载状态样式 */
+.loading-section {
+  margin-top: 20px;
+}
+
+.loading-card {
+  text-align: center;
+}
+
+.loading-content {
+  padding: 40px 20px;
+  color: #909399;
+}
+
+.loading-content i {
+  font-size: 24px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.loading-content p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 错误状态样式 */
+.error-section {
+  margin-top: 20px;
+}
+
+.error-card {
+  text-align: center;
+}
+
+.error-content {
+  padding: 40px 20px;
+  color: #F56C6C;
+}
+
+.error-content i {
+  font-size: 24px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.error-content p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+}
+
+/* 无效Mermaid数据样式 */
+.invalid-mermaid {
+  margin: 20px 0;
+}
+
+/* Mermaid 图表容器样式 */
+.mermaid-container {
+  width: 100%;
+  background-color: #FAFAFA;
+  border: 1px solid #EBEEF5;
+  border-radius: 6px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.flow-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.flow-header h3 {
+  margin: 0 0 8px 0;
+  color: #303133;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.flow-description {
+  margin: 0;
+  color: #606266;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.node-flow-chart {
+  min-height: 300px;
+  border: 1px solid #E4E7ED;
+  border-radius: 4px;
+  background-color: white;
+  padding: 10px;
+}
+
+.flow-info {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.flow-info .el-tag {
+  margin: 0 4px;
+}
+
+/* 优化 Mermaid 图表内的样式 */
+.mermaid-container ::v-deep .mermaid-chart svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .mermaid-container {
+    padding: 12px;
+  }
+  
+  .flow-header h3 {
+    font-size: 16px;
+  }
+  
+  .flow-description {
+    font-size: 13px;
+  }
+  
+  .node-flow-chart {
+    min-height: 250px;
+  }
+  
+  .flow-info .el-tag {
+    margin: 2px;
+    font-size: 11px;
+  }
 }
 </style> 

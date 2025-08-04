@@ -37,7 +37,7 @@ export default {
         return;
       }
       const script = document.createElement('script');
-      script.src = 'https://unpkg.com/mermaid@8.5.0/dist/mermaid.min.js';
+      script.src = 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js';
       script.onload = () => {
         this.mermaidLoaded = true;
         this.initMermaid();
@@ -54,15 +54,28 @@ export default {
       });
       this.mermaidInitialized = true;
     },
-    renderMermaid() {
+    async renderMermaid() {
       if (!window.mermaid || !this.mermaidLoaded) return;
+      await this.$nextTick();
       const container = this.$refs.container;
       if (!container) return;
       const id = `mermaid-${Date.now()}`;
       container.innerHTML = '';
-      window.mermaid.render(id, this.code, (svgCode) => {
-        container.innerHTML = svgCode;
-      });
+      try {
+        const renderRes = window.mermaid.render(id, this.code);
+        // Mermaid v10 及以上返回 Promise
+        if (renderRes instanceof Promise) {
+          const { svg } = await renderRes;
+          container.innerHTML = svg;
+        } else {
+          // 兼容旧版本 callback 写法
+          window.mermaid.render(id, this.code, (svgCode) => {
+            container.innerHTML = svgCode;
+          });
+        }
+      } catch (error) {
+        console.error('Mermaid 渲染失败:', error);
+      }
     }
   }
 }

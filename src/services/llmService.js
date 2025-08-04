@@ -61,7 +61,7 @@ class LLMService {
         return {
           success: true,
           data: {
-            content: completion.choices[0]?.message?.content,
+            content: completion.choices && completion.choices[0] && completion.choices[0].message && completion.choices[0].message.content,
             usage: completion.usage,
             model: completion.model,
             timestamp: new Date().toISOString()
@@ -115,7 +115,7 @@ class LLMService {
         return {
           success: true,
           data: {
-            content: completion.choices[0]?.message?.content,
+            content: completion.choices && completion.choices[0] && completion.choices[0].message && completion.choices[0].message.content,
             usage: completion.usage,
             model: completion.model,
             timestamp: new Date().toISOString()
@@ -195,7 +195,7 @@ class LLMService {
     let fullContent = '';
     try {
       for await (const part of stream) {
-        const content = part.choices[0]?.delta?.content || '';
+        const content = (part.choices && part.choices[0] && part.choices[0].delta && part.choices[0].delta.content) || '';
         fullContent += content;
       }
       return fullContent;

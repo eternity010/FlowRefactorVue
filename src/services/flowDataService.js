@@ -459,6 +459,285 @@ class FlowDataService {
       return { success: false, error: error.message };
     }
   }
+
+  // ==================== 节点详情相关方法 ====================
+
+  // 获取节点的详细信息，包括当前流程编号
+  async getNodeDetail(collectionName, nodeId) {
+    try {
+      const collection = this.getCollection(collectionName);
+      const result = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            nodeId: 1,
+            description: 1,
+            flowCount: 1,
+            currentFlowNumber: 1,
+            createdAt: 1
+          }
+        }
+      );
+      
+      if (!result) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      console.error(`获取节点 ${nodeId} 详情失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // 获取节点的当前实现流程（根据currentFlowNumber自动获取对应的mermaidDefinition）
+  async getNodeCurrentFlow(collectionName, nodeId) {
+    try {
+      const collection = this.getCollection(collectionName);
+      
+      // 先获取节点的当前流程编号
+      const nodeInfo = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            currentFlowNumber: 1,
+            flowCount: 1,
+            description: 1
+          }
+        }
+      );
+      
+      if (!nodeInfo) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      // 根据 currentFlowNumber 构建字段名
+      const mermaidField = `mermaidDefinition${nodeInfo.currentFlowNumber}`;
+      
+      // 获取对应的Mermaid定义
+      const flowData = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            [mermaidField]: 1,
+            currentFlowNumber: 1,
+            flowCount: 1,
+            description: 1
+          }
+        }
+      );
+      
+      return {
+        success: true,
+        data: {
+          mermaidDefinition: flowData[mermaidField],
+          currentFlowNumber: nodeInfo.currentFlowNumber,
+          flowCount: nodeInfo.flowCount,
+          description: nodeInfo.description,
+          nodeId: nodeId
+        }
+      };
+    } catch (error) {
+      console.error(`获取节点 ${nodeId} 当前流程失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // 获取节点指定编号的实现流程
+  async getNodeImplementation(collectionName, nodeId, flowNumber) {
+    try {
+      const collection = this.getCollection(collectionName);
+      
+      // 构建动态字段名
+      const mermaidField = `mermaidDefinition${flowNumber}`;
+      
+      // 先验证流程编号是否有效
+      const nodeInfo = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            flowCount: 1,
+            description: 1
+          }
+        }
+      );
+      
+      if (!nodeInfo) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      if (flowNumber > nodeInfo.flowCount) {
+        return { success: false, error: `无效的流程编号 ${flowNumber}，该节点只有 ${nodeInfo.flowCount} 个流程` };
+      }
+      
+      // 获取指定流程的Mermaid定义
+      const flowData = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            [mermaidField]: 1,
+            flowCount: 1,
+            description: 1
+          }
+        }
+      );
+      
+      if (!flowData[mermaidField]) {
+        return { success: false, error: `流程${flowNumber}的定义不存在` };
+      }
+      
+      return {
+        success: true,
+        data: {
+          mermaidDefinition: flowData[mermaidField],
+          flowNumber: flowNumber,
+          flowCount: nodeInfo.flowCount,
+          description: nodeInfo.description,
+          nodeId: nodeId
+        }
+      };
+    } catch (error) {
+      console.error(`获取节点 ${nodeId} 流程${flowNumber}失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // 获取节点的所有流程数据
+  async getNodeAllFlows(collectionName, nodeId) {
+    try {
+      const collection = this.getCollection(collectionName);
+      const result = await collection.findOne({ nodeId: nodeId });
+      
+      if (!result) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      // 提取所有的mermaidDefinition字段
+      const flows = {};
+      for (let i = 1; i <= result.flowCount; i++) {
+        const fieldName = `mermaidDefinition${i}`;
+        if (result[fieldName]) {
+          flows[`flow${i}`] = {
+            flowNumber: i,
+            mermaidDefinition: result[fieldName],
+            isActive: i === result.currentFlowNumber
+          };
+        }
+      }
+      
+      return {
+        success: true,
+        data: {
+          nodeId: nodeId,
+          description: result.description,
+          flowCount: result.flowCount,
+          currentFlowNumber: result.currentFlowNumber,
+          flows: flows,
+          createdAt: result.createdAt
+        }
+      };
+    } catch (error) {
+      console.error(`获取节点 ${nodeId} 所有流程失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // 切换节点的当前流程
+  async switchNodeFlow(collectionName, nodeId, currentFlowNumber) {
+    try {
+      const collection = this.getCollection(collectionName);
+      
+      // 验证流程编号是否有效
+      const nodeData = await collection.findOne(
+        { nodeId: nodeId },
+        { projection: { flowCount: 1 } }
+      );
+      
+      if (!nodeData) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      if (currentFlowNumber > nodeData.flowCount) {
+        return { success: false, error: `无效的流程编号 ${currentFlowNumber}，该节点只有 ${nodeData.flowCount} 个流程` };
+      }
+      
+      // 更新数据库中的 currentFlowNumber
+      const updateResult = await collection.updateOne(
+        { nodeId: nodeId },
+        { 
+          $set: { 
+            currentFlowNumber: currentFlowNumber,
+            updatedAt: new Date()
+          } 
+        }
+      );
+      
+      if (updateResult.modifiedCount > 0) {
+        return {
+          success: true,
+          data: {
+            nodeId: nodeId,
+            currentFlowNumber: currentFlowNumber,
+            message: `已切换到流程${currentFlowNumber}`
+          }
+        };
+      } else {
+        return { success: false, error: '流程切换失败，没有修改任何数据' };
+      }
+    } catch (error) {
+      console.error(`切换节点 ${nodeId} 流程失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // 获取节点的所有可用流程列表
+  async getNodeFlowList(collectionName, nodeId) {
+    try {
+      const collection = this.getCollection(collectionName);
+      const result = await collection.findOne(
+        { nodeId: nodeId },
+        { 
+          projection: {
+            flowCount: 1,
+            currentFlowNumber: 1,
+            description: 1
+          }
+        }
+      );
+      
+      if (!result) {
+        return { success: false, error: `节点 ${nodeId} 不存在` };
+      }
+      
+      // 生成流程列表
+      const flowList = [];
+      for (let i = 1; i <= result.flowCount; i++) {
+        flowList.push({
+          flowNumber: i,
+          name: `流程${i}`,
+          isActive: i === result.currentFlowNumber,
+          type: i === 1 ? 'main' : 'backup'
+        });
+      }
+      
+      return {
+        success: true,
+        data: {
+          nodeId: nodeId,
+          description: result.description,
+          currentFlowNumber: result.currentFlowNumber,
+          totalFlows: result.flowCount,
+          flowList: flowList
+        }
+      };
+    } catch (error) {
+      console.error(`获取节点 ${nodeId} 流程列表失败:`, error);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 module.exports = FlowDataService; 

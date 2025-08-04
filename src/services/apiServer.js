@@ -1726,6 +1726,104 @@ app.get('/api/llm/usage-stats', async (req, res) => {
   }
 });
 
+// ================================
+// 节点详情相关API
+// ================================
+
+// 获取节点的详细信息，包括当前流程编号
+app.get('/api/node-detail/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    const result = await flowDataService.getNodeDetail(collectionName, nodeId);
+    sendResponse(res, result, `获取节点 ${nodeId} 详情失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取节点的当前实现流程（根据currentFlowNumber自动获取对应的mermaidDefinition）
+app.get('/api/node-current-flow/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    const result = await flowDataService.getNodeCurrentFlow(collectionName, nodeId);
+    sendResponse(res, result, `获取节点 ${nodeId} 当前流程失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取节点指定编号的实现流程
+app.get('/api/node-implementation/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const { flowNumber } = req.query;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    if (!flowNumber) {
+      return res.status(400).json({
+        success: false,
+        error: '流程编号不能为空'
+      });
+    }
+    
+    const result = await flowDataService.getNodeImplementation(collectionName, nodeId, parseInt(flowNumber));
+    sendResponse(res, result, `获取节点 ${nodeId} 流程${flowNumber}失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取节点的所有流程数据
+app.get('/api/node-all-flows/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    const result = await flowDataService.getNodeAllFlows(collectionName, nodeId);
+    sendResponse(res, result, `获取节点 ${nodeId} 所有流程失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 切换节点的当前流程
+app.put('/api/node-flow-switch/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const { currentFlowNumber } = req.body;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    if (typeof currentFlowNumber !== 'number' || currentFlowNumber < 1) {
+      return res.status(400).json({
+        success: false,
+        error: '流程编号必须是大于0的数字'
+      });
+    }
+    
+    const result = await flowDataService.switchNodeFlow(collectionName, nodeId, currentFlowNumber);
+    sendResponse(res, result, `切换节点 ${nodeId} 流程失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取节点的所有可用流程列表
+app.get('/api/node-flow-list/:nodeType/:nodeId', async (req, res) => {
+  try {
+    const { nodeType, nodeId } = req.params;
+    const collectionName = `${nodeType}_flow_mermaid`;
+    
+    const result = await flowDataService.getNodeFlowList(collectionName, nodeId);
+    sendResponse(res, result, `获取节点 ${nodeId} 流程列表失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // 启动服务器
 function startServer() {
   app.listen(PORT, async () => {

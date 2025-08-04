@@ -1,0 +1,170 @@
+[
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU1 [计划整合确定] - 主子流程 (正式、跨部门协同)\n\n    %% 所有节点定义\n    PU1_M1[需求部门提报]\n    PU1_M2[采购部门整合]\n    PU1_M3[跨部门评审]\n    PU1_M4[管理层审批]\n    PU1_M5[计划下达]\n\n    %% 所有边的定义\n    PU1_M1 --> PU1_M2\n    PU1_M2 --> PU1_M3\n    PU1_M3 --> PU1_M4\n    PU1_M4 --> PU1_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU1 [计划整合确定] - 备用子流程 (滚动预测、敏捷响应)\n\n    %% 所有节点定义\n    PU1_A1[系统数据驱动]\n    PU1_A2[关键用户沟通]\n    PU1_A3[预算内授权]\n    PU1_A4[动态更新]\n    PU1_A5[简报通知]\n\n    %% 所有边的定义\n    PU1_A1 --> PU1_A2\n    PU1_A2 --> PU1_A3\n    PU1_A3 --> PU1_A4\n    PU1_A4 --> PU1_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU2 [品类管理] - 主子流程 (战略寻源与分析)\n\n    %% 所有节点定义\n    PU2_M1[数据分析]\n    PU2_M2[市场研究]\n    PU2_M3[策略制定]\n    PU2_M4[策略审批与执行]\n    PU2_M5[定期回顾]\n\n    %% 所有边的定义\n    PU2_M1 --> PU2_M2\n    PU2_M2 --> PU2_M3\n    PU2_M3 --> PU2_M4\n    PU2_M4 --> PU2_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU2 [品类管理] - 备用子流程 (基于经验的快速决策)\n\n    %% 所有节点定义\n    PU2_A1[历史供应商评估]\n    PU2_A2[专家访谈]\n    PU2_A3[简易策略定义]\n    PU2_A4[邮件确认]\n    PU2_A5[按需调整]\n\n    %% 所有边的定义\n    PU2_A1 --> PU2_A2\n    PU2_A2 --> PU2_A3\n    PU2_A3 --> PU2_A4\n    PU2_A4 --> PU2_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU3 [技术规格拆解] - 主子流程 (技术部门主导的详细拆解)\n\n    %% 所有节点定义\n    PU3_M1[技术资料接收]\n    PU3_M2[技术部门拆解]\n    PU3_M3[标准化审查]\n    PU3_M4[联合评审]\n    PU3_M5[定稿与下发]\n\n    %% 所有边的定义\n    PU3_M1 --> PU3_M2\n    PU3_M2 --> PU3_M3\n    PU3_M3 --> PU3_M4\n    PU3_M4 --> PU3_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU3 [技术规格拆解] - 备用子流程 (供应商或样品驱动)\n\n    %% 所有节点定义\n    PU3_A1[功能需求定义]\n    PU3_A2[市场方案搜寻]\n    PU3_A3[样品/方案评审]\n    PU3_A4[规格反向确定]\n    PU3_A5[简化记录]\n\n    %% 所有边的定义\n    PU3_A1 --> PU3_A2\n    PU3_A2 --> PU3_A3\n    PU3_A3 --> PU3_A4\n    PU3_A4 --> PU3_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU4 [确定工程物料清单（EBOM）] - 主子流程 (设计与工程部门主导)\n\n    %% 所有节点定义\n    PU4_M1[设计输出]\n    PU4_M2[结构化整理]\n    PU4_M3[跨部门评审]\n    PU4_M4[版本冻结与发布]\n\n    %% 所有边的定义\n    PU4_M1 --> PU4_M2\n    PU4_M2 --> PU4_M3\n    PU4_M3 --> PU4_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU4 [确定工程物料清单（EBOM）] - 备用子流程 (基于原型或样品的反向工程)\n\n    %% 所有节点定义\n    PU4_A1[原型/样品确认]\n    PU4_A2[实物拆解]\n    PU4_A3[清单手动创建]\n    PU4_A4[快速验证]\n    PU4_A5[非正式发布]\n\n    %% 所有边的定义\n    PU4_A1 --> PU4_A2\n    PU4_A2 --> PU4_A3\n    PU4_A3 --> PU4_A4\n    PU4_A4 --> PU4_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU5 [确定制造物料清单（MBOM）] - 主子流程 (工艺部门基于EBOM转化)\n\n    %% 所有节点定义\n    PU5_M1[EBOM接收]\n    PU5_M2[工艺路线规划]\n    PU5_M3[工序与用量确定]\n    PU5_M4[系统录入与验证]\n    PU5_M5[正式发布]\n\n    %% 所有边的定义\n    PU5_M1 --> PU5_M2\n    PU5_M2 --> PU5_M3\n    PU5_M3 --> PU5_M4\n    PU5_M4 --> PU5_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU5 [确定制造物料清单（MBOM）] - 备用子流程 (车间主管经验估算)\n\n    %% 所有节点定义\n    PU5_A1[EBOM/物料清单获取]\n    PU5_A2[经验估算]\n    PU5_A3[创建领料单]\n    PU5_A4[按单领料]\n    PU5_A5[事后盘点调整]\n\n    %% 所有边的定义\n    PU5_A1 --> PU5_A2\n    PU5_A2 --> PU5_A3\n    PU5_A3 --> PU5_A4\n    PU5_A4 --> PU5_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU6 [生产物资供应商准入管理] - 主子流程 (全面、多阶段审核)\n\n    %% 所有节点定义\n    PU6_M1[供应商申请/寻源]\n    PU6_M2[初步筛选]\n    PU6_M3[现场审核]\n    PU6_M4[样品/小批量测试]\n    PU6_M5[评审会决策]\n    PU6_M6[系统录入与协议签订]\n\n    %% 所有边的定义\n    PU6_M1 --> PU6_M2\n    PU6_M2 --> PU6_M3\n    PU6_M3 --> PU6_M4\n    PU6_M4 --> PU6_M5\n    PU6_M5 --> PU6_M6"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU6 [生产物资供应商准入管理] - 备用子流程 (快速/有条件准入)\n\n    %% 所有节点定义\n    PU6_A1[推荐与背书]\n    PU6_A2[核心文件审查]\n    PU6_A3[远程/视频审核]\n    PU6_A4[首单即测试]\n    PU6_A5[有条件批准]\n\n    %% 所有边的定义\n    PU6_A1 --> PU6_A2\n    PU6_A2 --> PU6_A3\n    PU6_A3 --> PU6_A4\n    PU6_A4 --> PU6_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU7 [装备设施类供应商准入管理] - 主子流程 (技术与服务能力并重)\n\n    %% 所有节点定义\n    PU7_M1[供应商提交方案]\n    PU7_M2[技术能力评估]\n    PU7_M3[案例考察]\n    PU7_M4[商务与服务条款评审]\n    PU7_M5[综合评审决策]\n\n    %% 所有边的定义\n    PU7_M1 --> PU7_M2\n    PU7_M2 --> PU7_M3\n    PU7_M3 --> PU7_M4\n    PU7_M4 --> PU7_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU7 [装备设施类供应商准入管理] - 备用子流程 (展会/行业推荐快速引入)\n\n    %% 所有节点定义\n    PU7_A1[行业展会考察]\n    PU7_A2[标杆企业参考]\n    PU7_A3[核心功能验证]\n    PU7_A4[简化评审]\n    PU7_A5[合同重点保障]\n\n    %% 所有边的定义\n    PU7_A1 --> PU7_A2\n    PU7_A2 --> PU7_A3\n    PU7_A3 --> PU7_A4\n    PU7_A4 --> PU7_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU8 [信息化类供应商准入管理] - 主子流程 (方案验证与数据安全并重)\n\n    %% 所有节点定义\n    PU8_M1[RFI/RFP流程]\n    PU8_M2[POC测试 (Proof of Concept)]\n    PU8_M3[信息安全评估]\n    PU8_M4[服务水平协议(SLA)谈判]\n    PU8_M5[综合评审决策]\n\n    %% 所有边的定义\n    PU8_M1 --> PU8_M2\n    PU8_M2 --> PU8_M3\n    PU8_M3 --> PU8_M4\n    PU8_M4 --> PU8_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU8 [信息化类供应商准入管理] - 备用子流程 (市场标准产品快速引入)\n\n    %% 所有节点定义\n    PU8_A1[选用主流SaaS服务]\n    PU8_A2[免费试用评估]\n    PU8_A3[公开服务条款审阅]\n    PU8_A4[小范围快速决策]\n\n    %% 所有边的定义\n    PU8_A1 --> PU8_A2\n    PU8_A2 --> PU8_A3\n    PU8_A3 --> PU8_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU9 [供应商考核评价] - 主子流程 (量化KPI与定期评审)\n\n    %% 所有节点定义\n    PU9_M1[建立评价模型]\n    PU9_M2[数据自动采集]\n    PU9_M3[多部门主观打分]\n    PU9_M4[生成绩效报告]\n    PU9_M5[绩效沟通与改进]\n\n    %% 所有边的定义\n    PU9_M1 --> PU9_M2\n    PU9_M2 --> PU9_M3\n    PU9_M3 --> PU9_M4\n    PU9_M4 --> PU9_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU9 [供应商考核评价] - 备用子流程 (事件驱动式/异常管理)\n\n    %% 所有节点定义\n    PU9_A1[无问题不评估]\n    PU9_A2[建立异常记录]\n    PU9_A3[定期汇总问题]\n    PU9_A4[非正式沟通]\n    PU9_A5[作为采购决策参考]\n\n    %% 所有边的定义\n    PU9_A1 --> PU9_A2\n    PU9_A2 --> PU9_A3\n    PU9_A3 --> PU9_A4\n    PU9_A4 --> PU9_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU10 [供应商日常管理] - 主子流程 (战略协同与持续改进)\n\n    %% 所有节点定义\n    PU10_M1[高层定期互访]\n    PU10_M2[联合改进项目]\n    PU10_M3[信息共享平台]\n    PU10_M4[风险监控与预警]\n    PU10_M5[年度供应商大会]\n\n    %% 所有边的定义\n    PU10_M1 --> PU10_M2\n    PU10_M2 --> PU10_M3\n    PU10_M3 --> PU10_M4\n    PU10_M4 --> PU10_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU10 [供应商日常管理] - 备用子流程 (订单驱动的被动管理)\n\n    %% 所有节点定义\n    PU10_A1[按订单沟通]\n    PU10_A2[问题驱动的交流]\n    PU10_A3[无主动信息共享]\n    PU10_A4[无风险监控]\n    PU10_A5[无常态化活动]\n\n    %% 所有边的定义\n    PU10_A1 --> PU10_A2\n    PU10_A2 --> PU10_A3\n    PU10_A3 --> PU10_A4\n    PU10_A4 --> PU10_A5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU11 [平台采购需求] - 主子流程 (系统驱动与计划员审核)\n\n    %% 所有节点定义\n    PU11_M1[系统运算生成]\n    PU11_M2[计划员审核与整合]\n    PU11_M3[需求确认与释放]\n    PU11_M4[需求池形成]\n\n    %% 所有边的定义\n    PU11_M1 --> PU11_M2\n    PU11_M2 --> PU11_M3\n    PU11_M3 --> PU11_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU11 [平台采购需求] - 备用子流程 (手动提报与汇总)\n\n    %% 所有节点定义\n    PU11_A1[部门手动识别]\n    PU11_A2[提交需求清单]\n    PU11_A3[手动汇总与整理]\n    PU11_A4[录入系统或备案]\n\n    %% 所有边的定义\n    PU11_A1 --> PU11_A2\n    PU11_A2 --> PU11_A3\n    PU11_A3 --> PU11_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU12 [采购方案编制] - 主子流程 (针对重大项目的正式方案)\n\n    %% 所有节点定义\n    PU12_M1[项目启动]\n    PU12_M2[方案研讨]\n    PU12_M3[编写方案书]\n    PU12_M4[方案评审]\n    PU12_M5[审批与备案]\n\n    %% 所有边的定义\n    PU12_M1 --> PU12_M2\n    PU12_M2 --> PU12_M3\n    PU12_M3 --> PU12_M4\n    PU12_M4 --> PU12_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU12 [采购方案编制] - 备用子流程 (基于品类策略的快速决策)\n\n    %% 所有节点定义\n    PU12_A1[应用品类策略]\n    PU12_A2[口头/邮件沟通]\n    PU12_A3[无正式方案]\n    PU12_A4[记录在案]\n\n    %% 所有边的定义\n    PU12_A1 --> PU12_A2\n    PU12_A2 --> PU12_A3\n    PU12_A3 --> PU12_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU13 [采购申请] - 主子流程 (规范化的电子审批流)\n\n    %% 所有节点定义\n    PU13_M1[创建采购申请(PR)]\n    PU13_M2[系统自动校验]\n    PU13_M3[电子审批流转]\n    PU13_M4[审批完成与状态转化]\n\n    %% 所有边的定义\n    PU13_M1 --> PU13_M2\n    PU13_M2 --> PU13_M3\n    PU13_M3 --> PU13_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU13 [采购申请] - 备用子流程 (纸质/邮件审批)\n\n    %% 所有节点定义\n    PU13_A1[填写纸质/电子表单]\n    PU13_A2[线下传签/邮件转发]\n    PU13_A3[提交至采购部]\n    PU13_A4[采购部存档与执行]\n\n    %% 所有边的定义\n    PU13_A1 --> PU13_A2\n    PU13_A2 --> PU13_A3\n    PU13_A3 --> PU13_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU14 [采购限价制定] - 主子流程 (多维度成本分析)\n\n    %% 所有节点定义\n    PU14_M1[历史价格分析]\n    PU14_M2[成本构成分析 (Should Cost)]\n    PU14_M3[市场询价/预算参考]\n    PU14_M4[制定与审批]\n\n    %% 所有边的定义\n    PU14_M1 --> PU14_M2\n    PU14_M2 --> PU14_M3\n    PU14_M3 --> PU14_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU14 [采购限价制定] - 备用子流程 (基于历史价的快速估算)\n\n    %% 所有节点定义\n    PU14_A1[查找最近一次采购价]\n    PU14_A2[考虑通胀/市场波动]\n    PU14_A3[采购员自行决定]\n    PU14_A4[以预算为限]\n\n    %% 所有边的定义\n    PU14_A1 --> PU14_A2\n    PU14_A2 --> PU14_A3\n    PU14_A3 --> PU14_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU15 [采购文件制定] - 主子流程 (标准化与定制化结合)\n\n    %% 所有节点定义\n    PU15_M1[调用标准模板]\n    PU15_M2[填充技术与商务条款]\n    PU15_M3[法务审核]\n    PU15_M4[最终审批与定稿]\n\n    %% 所有边的定义\n    PU15_M1 --> PU15_M2\n    PU15_M2 --> PU15_M3\n    PU15_M3 --> PU15_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU15 [采购文件制定] - 备用子流程 (简化/非正式文件)\n\n    %% 所有节点定义\n    PU15_A1[邮件询价]\n    PU15_A2[使用历史文件]\n    PU15_A3[口头询价]\n    PU15_A4[无法务审核]\n\n    %% 所有边的定义\n    PU15_A1 --> PU15_A2\n    PU15_A2 --> PU15_A3\n    PU15_A3 --> PU15_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU16 [招标采购] - 主子流程 (公开、公平、公正)\n\n    %% 所有节点定义\n    PU16_M1[发布招标公告]\n    PU16_M2[资格预审(可选)]\n    PU16_M3[发售招标文件与答疑]\n    PU16_M4[投标与开标]\n    PU16_M5[评标]\n    PU16_M6[定标与通知]\n\n    %% 所有边的定义\n    PU16_M1 --> PU16_M2\n    PU16_M2 --> PU16_M3\n    PU16_M3 --> PU16_M4\n    PU16_M4 --> PU16_M5\n    PU16_M5 --> PU16_M6"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU16 [招标采购] - 备用子流程 (邀请招标)\n\n    %% 所有节点定义\n    PU16_A1[确定邀请名单]\n    PU16_A2[发出投标邀请书]\n    PU16_A3[简化流程]\n\n    %% 所有边的定义\n    PU16_A1 --> PU16_A2\n    PU16_A2 --> PU16_A3"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU17 [询比采购] - 主子流程 (规范化询价与比价)\n\n    %% 所有节点定义\n    PU17_M1[选择询价对象]\n    PU17_M2[统一发出询价单]\n    PU17_M3[报价回收与澄清]\n    PU17_M4[制作比价表]\n    PU17_M5[综合评估与推荐]\n    PU17_M6[审批与下单]\n\n    %% 所有边的定义\n    PU17_M1 --> PU17_M2\n    PU17_M2 --> PU17_M3\n    PU17_M3 --> PU17_M4\n    PU17_M4 --> PU17_M5\n    PU17_M5 --> PU17_M6"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU17 [询比采购] - 备用子流程 (非正式快速比价)\n\n    %% 所有节点定义\n    PU17_A1[电话/即时通讯询价]\n    PU17_A2[记录报价]\n    PU17_A3[口头决策]\n    PU17_A4[邮件确认价格]\n\n    %% 所有边的定义\n    PU17_A1 --> PU17_A2\n    PU17_A2 --> PU17_A3\n    PU17_A3 --> PU17_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU18 [竞价采购] - 主子流程 (在线平台反向竞拍)\n\n    %% 所有节点定义\n    PU18_M1[发布竞价公告]\n    PU18_M2[供应商报名与资格确认]\n    PU18_M3[组织在线竞价]\n    PU18_M4[竞价结束与结果确认]\n    PU18_M5[审批与授标]\n\n    %% 所有边的定义\n    PU18_M1 --> PU18_M2\n    PU18_M2 --> PU18_M3\n    PU18_M3 --> PU18_M4\n    PU18_M4 --> PU18_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU18 [竞价采购] - 备用子流程 (多轮线下报价)\n\n    %% 所有节点定义\n    PU18_A1[首轮书面报价]\n    PU18_A2[告知最优价(可选)]\n    PU18_A3[最终报价]\n    PU18_A4[择优选择]\n\n    %% 所有边的定义\n    PU18_A1 --> PU18_A2\n    PU18_A2 --> PU18_A3\n    PU18_A3 --> PU18_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU19 [谈判采购] - 主子流程 (结构化谈判)\n\n    %% 所有节点定义\n    PU19_M1[成立谈判小组]\n    PU19_M2[制定谈判策略]\n    PU19_M3[多轮谈判]\n    PU19_M4[会议纪要]\n    PU19_M5[确定最终方案与报批]\n\n    %% 所有边的定义\n    PU19_M1 --> PU19_M2\n    PU19_M2 --> PU19_M3\n    PU19_M3 --> PU19_M4\n    PU19_M4 --> PU19_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU19 [谈判采购] - 备用子流程 (采购员主导的商务谈判)\n\n    %% 所有节点定义\n    PU19_A1[单一主题谈判]\n    PU19_A2[非正式沟通]\n    PU19_A3[口头协议]\n    PU19_A4[无正式纪要]\n\n    %% 所有边的定义\n    PU19_A1 --> PU19_A2\n    PU19_A2 --> PU19_A3\n    PU19_A3 --> PU19_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU20 [直接采购] - 主子流程 (理由充分的单一来源采购)\n\n    %% 所有节点定义\n    PU20_M1[提交单一来源申请]\n    PU20_M2[采购与技术部门审核]\n    PU20_M3[管理层审批]\n    PU20_M4[与供应商谈判]\n    PU20_M5[签订合同]\n\n    %% 所有边的定义\n    PU20_M1 --> PU20_M2\n    PU20_M2 --> PU20_M3\n    PU20_M3 --> PU20_M4\n    PU20_M4 --> PU20_M5"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU20 [直接采购] - 备用子流程 (小额/授权直接采购)\n\n    %% 所有节点定义\n    PU20_A1[授权清单]\n    PU20_A2[采购员直接下单]\n    PU20_A3[事后备案]\n\n    %% 所有边的定义\n    PU20_A1 --> PU20_A2\n    PU20_A2 --> PU20_A3"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU21 [招投标公示] - 主子流程 (规范的内外公示)\n\n    %% 所有节点定义\n    PU21_M1[中标结果内部审批]\n    PU21_M2[发布中标候选人公示]\n    PU21_M3[处理异议]\n    PU21_M4[发布中标结果公告]\n\n    %% 所有边的定义\n    PU21_M1 --> PU21_M2\n    PU21_M2 --> PU21_M3\n    PU21_M3 --> PU21_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU21 [招投标公示] - 备用子流程 (简化/内部通知)\n\n    %% 所有节点定义\n    PU21_A1[不进行公示]\n    PU21_A2[结果内部通知]\n    PU21_A3[直接发通知书]\n\n    %% 所有边的定义\n    PU21_A1 --> PU21_A2\n    PU21_A2 --> PU21_A3"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU22 [采购合同起草] - 主子流程 (法务/采购主导)\n\n    %% 所有节点定义\n    PU22_M1[调用标准合同模板]\n    PU22_M2[填入商务与技术条款]\n    PU22_M3[法务审核与修改]\n    PU22_M4[与对方确认]\n\n    %% 所有边的定义\n    PU22_M1 --> PU22_M2\n    PU22_M2 --> PU22_M3\n    PU22_M3 --> PU22_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU22 [采购合同起草] - 备用子流程 (采购订单替代合同)\n\n    %% 所有节点定义\n    PU22_A1[生成采购订单(PO)]\n    PU22_A2[附带标准条款]\n    PU22_A3[供应商盖章回传]\n    PU22_A4[无单独合同]\n\n    %% 所有边的定义\n    PU22_A1 --> PU22_A2\n    PU22_A2 --> PU22_A3\n    PU22_A3 --> PU22_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU23 [合同审批] - 主子流程 (多级线上审批流)\n\n    %% 所有节点定义\n    PU23_M1[发起审批]\n    PU23_M2[按规则流转]\n    PU23_M3[线上签核]\n    PU23_M4[生成审批记录]\n\n    %% 所有边的定义\n    PU23_M1 --> PU23_M2\n    PU23_M2 --> PU23_M3\n    PU23_M3 --> PU23_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU23 [合同审批] - 备用子流程 (纸质传签/邮件审批)\n\n    %% 所有节点定义\n    PU23_A1[打印合同]\n    PU23_A2[手动传签]\n    PU23_A3[邮件审批链]\n    PU23_A4[事后归档]\n\n    %% 所有边的定义\n    PU23_A1 --> PU23_A2\n    PU23_A2 --> PU23_A3\n    PU23_A3 --> PU23_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU24 [合同归档] - 主子流程 (电子与纸质双轨归档)\n\n    %% 所有节点定义\n    PU24_M1[合同用印与签署]\n    PU24_M2[扫描电子化]\n    PU24_M3[电子归档]\n    PU24_M4[实体归档]\n\n    %% 所有边的定义\n    PU24_M1 --> PU24_M2\n    PU24_M2 --> PU24_M3\n    PU24_M3 --> PU24_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU24 [合同归档] - 备用子流程 (简化归档)\n\n    %% 所有节点定义\n    PU24_A1[部门自行保管]\n    PU24_A2[共享文件夹存储]\n    PU24_A3[无系统化管理]\n\n    %% 所有边的定义\n    PU24_A1 --> PU24_A2\n    PU24_A2 --> PU24_A3"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU25 [物料供应] - 主子流程 (协同平台与高级发货通知ASN)\n\n    %% 所有节点定义\n    PU25_M1[订单确认与承诺交期]\n    PU25_M2[创建预发货通知(ASN)]\n    PU25_M3[物流信息实时跟踪]\n    PU25_M4[信息同步至收货方]\n\n    %% 所有边的定义\n    PU25_M1 --> PU25_M2\n    PU25_M2 --> PU25_M3\n    PU25_M3 --> PU25_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU25 [物料供应] - 备用子流程 (人工沟通与被动跟踪)\n\n    %% 所有节点定义\n    PU25_A1[电话/邮件确认发货]\n    PU25_A2[获取基本物流信息]\n    PU25_A3[采购员手动跟踪]\n    PU25_A4[手动通知仓库]\n\n    %% 所有边的定义\n    PU25_A1 --> PU25_A2\n    PU25_A2 --> PU25_A3\n    PU25_A3 --> PU25_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU26 [物料入库] - 主子流程 (扫码收货与系统集成)\n\n    %% 所有节点定义\n    PU26_M1[核对ASN/PO信息]\n    PU26_M2[物理清点与检查]\n    PU26_M3[扫码执行收货]\n    PU26_M4[系统自动处理]\n\n    %% 所有边的定义\n    PU26_M1 --> PU26_M2\n    PU26_M2 --> PU26_M3\n    PU26_M3 --> PU26_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU26 [物料入库] - 备用子流程 (纸质单据与手动录入)\n\n    %% 所有节点定义\n    PU26_A1[接收纸质送货单]\n    PU26_A2[人工核对与清点]\n    PU26_A3[纸质签收确认]\n    PU26_A4[延时批量录入]\n\n    %% 所有边的定义\n    PU26_A1 --> PU26_A2\n    PU26_A2 --> PU26_A3\n    PU26_A3 --> PU26_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU27 [物料验收] - 主子流程 (质检部门专业检验)\n\n    %% 所有节点定义\n    PU27_M1[系统报检]\n    PU27_M2[抽样与检验]\n    PU27_M3[记录检验结果]\n    PU27_M4[结果反馈]\n\n    %% 所有边的定义\n    PU27_M1 --> PU27_M2\n    PU27_M2 --> PU27_M3\n    PU27_M3 --> PU27_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU27 [物料验收] - 备用子流程 (仓库/使用部门简易验收)\n\n    %% 所有节点定义\n    PU27_A1[仓库目视检验]\n    PU27_A2[使用部门验收]\n    PU27_A3[合格即入库]\n    PU27_A4[无详细检验记录]\n\n    %% 所有边的定义\n    PU27_A1 --> PU27_A2\n    PU27_A2 --> PU27_A3\n    PU27_A3 --> PU27_A4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU28 [物料仓储管理] - 主子流程 (WMS系统精细化管理)\n\n    %% 所有节点定义\n    PU28_M1[系统推荐上架]\n    PU28_M2[扫码上架与确认]\n    PU28_M3[系统指导拣货]\n    PU28_M4[定期循环盘点]\n\n    %% 所有边的定义\n    PU28_M1 --> PU28_M2\n    PU28_M2 --> PU28_M3\n    PU28_M3 --> PU28_M4"
+  },
+  {
+    "mermaidDefinition": "flowchart TD\n    %% 图名: PU28 [物料仓储管理] - 备用子流程 (人工经验管理)\n\n    %% 所有节点定义\n    PU28_A1[经验判断上架]\n    PU28_A2[手动记录库位]\n    PU28_A3[按需找料]\n    PU28_A4[年底集中大盘点]\n\n    %% 所有边的定义\n    PU28_A1 --> PU28_A2\n    PU28_A2 --> PU28_A3\n    PU28_A3 --> PU28_A4"
+  }
+]
