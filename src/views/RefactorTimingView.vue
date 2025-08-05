@@ -944,30 +944,24 @@ export default {
         console.log('AI收集状态加载完成（使用默认值）');
       }
     },
-    /* ===== 新增: 获取风险等级分类 ===== */
+    /* ===== 获取风险等级分类 ===== */
     async fetchRiskClassification() {
       try {
         this.riskClassificationLoading = true;
         this.riskClassificationError = null;
 
-        // 1. 获取全部风险数据
+        // 直接调用统一的风险分析API，让后端处理数据获取
         const apiBase = process.env.VUE_APP_API_URL || 'http://localhost:3001';
-        const riskResp = await axios.get(`${apiBase}/api/risk-data`);
-        if (!riskResp.data.success) {
-          throw new Error(riskResp.data.error || '获取风险数据失败');
+        const response = await axios.post(`${apiBase}/api/llm/analyze-risk-structure`);
+        
+        if (!response.data.success) {
+          throw new Error(response.data.error || '风险分析失败');
         }
 
-        const riskRecords = riskResp.data.data;
+        const analysisData = response.data.data;
+        const analysis = analysisData.analysis.riskAnalysis;
 
-        // 2. 调用大模型风险结构化分析API
-        const llmResp = await llmApi.analyzeRiskStructure(riskRecords);
-        if (!llmResp.success) {
-          throw new Error(llmResp.error || '大模型分析失败');
-        }
-
-        const analysis = llmResp.data.riskAnalysis;
-
-        // 3. 更新riskData对象
+        // 更新riskData对象
         this.riskData.totalRisks = analysis.summary.totalSteps;
         this.riskData.highRisks = analysis.riskClassification.highRisk.steps.length;
         this.riskData.mediumRisks = analysis.riskClassification.mediumRisk.steps.length;
@@ -977,7 +971,6 @@ export default {
         this.riskData.lowRiskSteps = analysis.riskClassification.lowRisk.steps;
 
         console.log('✅ 风险等级分类获取成功');
-        console.log('ℹ️ 原始风险数据:', riskRecords);
         console.log('ℹ️ 大模型风险分析结果:', analysis);
       } catch (error) {
         console.error('❌ 获取风险等级分类失败:', error);

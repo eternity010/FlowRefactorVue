@@ -146,6 +146,17 @@ class LLMApi {
   async getUsageStats() {
     return await this.get('/api/llm/usage-stats');
   }
+
+  /**
+   * 分析流程节点风险状态
+   * 基于风险数据和数据库中的采购流程结构，分析哪些节点处于高危状态
+   * @param {Object} analysisParams - 分析参数
+   * @param {Array} analysisParams.riskData - 风险数据数组
+   * @returns {Promise<Object>} 高危节点分析结果
+   */
+  async analyzeProcessNodeRisk(analysisParams = {}) {
+    return await this.post('/api/llm/analyze-process-node-risk', analysisParams);
+  }
 }
 
 // 创建实例并导出

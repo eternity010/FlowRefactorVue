@@ -1707,6 +1707,142 @@ app.post('/api/llm/analyze-risk-structure', async (req, res) => {
   }
 });
 
+// 流程节点风险分析
+app.post('/api/llm/analyze-process-node-risk', async (req, res) => {
+  try {
+    console.log('🔄 开始执行流程节点风险分析...');
+    
+    const { riskData } = req.body;
+    
+    // 参数验证
+    if (!riskData || !Array.isArray(riskData) || riskData.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '缺少有效的风险数据'
+      });
+    }
+    
+    console.log(`✅ 风险数据验证通过: ${riskData.length} 条风险记录`);
+    
+    // 从数据库获取采购流程结构数据
+    console.log('🔄 正在从数据库获取采购流程结构数据...');
+    const processStructureResult = await flowDataService.getMermaidFlowData('purchase');
+    
+    if (!processStructureResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: '获取流程结构数据失败: ' + processStructureResult.error
+      });
+    }
+    
+    const processStructure = processStructureResult.data;
+    console.log(`✅ 成功获取流程结构数据: ${processStructure.length} 个采购流程节点`);
+    
+    // 准备分析请求数据
+    const analysisRequest = {
+      riskData: riskData,
+      processStructure: processStructure
+    };
+    
+    // 构建系统提示词
+    const systemMessage = `你是一个专业的流程风险分析专家。请基于提供的风险数据和流程结构，分析出在风险数据影响下处于高危状态的流程节点。
+
+分析要求：
+1. 仔细分析风险数据中的风险因子和风险值
+2. 对照流程结构，识别哪些节点与高风险因子相关
+3. 确定高危节点并提供详细的风险分析理由
+
+请以以下JSON格式输出结果：
+{
+  "highRiskNodes": [
+    {
+      "nodeId": "节点ID",
+      "nodeName": "节点名称", 
+      "riskLevel": "HIGH/MEDIUM/LOW",
+      "riskScore": 0.85,
+      "riskFactors": ["相关风险因子1", "相关风险因子2"],
+      "riskReason": "详细风险分析原因",
+      "recommendation": "风险缓解建议"
+    }
+  ],
+  "summary": {
+    "totalNodes": 总节点数,
+    "highRiskNodes": 高危节点数,
+    "mediumRiskNodes": 中风险节点数,
+    "lowRiskNodes": 低风险节点数,
+    "overallRiskLevel": "整体风险等级",
+    "criticalPath": "关键风险路径",
+    "mainRecommendation": "主要建议"
+  }
+}`;
+
+    // 调用大模型分析
+    const analysisResult = await llmService.chat(
+      `请分析以下风险数据和流程结构，识别高危节点：
+
+风险数据：
+${JSON.stringify(analysisRequest.riskData, null, 2)}
+
+流程结构：
+${JSON.stringify(analysisRequest.processStructure, null, 2)}`,
+      systemMessage
+    );
+
+    if (analysisResult.success) {
+      try {
+        // 尝试解析JSON
+        let parsedResult;
+        let rawContent = analysisResult.data.content.trim();
+
+        // 直接尝试解析
+        try {
+          parsedResult = JSON.parse(rawContent);
+        } catch (e1) {
+          // 去除```包裹以及```json标记
+          const cleaned = rawContent
+            .replace(/```json\s*/gi, '')
+            .replace(/```/g, '')
+            .trim();
+          parsedResult = JSON.parse(cleaned);
+        }
+        
+        res.json({
+          success: true,
+          data: {
+            nodeRiskAnalysis: parsedResult,
+            analysis: {
+              usage: analysisResult.data.usage,
+              model: analysisResult.data.model,
+              timestamp: analysisResult.data.timestamp
+            },
+            inputInfo: {
+              riskDataCount: riskData.length,
+              processNodeCount: processStructure.length,
+              dataSource: '数据库采购流程'
+            }
+          }
+        });
+      } catch (parseError) {
+        // 如果JSON解析失败，返回原始内容
+        res.json({
+          success: false,
+          error: 'LLM输出格式不是有效的JSON',
+          rawContent: analysisResult.data.content,
+          usage: analysisResult.data.usage
+        });
+      }
+    } else {
+      res.status(500).json({
+        success: false,
+        error: analysisResult.error
+      });
+    }
+
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // 获取使用统计（占位符，后续可扩展）
 app.get('/api/llm/usage-stats', async (req, res) => {
   try {

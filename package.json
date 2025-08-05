@@ -32,7 +32,9 @@
     "test-single-risk": "node scripts/test-single-risk-analysis.js",
     "test-structured-risk": "node scripts/test-structured-risk-analysis.js",
     "test-risk-structure-api": "node scripts/test-risk-structure-api.js",
-    "demo-risk-api": "node scripts/demo-risk-structure-api.js"
+    "demo-risk-api": "node scripts/demo-risk-structure-api.js",
+    "import-procurement-data": "node scripts/import-procurement-data-to-mongodb.js",
+    "test-procurement-data": "node scripts/test-procurement-data-queries.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",

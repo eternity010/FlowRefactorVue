@@ -1,7 +1,7 @@
 <template>
   <div class="process-optimization-container">
     <!-- 前置页面 -->
-    <div v-if="!showMainContent && !showLoading" class="pre-page">
+    <div v-if="!showMainContent && !showRiskAnalysis" class="pre-page">
       <!-- 数据加载错误提示 -->
       <div v-if="dataError" class="data-error-indicator">
         <el-card class="error-indicator-card">
@@ -119,10 +119,10 @@
       </el-card>
     </div>
 
-    <!-- 加载动画页面 -->
-    <div v-if="showLoading" class="loading-page">
-      <el-card class="loading-card">
-        <div class="loading-content">
+    <!-- 风险分析前置界面 -->
+    <div v-if="showRiskAnalysis && riskAnalysisLoading" class="risk-pre-page">
+      <el-card class="risk-pre-card">
+        <div class="risk-pre-content">
           <div class="neural-network">
             <div class="node-layer">
               <div class="node" v-for="i in 4" :key="'input-' + i"></div>
@@ -146,8 +146,8 @@
               <div class="node" v-for="i in 3" :key="'output-' + i"></div>
             </div>
           </div>
-          <h3 class="loading-title">分析中</h3>
-          <p class="loading-description">正在分析流程数据，识别优化点...</p>
+          <h3 class="loading-title">风险数据分析中</h3>
+          <p class="loading-description">大模型正在对流程风险进行结构化分析...</p>
           <div class="progress-dots">
             <span class="dot"></span>
             <span class="dot"></span>
@@ -157,8 +157,150 @@
       </el-card>
     </div>
 
+    <!-- 风险分析中间态页面 -->
+    <div v-if="showRiskAnalysis && !riskAnalysisLoading" class="risk-analysis-page">
+      <el-card class="risk-analysis-card">
+        <div slot="header" class="risk-analysis-header">
+          <span>风险数据结构化分析</span>
+          <el-tag size="small" type="success">AI分析</el-tag>
+        </div>
+        
+        <div class="risk-analysis-content">
+          <!-- 风险分析结果 -->
+          <div v-if="riskAnalysisData" class="risk-analysis-result">
+            <!-- 风险等级统计 -->
+            <div class="risk-statistics">
+              <div class="stat-card high-risk">
+                <div class="stat-icon">
+                  <i class="el-icon-warning"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ riskAnalysisData.highRiskCount }}</div>
+                  <div class="stat-label">高风险环节</div>
+                </div>
+              </div>
+              
+              <div class="stat-card medium-risk">
+                <div class="stat-icon">
+                  <i class="el-icon-info"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ riskAnalysisData.mediumRiskCount }}</div>
+                  <div class="stat-label">中风险环节</div>
+                </div>
+              </div>
+              
+              <div class="stat-card low-risk">
+                <div class="stat-icon">
+                  <i class="el-icon-success"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ riskAnalysisData.lowRiskCount }}</div>
+                  <div class="stat-label">低风险环节</div>
+                </div>
+              </div>
+              
+              <div class="stat-card total">
+                <div class="stat-icon">
+                  <i class="el-icon-data-analysis"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-number">{{ riskAnalysisData.totalSteps }}</div>
+                  <div class="stat-label">总环节数</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 风险详情 -->
+            <div class="risk-details">
+              <el-tabs v-model="activeRiskTab" type="border-card">
+                <el-tab-pane label="高风险环节" name="high">
+                  <div class="risk-step-list">
+                    <div v-for="step in riskAnalysisData.highRiskSteps" :key="step.id" class="risk-step-item high">
+                      <div class="step-header">
+                        <span class="step-id">{{ step.id }}</span>
+                        <span class="step-name">{{ step.name }}</span>
+                        <el-tag size="mini" type="danger">高风险</el-tag>
+                      </div>
+                      <div class="step-description">{{ step.description }}</div>
+                    </div>
+                  </div>
+                </el-tab-pane>
+                
+                <el-tab-pane label="中风险环节" name="medium">
+                  <div class="risk-step-list">
+                    <div v-for="step in riskAnalysisData.mediumRiskSteps" :key="step.id" class="risk-step-item medium">
+                      <div class="step-header">
+                        <span class="step-id">{{ step.id }}</span>
+                        <span class="step-name">{{ step.name }}</span>
+                        <el-tag size="mini" type="warning">中风险</el-tag>
+                      </div>
+                      <div class="step-description">{{ step.description }}</div>
+                    </div>
+                  </div>
+                </el-tab-pane>
+                
+                <el-tab-pane label="低风险环节" name="low">
+                  <div class="risk-step-list">
+                    <div v-for="step in riskAnalysisData.lowRiskSteps" :key="step.id" class="risk-step-item low">
+                      <div class="step-header">
+                        <span class="step-id">{{ step.id }}</span>
+                        <span class="step-name">{{ step.name }}</span>
+                        <el-tag size="mini" type="success">低风险</el-tag>
+                      </div>
+                      <div class="step-description">{{ step.description }}</div>
+                    </div>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
+
+            <!-- 分析建议 -->
+            <div class="risk-recommendations">
+              <el-alert
+                title="优化建议"
+                type="info"
+                :closable="false"
+                show-icon>
+                <div class="recommendation-content">
+                  <div class="recommendation-item">
+                    <strong>关键风险环节:</strong> {{ riskAnalysisData.criticalStep }}
+                  </div>
+                  <div class="recommendation-item">
+                    <strong>主要建议:</strong> {{ riskAnalysisData.recommendation }}
+                  </div>
+                </div>
+              </el-alert>
+            </div>
+          </div>
+
+          <!-- 错误状态 -->
+          <div v-else-if="riskAnalysisError" class="risk-error">
+            <div class="error-content">
+              <i class="el-icon-warning" style="font-size: 48px; color: #F56C6C;"></i>
+              <h3>风险分析失败</h3>
+              <p>{{ riskAnalysisError }}</p>
+              <el-button type="primary" @click="retryRiskAnalysis">
+                重新分析
+              </el-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <div class="risk-analysis-actions">
+          <el-button type="primary" @click="proceedToOptimization" :disabled="!riskAnalysisData">
+            继续优化分析
+          </el-button>
+          <el-button @click="goBackToStart">
+            返回
+          </el-button>
+        </div>
+      </el-card>
+    </div>
+
     <!-- 主要内容 -->
-    <div v-if="showMainContent && !showLoading">
+    <div v-if="showMainContent && !showRiskAnalysis">
       <!-- 数据检查 -->
       <div v-if="Object.keys(filteredOptPoints).length === 0" class="no-data-warning">
         <el-card>
@@ -309,6 +451,7 @@
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
+import { llmApi } from '@/api/llmApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
@@ -316,7 +459,7 @@ export default {
   data() {
     return {
       showMainContent: false, // 控制是否显示主要内容
-      showLoading: false, // 控制是否显示加载动画
+      showRiskAnalysis: false, // 控制是否显示风险分析中间态页面
       activeOptTab: 'Optimization1',
       optPoints: {}, // 改为空对象，通过API获取
       showResourceDialog: false,
@@ -348,7 +491,17 @@ export default {
       // 添加mermaid相关属性
       mermaidLoaded: false,
       mermaidInitialized: false,
-      renderedCharts: {} // 存储渲染的图表
+      renderedCharts: {}, // 存储渲染的图表
+      // 风险分析相关属性
+      riskAnalysisLoading: false,
+      riskAnalysisData: null,
+      riskAnalysisError: null,
+      activeRiskTab: 'high', // 默认显示高风险环节
+      // 保存风险数据用于后续分析
+      savedRiskData: null,
+      savedAnalysisData: null,
+      // 流程节点风险分析结果
+      processNodeRiskAnalysis: null
     }
   },
 
@@ -630,12 +783,10 @@ export default {
         return;
       }
       
-      this.showLoading = true;
-      // 模拟神经网络分析过程
-      setTimeout(() => {
-        this.showLoading = false;
-        this.showMainContent = true;
-      }, 1000);
+      // 直接进入风险分析页面，隐藏主要操作卡片
+      this.showRiskAnalysis = true;
+      // 开始风险分析
+      this.performRiskAnalysis();
     },
 
     async acceptChange(optimizationKey) {
@@ -701,7 +852,7 @@ export default {
 
     goBackAndReload() {
       this.showMainContent = false;
-      this.showLoading = false;
+      this.showRiskAnalysis = false;
       this.loadOptimizationData();
     },
 
@@ -811,6 +962,159 @@ export default {
         this.loadNeuralNetworkParams(),
         this.loadRAGConfig()
       ]);
+    },
+
+    // 执行风险分析
+    async performRiskAnalysis() {
+      this.riskAnalysisLoading = true;
+      this.riskAnalysisError = null;
+      
+      try {
+        // 使用llmApi的风险分析接口
+        const response = await llmApi.analyzeRiskStructure();
+        
+        if (!response.success) {
+          throw new Error(response.error || '风险分析失败');
+        }
+
+        const analysisData = response.data;
+        const analysis = analysisData.analysis.riskAnalysis;
+
+        // 保存完整的风险数据和分析数据，用于后续的流程节点风险分析
+        this.savedRiskData = analysisData.originalData; // 原始风险数据
+        this.savedAnalysisData = analysisData; // 完整的分析数据
+
+        // 处理风险分析数据
+        this.riskAnalysisData = {
+          totalSteps: analysis.summary.totalSteps,
+          highRiskCount: analysis.riskClassification.highRisk.steps.length,
+          mediumRiskCount: analysis.riskClassification.mediumRisk.steps.length,
+          lowRiskCount: analysis.riskClassification.lowRisk.steps.length,
+          // 转换步骤数组为对象格式，包含id、name、description
+          highRiskSteps: this.transformStepsArray(analysis.riskClassification.highRisk.steps, analysis.riskClassification.highRisk.description),
+          mediumRiskSteps: this.transformStepsArray(analysis.riskClassification.mediumRisk.steps, analysis.riskClassification.mediumRisk.description),
+          lowRiskSteps: this.transformStepsArray(analysis.riskClassification.lowRisk.steps, analysis.riskClassification.lowRisk.description),
+          criticalStep: analysis.summary.criticalStep,
+          recommendation: analysis.summary.recommendation
+        };
+
+        console.log('✅ 风险分析完成:', this.riskAnalysisData);
+        console.log('💾 已保存风险数据供后续分析使用');
+        this.$message.success('风险分析完成');
+      } catch (error) {
+        console.error('❌ 风险分析失败:', error);
+        this.riskAnalysisError = error.message || '风险分析失败';
+        this.$message.error('风险分析失败: ' + error.message);
+      } finally {
+        this.riskAnalysisLoading = false;
+      }
+    },
+
+    // 重试风险分析
+    async retryRiskAnalysis() {
+      await this.performRiskAnalysis();
+    },
+
+    // 继续进入优化分析
+    async proceedToOptimization() {
+      try {
+        // 检查是否有保存的风险数据
+        if (!this.savedRiskData || !this.savedAnalysisData) {
+          this.$message.warning('缺少风险数据，无法进行流程节点风险分析');
+          this.showRiskAnalysis = false;
+          this.showMainContent = true;
+          return;
+        }
+
+        this.$message.info('正在进行流程节点风险分析...');
+        
+        // 调用流程节点风险分析API
+        await this.analyzeProcessNodeRisk();
+        
+        // 进入主要内容页面
+        this.showRiskAnalysis = false;
+        this.showMainContent = true;
+      } catch (error) {
+        console.error('❌ 流程节点风险分析失败:', error);
+        this.$message.error('流程节点风险分析失败，继续进入优化页面');
+        // 即使失败也继续进入主要内容
+        this.showRiskAnalysis = false;
+        this.showMainContent = true;
+      }
+    },
+
+    // 返回开始页面
+    goBackToStart() {
+      this.showRiskAnalysis = false;
+      this.showMainContent = false;
+      // 重置风险分析数据
+      this.riskAnalysisData = null;
+      this.riskAnalysisError = null;
+      // 重置保存的数据
+      this.savedRiskData = null;
+      this.savedAnalysisData = null;
+      this.processNodeRiskAnalysis = null;
+    },
+
+    // 转换步骤数组为对象格式
+    transformStepsArray(stepsArray, description) {
+      if (!Array.isArray(stepsArray)) {
+        return [];
+      }
+      
+      return stepsArray.map((stepName, index) => {
+        // 智能生成步骤ID，基于步骤名称判断类型
+        let stepId = '';
+        const procurementKeywords = ['采购', '供应商', '签约', '验收', '结算', '入库', '质量', 'IQC'];
+        const isProcurementRelated = procurementKeywords.some(keyword => stepName.includes(keyword));
+        
+        if (isProcurementRelated) {
+          stepId = `PU${String(index + 1).padStart(2, '0')}`;
+        } else {
+          stepId = `STEP${String(index + 1).padStart(2, '0')}`;
+        }
+        
+        return {
+          id: stepId,
+          name: stepName,
+          description: description || `${stepName}环节的详细说明`
+        };
+      });
+    },
+
+    // 流程节点风险分析
+    async analyzeProcessNodeRisk() {
+      try {
+        console.log('🔄 开始流程节点风险分析...');
+        
+        // 准备分析参数 - 只传入风险数据，流程结构由后端从数据库获取
+        const analysisParams = {
+          riskData: this.savedRiskData // 来自 analyzeRiskStructure 的原始风险数据
+        };
+
+        console.log('📊 分析参数:', {
+          '风险数据记录数': (this.savedRiskData && this.savedRiskData.length) || 0,
+          '流程结构数据源': '后端从数据库自动获取'
+        });
+
+        // 调用新的API
+        const response = await llmApi.analyzeProcessNodeRisk(analysisParams);
+        
+        if (!response.success) {
+          throw new Error(response.error || '流程节点风险分析失败');
+        }
+
+        console.log('✅ 流程节点风险分析完成:', response.data);
+        this.$message.success('流程节点风险分析完成');
+        
+        // 可以将分析结果保存到组件状态中，供后续使用
+        this.processNodeRiskAnalysis = response.data;
+        
+        return response.data;
+      } catch (error) {
+        console.error('❌ 流程节点风险分析失败:', error);
+        throw error;
+      }
     }
   }
 }
@@ -1135,21 +1439,21 @@ export default {
   }
 }
 
-/* 加载动画页面样式 */
-.loading-page {
+/* 风险分析前置界面样式 */
+.risk-pre-page {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 70vh;
 }
 
-.loading-card {
+.risk-pre-card {
   width: 100%;
   max-width: 700px;
   text-align: center;
 }
 
-.loading-content {
+.risk-pre-content {
   padding: 50px 20px;
 }
 
@@ -1617,6 +1921,296 @@ export default {
   }
   100% {
     left: 100%;
+  }
+}
+
+/* 风险分析中间态页面样式 */
+.risk-analysis-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 20px;
+}
+
+.risk-analysis-card {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.risk-analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.risk-analysis-content {
+  padding: 20px 0;
+}
+
+/* 风险分析加载状态 */
+.risk-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.risk-loading-spinner {
+  margin-bottom: 20px;
+}
+
+.risk-loading-spinner i {
+  font-size: 48px;
+  color: #409EFF;
+  animation: spin 1s linear infinite;
+}
+
+.risk-loading h3 {
+  font-size: 24px;
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.risk-loading p {
+  font-size: 16px;
+  color: #606266;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 风险统计卡片 */
+.risk-statistics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card.high-risk {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  color: white;
+}
+
+.stat-card.medium-risk {
+  background: linear-gradient(135deg, #ffa726, #ffb74d);
+  color: white;
+}
+
+.stat-card.low-risk {
+  background: linear-gradient(135deg, #66bb6a, #81c784);
+  color: white;
+}
+
+.stat-card.total {
+  background: linear-gradient(135deg, #42a5f5, #64b5f6);
+  color: white;
+}
+
+.stat-icon {
+  margin-right: 15px;
+}
+
+.stat-icon i {
+  font-size: 32px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 风险详情 */
+.risk-details {
+  margin-bottom: 30px;
+}
+
+.risk-step-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.risk-step-item {
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  background-color: #f8f9fa;
+}
+
+.risk-step-item.high {
+  border-left-color: #f56c6c;
+  background-color: #fef0f0;
+}
+
+.risk-step-item.medium {
+  border-left-color: #e6a23c;
+  background-color: #fdf6ec;
+}
+
+.risk-step-item.low {
+  border-left-color: #67c23a;
+  background-color: #f0f9ff;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.step-id {
+  font-weight: bold;
+  color: #409EFF;
+  margin-right: 10px;
+  min-width: 60px;
+}
+
+.step-name {
+  flex: 1;
+  font-weight: 600;
+  color: #303133;
+}
+
+.step-description {
+  color: #606266;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* 风险建议 */
+.risk-recommendations {
+  margin-bottom: 30px;
+}
+
+.recommendation-content {
+  padding: 10px 0;
+}
+
+.recommendation-item {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.recommendation-item:last-child {
+  margin-bottom: 0;
+}
+
+.recommendation-item strong {
+  color: #409EFF;
+}
+
+/* 错误状态 */
+.risk-error {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.error-content h3 {
+  font-size: 24px;
+  color: #303133;
+  margin: 0;
+}
+
+.error-content p {
+  font-size: 16px;
+  color: #606266;
+  margin: 0;
+}
+
+/* 底部操作按钮 */
+.risk-analysis-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+.risk-analysis-actions .el-button {
+  min-width: 120px;
+  padding: 12px 24px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .risk-statistics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+  }
+  
+  .stat-icon i {
+    font-size: 24px;
+  }
+  
+  .stat-number {
+    font-size: 20px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+  }
+  
+  .risk-analysis-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .risk-analysis-actions .el-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .risk-statistics {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .step-id {
+    margin-right: 0;
   }
 }
 </style> 
