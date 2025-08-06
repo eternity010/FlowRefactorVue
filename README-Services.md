@@ -210,6 +210,7 @@ Vue组件 → llmApi → apiServer → llmService → 火山引擎Ark API
 | `/api/sub-process-data` | GET | 获取子流程数据 | `getSubProcessData()` |
 | `/api/sub-process-data/:type` | GET | 获取指定类型子流程数据 | `getSubProcessDataByType()` |
 | `/api/mermaid-flow/:type` | GET | 获取Mermaid流程图数据 | `getMermaidFlowData()` |
+| `/api/mermaid-flow/:type/nodes` | POST | 获取特定节点的数据 | `getNodeDataFromMermaid()` |
 | `/api/mermaid-flows` | GET | 获取所有Mermaid流程图数据 | `getAllMermaidFlowData()` |
 | `/api/total-data` | GET | 获取总数据 | `getTotalData()` |
 | `/api/search-flow` | GET | 搜索流程数据 | `searchFlowData()` |
@@ -283,6 +284,9 @@ Vue组件 → llmApi → apiServer → llmService → 火山引擎Ark API
 | `/api/llm/analyze-process` | POST | 流程分析 | `analyzeProcess()` |
 | `/api/llm/assess-risks` | POST | 风险评估 | `assessRisks()` |
 | `/api/llm/recommendations` | POST | 智能推荐 | `getRecommendations()` |
+| `/api/llm/analyze-risk-structure` | POST | 风险数据结构化分析 | `analyzeRiskStructure()` |
+| `/api/llm/analyze-process-node-risk` | POST | 分析流程节点风险状态 | `analyzeProcessNodeRisk()` |
+| `/api/llm/save-node-risk-status` | POST | 保存节点风险状态数据到MongoDB（原始API结果） | `saveNodeRiskStatusData()` |
 | `/api/llm/connection` | GET | 检查连接状态 | `checkConnection()` |
 | `/api/llm/usage-stats` | GET | 获取使用统计 | 统计功能 |
 
@@ -326,6 +330,9 @@ const subProcessData = await subProcessDataApi.getSubProcessDataByType('purchase
 
 // 获取Mermaid流程图数据
 const mermaidData = await subProcessDataApi.getMermaidFlowData('purchase')
+
+// 获取特定节点的数据
+const nodeData = await subProcessDataApi.getNodeDataFromMermaid('purchase', ['PU22', 'PU23', 'PU27'])
 
 // 获取规划时间数据
 const planningData = await planningTimeApi.getPlanningTimeData()
@@ -403,6 +410,32 @@ const recommendations = await llmApi.getRecommendations({
   currentRiskLevel: '高风险',
   targetRiskLevel: '中风险',
   constraints: ['成本控制', '时间限制']
+})
+
+// 风险数据结构化分析
+const riskStructureAnalysis = await llmApi.analyzeRiskStructure()
+
+// 分析流程节点风险状态
+const nodeRiskAnalysis = await llmApi.analyzeProcessNodeRisk({
+  riskData: riskData
+})
+
+// 保存节点风险状态数据到MongoDB（原始API结果）
+const saveResult = await llmApi.saveNodeRiskStatusData({
+  nodeRiskAnalysis: {
+    highRiskNodes: [...],
+    summary: {...}
+  },
+  analysis: {
+    model: "deepseek-v3-250324",
+    timestamp: "2025-01-20T10:30:45.516Z",
+    usage: {...}
+  },
+  inputInfo: {
+    riskDataCount: 1,
+    processNodeCount: 28,
+    dataSource: "数据库采购流程"
+  }
 })
 
 // 检查大模型连接
@@ -631,6 +664,7 @@ curl http://localhost:3001/api/llm/connection
 11. **参数配置集合**: `neural_network_parameters`, `neural_network_parameter_history`, `neural_network_saved_configs`
 12. **流程优化集合**: `process_optimization_flow_data`
 13. **风险数据集合**: `risk_data` (新增)
+14. **节点风险状态集合**: `node_risk_status_data` (新增)
 
 ### 开发建议
 12. **渐进增强**: 前端应优雅处理API服务不可用的情况

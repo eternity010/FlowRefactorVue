@@ -197,6 +197,56 @@ app.get('/api/mermaid-flows', async (req, res) => {
   }
 });
 
+// 获取特定节点的数据
+app.post('/api/mermaid-flow/:type/nodes', async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { nodeIds } = req.body;
+    
+    console.log(`🔍 获取 ${type} 流程中的节点数据:`, nodeIds);
+    
+    // 参数验证
+    if (!nodeIds || !Array.isArray(nodeIds) || nodeIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '参数错误：nodeIds必须是非空数组'
+      });
+    }
+    
+    // 验证流程类型
+    const validTypes = ['purchase', 'production', 'marketing', 'operation'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({
+        success: false,
+        error: `无效的流程类型: ${type}。支持的类型: ${validTypes.join(', ')}`
+      });
+    }
+    
+    console.log(`📋 请求获取的节点ID: ${nodeIds.join(', ')}`);
+    
+    const result = await flowDataService.getNodeDataFromMermaid(type, nodeIds);
+    
+    if (result.success) {
+      console.log(`✅ 成功获取节点数据: 请求${result.data.totalRequested}个，找到${result.data.totalFound}个`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: `成功获取 ${type} 流程的节点数据`
+      });
+    } else {
+      console.error(`❌ 获取节点数据失败:`, result.error);
+      res.status(404).json({
+        success: false,
+        error: result.error
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ 获取节点数据异常:', error);
+    sendError(res, error);
+  }
+});
+
 // 搜索流程数据
 app.get('/api/search-flow', async (req, res) => {
   try {
@@ -1858,6 +1908,78 @@ app.get('/api/llm/usage-stats', async (req, res) => {
       }
     });
   } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 保存节点风险状态数据到MongoDB（原始API结果）
+app.post('/api/llm/save-node-risk-status', async (req, res) => {
+  try {
+    console.log('🔄 开始保存节点风险状态数据（原始API结果）...');
+    
+    const { nodeRiskStatusData } = req.body;
+    
+    // 参数验证
+    if (!nodeRiskStatusData) {
+      return res.status(400).json({
+        success: false,
+        error: '缺少节点风险状态数据'
+      });
+    }
+    
+    console.log('✅ 节点风险状态数据验证通过');
+    console.log('📋 数据类型:', typeof nodeRiskStatusData);
+    console.log('📋 数据结构:', {
+      hasNodeRiskAnalysis: !!nodeRiskStatusData.nodeRiskAnalysis,
+      hasAnalysis: !!nodeRiskStatusData.analysis,
+      hasInputInfo: !!nodeRiskStatusData.inputInfo,
+      keys: Object.keys(nodeRiskStatusData)
+    });
+    
+    // 准备保存到MongoDB的数据
+    const timestamp = new Date();
+    const dataToSave = {
+      _id: timestamp.toISOString(), // 使用时间作为ID
+      timestamp: timestamp,
+      createdAt: timestamp,
+      originalApiResult: nodeRiskStatusData, // 明确标记为原始API结果
+      dataType: 'original_api_result', // 数据类型标记
+      version: '1.0.0',
+      source: 'ProcessOptimizationView'
+    };
+    
+    console.log('📝 准备保存数据:', {
+      id: dataToSave._id,
+      timestamp: dataToSave.timestamp,
+      dataType: dataToSave.dataType,
+      source: dataToSave.source,
+      originalDataKeys: Object.keys(nodeRiskStatusData)
+    });
+    
+    // 使用flowDataService保存到maintenance_system数据库的node_risk_status_data集合
+    const saveResult = await flowDataService.saveToCollection('node_risk_status_data', dataToSave);
+    
+    if (saveResult.success) {
+      console.log('✅ 节点风险状态数据（原始API结果）保存成功');
+      res.json({
+        success: true,
+        data: {
+          id: dataToSave._id,
+          timestamp: dataToSave.timestamp,
+          dataType: dataToSave.dataType,
+          message: '节点风险状态数据（原始API结果）保存成功'
+        }
+      });
+    } else {
+      console.error('❌ 保存失败:', saveResult.error);
+      res.status(500).json({
+        success: false,
+        error: '保存节点风险状态数据失败: ' + saveResult.error
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ 保存节点风险状态数据异常:', error);
     sendError(res, error);
   }
 });

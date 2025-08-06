@@ -157,6 +157,17 @@ class LLMApi {
   async analyzeProcessNodeRisk(analysisParams = {}) {
     return await this.post('/api/llm/analyze-process-node-risk', analysisParams);
   }
+
+  /**
+   * 保存节点风险状态数据到MongoDB
+   * @param {Object} nodeRiskStatusData - 节点风险状态数据（原始API结果或格式化数据）
+   * @returns {Promise<Object>} 保存结果
+   */
+  async saveNodeRiskStatusData(nodeRiskStatusData) {
+    return await this.post('/api/llm/save-node-risk-status', {
+      nodeRiskStatusData
+    });
+  }
 }
 
 // 创建实例并导出

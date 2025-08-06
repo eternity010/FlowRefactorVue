@@ -56,6 +56,8 @@
             <i class="el-icon-document"></i>
             配置RAG
           </el-button>
+          
+
             </div>
           </div>
           
@@ -272,6 +274,124 @@
                 </div>
               </el-alert>
             </div>
+
+            <!-- 节点风险状态分析区域 -->
+            <div v-if="nodeRiskStatusData" class="node-risk-status-section">
+              <el-divider content-position="left">
+                <i class="el-icon-cpu"></i>
+                <span>节点风险状态分析</span>
+              </el-divider>
+              
+              <!-- 节点风险统计 -->
+              <div class="node-risk-statistics">
+                <div class="node-stat-card total-nodes">
+                  <div class="stat-icon">
+                    <i class="el-icon-data-analysis"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.totalNodes }}</div>
+                    <div class="stat-label">总节点数</div>
+                  </div>
+                </div>
+                
+                <div class="node-stat-card high-risk-nodes">
+                  <div class="stat-icon">
+                    <i class="el-icon-warning"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.highRiskNodes }}</div>
+                    <div class="stat-label">高危节点</div>
+                  </div>
+                </div>
+                
+                <div class="node-stat-card overall-risk">
+                  <div class="stat-icon">
+                    <i class="el-icon-pie-chart"></i>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.overallRiskLevel }}</div>
+                    <div class="stat-label">整体风险等级</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 高危节点列表 -->
+              <div v-if="nodeRiskStatusData.nodesByRiskLevel.HIGH.length > 0" class="high-risk-nodes-list">
+                <h4 class="section-subtitle">🔴 高危节点详情</h4>
+                <div class="high-risk-node-cards">
+                  <div 
+                    v-for="node in nodeRiskStatusData.nodesByRiskLevel.HIGH" 
+                    :key="node.nodeId"
+                    class="risk-node-card high-risk">
+                    <div class="node-header">
+                      <span class="node-id">{{ node.nodeId }}</span>
+                      <span class="node-name">{{ node.nodeName }}</span>
+                      <el-tag size="mini" type="danger">{{ node.riskLevel }}</el-tag>
+                    </div>
+                    <div class="node-score">
+                      <span>风险评分: </span>
+                      <span class="score-value">{{ node.riskScore }}</span>
+                    </div>
+                    <div class="node-factors">
+                      <span>风险因子: </span>
+                      <el-tag 
+                        v-for="factor in node.riskFactors" 
+                        :key="factor"
+                        size="mini" 
+                        type="warning" 
+                        style="margin: 0 2px;">
+                        {{ factor }}
+                      </el-tag>
+                    </div>
+                    <div class="node-reason">{{ node.riskReason }}</div>
+                    <div class="node-recommendation">
+                      <strong>建议:</strong> {{ node.recommendation }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 关键风险路径 -->
+              <div class="critical-path-section">
+                <el-alert
+                  title="关键风险路径"
+                  type="warning"
+                  :closable="false"
+                  show-icon>
+                  <div class="critical-path-content">
+                    <div class="path-text">{{ nodeRiskStatusData.criticalPath }}</div>
+                    <div class="main-recommendation">
+                      <strong>主要建议:</strong> {{ nodeRiskStatusData.mainRecommendation }}
+                    </div>
+                  </div>
+                </el-alert>
+              </div>
+            </div>
+
+            <!-- 节点风险分析加载状态 -->
+            <div v-if="nodeRiskAnalysisLoading" class="node-risk-loading">
+              <el-card class="loading-card">
+                <div class="loading-content">
+                  <i class="el-icon-loading loading-icon"></i>
+                  <h4>正在分析节点风险状态...</h4>
+                  <p>大模型正在结合风险数据和流程结构进行深度分析</p>
+                </div>
+              </el-card>
+            </div>
+
+            <!-- 节点风险分析错误状态 -->
+            <div v-if="nodeRiskAnalysisError" class="node-risk-error">
+              <el-alert
+                title="节点风险分析失败"
+                :description="nodeRiskAnalysisError"
+                type="error"
+                show-icon
+                :closable="false">
+                <el-button type="primary" size="small" @click="retryNodeRiskAnalysis">
+                  重新分析
+                </el-button>
+              </el-alert>
+            </div>
           </div>
 
           <!-- 错误状态 -->
@@ -289,9 +409,21 @@
 
         <!-- 底部操作按钮 -->
         <div class="risk-analysis-actions">
-          <el-button type="primary" @click="proceedToOptimization" :disabled="!riskAnalysisData">
+          <el-button 
+            v-if="!nodeRiskStatusData && !nodeRiskAnalysisLoading"
+            type="primary" 
+            @click="analyzeNodeRiskStatus" 
+            :disabled="!riskAnalysisData">
             继续优化分析
           </el-button>
+          
+          <el-button 
+            v-if="nodeRiskStatusData"
+            type="success" 
+            @click="proceedToOptimization">
+            进入流程优化
+          </el-button>
+          
           <el-button @click="goBackToStart">
             返回
           </el-button>
@@ -321,6 +453,26 @@
         <span>流程重构优化</span>
           <div class="header-actions">
         <el-tag size="small" type="primary">版本: 1.0.0</el-tag>
+        <!-- 风险数据状态指示器 -->
+        <div v-if="nodeRiskStatusData" class="risk-data-indicator">
+          <el-tag size="small" type="success">
+            <i class="el-icon-check"></i>
+            节点风险数据已加载
+          </el-tag>
+          <span class="risk-data-summary">
+            ({{ nodeRiskStatusData.riskStatistics.highRiskNodes }}个高危节点)
+          </span>
+          <!-- 导出按钮 -->
+          <el-button 
+            type="primary" 
+            size="mini"
+            icon="el-icon-download"
+            @click="exportEnrichedDataToJson"
+            :loading="exportLoading"
+            class="export-button-inline">
+            导出数据
+          </el-button>
+        </div>
           </div>
       </div>
       
@@ -452,6 +604,7 @@ import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
 import { llmApi } from '@/api/llmApi.js'
+import { subProcessDataApi } from '@/api/subProcessDataApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
@@ -501,7 +654,20 @@ export default {
       savedRiskData: null,
       savedAnalysisData: null,
       // 流程节点风险分析结果
-      processNodeRiskAnalysis: null
+      processNodeRiskAnalysis: null,
+      // 节点风险状态数据（格式化后的）
+      nodeRiskStatusData: null,
+      // 节点风险分析加载状态
+      nodeRiskAnalysisLoading: false,
+      // 节点风险分析错误
+      nodeRiskAnalysisError: null,
+      
+      // 高危节点数据
+      highRiskNodeData: null, // 高危节点的详细数据
+      highRiskNodeIds: [], // 高危节点ID列表
+      nodeDataLoading: false, // 节点数据加载状态
+      nodeDataError: null, // 节点数据加载错误
+      exportLoading: false // 导出功能加载状态
     }
   },
 
@@ -1015,31 +1181,358 @@ export default {
       await this.performRiskAnalysis();
     },
 
-    // 继续进入优化分析
-    async proceedToOptimization() {
+    // 分析节点风险状态（新方法）
+    async analyzeNodeRiskStatus() {
       try {
         // 检查是否有保存的风险数据
         if (!this.savedRiskData || !this.savedAnalysisData) {
           this.$message.warning('缺少风险数据，无法进行流程节点风险分析');
-          this.showRiskAnalysis = false;
-          this.showMainContent = true;
           return;
         }
 
+        // 开始加载
+        this.nodeRiskAnalysisLoading = true;
+        this.nodeRiskAnalysisError = null;
         this.$message.info('正在进行流程节点风险分析...');
         
-        // 调用流程节点风险分析API
-        await this.analyzeProcessNodeRisk();
+        // 调用节点风险状态分析API
+        const riskStatusData = await this.getNodeRiskStatus();
         
-        // 进入主要内容页面
-        this.showRiskAnalysis = false;
-        this.showMainContent = true;
+        if (riskStatusData) {
+          // 保存格式化后的节点风险状态数据
+          this.nodeRiskStatusData = riskStatusData;
+          console.log('✅ 节点风险状态数据已保存:', riskStatusData);
+          
+          // 调用API将原始API结果保存到MongoDB
+          try {
+            console.log('🔄 开始将原始节点风险状态数据保存到MongoDB...');
+            
+            // 使用原始API结果而不是格式化后的数据
+            const originalApiResult = this.processNodeRiskAnalysis;
+            console.log('📋 准备保存的原始API数据:', originalApiResult);
+            
+            const saveResult = await llmApi.saveNodeRiskStatusData(originalApiResult);
+            
+            if (saveResult.success) {
+              console.log('✅ 原始节点风险状态数据已成功保存到MongoDB:', saveResult.data);
+              this.$message.success('节点风险状态分析完成，原始数据已保存到数据库');
+            } else {
+              console.warn('⚠️ 原始节点风险状态数据保存到MongoDB失败:', saveResult.error);
+              this.$message.warning('节点风险状态分析完成，但原始数据保存失败: ' + saveResult.error);
+            }
+          } catch (saveError) {
+            console.error('❌ 保存原始节点风险状态数据到MongoDB异常:', saveError);
+            this.$message.warning('节点风险状态分析完成，但原始数据保存异常: ' + saveError.message);
+          }
+          
+          // 自动获取高危节点的详细数据
+          await this.fetchHighRiskNodeData();
+        } else {
+          throw new Error('未能获取到节点风险状态数据');
+        }
+        
       } catch (error) {
-        console.error('❌ 流程节点风险分析失败:', error);
-        this.$message.error('流程节点风险分析失败，继续进入优化页面');
-        // 即使失败也继续进入主要内容
+        console.error('❌ 节点风险状态分析失败:', error);
+        this.nodeRiskAnalysisError = error.message || '节点风险状态分析失败';
+        this.$message.error('节点风险状态分析失败: ' + error.message);
+      } finally {
+        this.nodeRiskAnalysisLoading = false;
+      }
+    },
+
+    // 重试节点风险分析
+    async retryNodeRiskAnalysis() {
+      await this.analyzeNodeRiskStatus();
+    },
+
+    // 获取高危节点的详细数据
+    async fetchHighRiskNodeData() {
+      try {
+        console.log('🔍 开始获取高危节点的详细数据...');
+        
+        // 检查是否有高危节点数据
+        if (!this.nodeRiskStatusData || !this.nodeRiskStatusData.highRiskNodes) {
+          console.log('⚠️ 没有高危节点数据，跳过获取详细数据');
+          return;
+        }
+        
+        // 提取高危节点ID列表
+        const highRiskNodeIds = this.nodeRiskStatusData.highRiskNodes.map(node => node.nodeId);
+        
+        if (highRiskNodeIds.length === 0) {
+          console.log('⚠️ 没有高危节点ID，跳过获取详细数据');
+          return;
+        }
+        
+        this.nodeDataLoading = true;
+        this.nodeDataError = null;
+        this.highRiskNodeIds = highRiskNodeIds;
+        
+        console.log(`📋 准备获取高危节点数据: ${highRiskNodeIds.join(', ')}`);
+        this.$message.info(`正在获取 ${highRiskNodeIds.length} 个高危节点的详细数据...`);
+        
+        // 调用API获取采购流程中的节点数据
+        const nodeDataResult = await subProcessDataApi.getNodeDataFromMermaid('purchase', highRiskNodeIds);
+        
+        if (nodeDataResult.success) {
+          this.highRiskNodeData = nodeDataResult.data;
+          
+          console.log('✅ 成功获取高危节点详细数据:', {
+            totalRequested: nodeDataResult.data.totalRequested,
+            totalFound: nodeDataResult.data.totalFound,
+            notFoundNodes: nodeDataResult.data.notFoundNodes
+          });
+          
+          // 显示获取结果
+          const foundCount = nodeDataResult.data.totalFound;
+          const totalCount = nodeDataResult.data.totalRequested;
+          
+          if (foundCount === totalCount) {
+            this.$message.success(`成功获取所有 ${foundCount} 个高危节点的详细数据`);
+          } else {
+            this.$message.warning(`获取了 ${foundCount}/${totalCount} 个高危节点的详细数据，${nodeDataResult.data.notFoundNodes.length} 个节点未找到`);
+            
+            if (nodeDataResult.data.notFoundNodes.length > 0) {
+              console.log('⚠️ 未找到的节点:', nodeDataResult.data.notFoundNodes);
+            }
+          }
+          
+          // 将节点数据与风险数据关联
+          this.enrichRiskDataWithNodeData();
+          
+        } else {
+          this.nodeDataError = nodeDataResult.error || '获取节点数据失败';
+          console.error('❌ 获取高危节点数据失败:', nodeDataResult.error);
+          this.$message.error('获取高危节点数据失败: ' + nodeDataResult.error);
+        }
+        
+      } catch (error) {
+        this.nodeDataError = error.message || '获取节点数据异常';
+        console.error('❌ 获取高危节点数据异常:', error);
+        this.$message.error('获取高危节点数据异常: ' + error.message);
+      } finally {
+        this.nodeDataLoading = false;
+      }
+    },
+
+    // 将节点数据与风险数据关联（增强版本，支持完整子流程信息）
+    enrichRiskDataWithNodeData() {
+      try {
+        if (!this.highRiskNodeData || !this.nodeRiskStatusData) {
+          console.log('⚠️ 缺少必要的数据进行关联');
+          return;
+        }
+        
+        console.log('🔗 开始关联节点数据与风险数据（包含子流程详情）...');
+        
+        const nodeDataMap = this.highRiskNodeData.nodeDataMap || {};
+        const enhancementInfo = this.highRiskNodeData.dataEnhancement || {};
+        
+        console.log('📊 数据关联概览:', {
+          可关联节点数: Object.keys(nodeDataMap).length,
+          包含子流程详情: enhancementInfo.includesSubProcessDetails,
+          子流程节点数: enhancementInfo.subProcessNodesFound
+        });
+        
+        let totalEnriched = 0;
+        let subProcessEnriched = 0;
+        
+        // 为每个高危节点添加详细的节点数据
+        if (this.nodeRiskStatusData.highRiskNodes) {
+          this.nodeRiskStatusData.highRiskNodes.forEach(riskNode => {
+            const nodeData = nodeDataMap[riskNode.nodeId];
+            if (nodeData) {
+              riskNode.nodeDetails = nodeData;
+              totalEnriched++;
+              
+              // 检查是否包含子流程信息
+              const hasSubProcess = nodeData.flowCount && nodeData.flowCount > 0;
+              if (hasSubProcess) {
+                subProcessEnriched++;
+                console.log(`✅ 为节点 ${riskNode.nodeId} 关联了完整数据（含${nodeData.flowCount}个子流程）:`, {
+                  基本信息: {
+                    id: nodeData.id,
+                    label: nodeData.label || nodeData.description,
+                    type: nodeData.type
+                  },
+                  子流程信息: {
+                    description: nodeData.description,
+                    flowCount: nodeData.flowCount,
+                    currentFlowNumber: nodeData.currentFlowNumber,
+                    hasMainFlow: !!nodeData.mermaidDefinition1,
+                    hasAltFlow: !!nodeData.mermaidDefinition2
+                  }
+                });
+              } else {
+                console.log(`✅ 为节点 ${riskNode.nodeId} 关联了基本数据:`, {
+                  id: nodeData.id,
+                  label: nodeData.label || nodeData.text,
+                  type: nodeData.type,
+                  source: nodeData.source
+                });
+              }
+            } else {
+              console.log(`⚠️ 节点 ${riskNode.nodeId} 没有找到对应的详细数据`);
+            }
+          });
+        }
+        
+        // 为按风险等级分组的节点也添加详细数据
+        if (this.nodeRiskStatusData.nodesByRiskLevel) {
+          ['HIGH', 'MEDIUM', 'LOW'].forEach(level => {
+            const nodes = this.nodeRiskStatusData.nodesByRiskLevel[level];
+            if (nodes && Array.isArray(nodes)) {
+              nodes.forEach(riskNode => {
+                const nodeData = nodeDataMap[riskNode.nodeId];
+                if (nodeData) {
+                  riskNode.nodeDetails = nodeData;
+                }
+              });
+            }
+          });
+        }
+        
+        console.log('✅ 节点数据与风险数据关联完成');
+        console.log('📈 关联统计:', {
+          总关联节点数: totalEnriched,
+          包含子流程详情节点数: subProcessEnriched,
+          关联成功率: `${((totalEnriched / ((this.nodeRiskStatusData.highRiskNodes && this.nodeRiskStatusData.highRiskNodes.length) || 1)) * 100).toFixed(1)}%`
+        });
+        
+        // 根据关联结果显示不同的消息
+        if (subProcessEnriched > 0) {
+          this.$message.success(`节点数据关联完成！${totalEnriched}个节点已关联，其中${subProcessEnriched}个包含完整子流程详情。您可以使用左上角的导出按钮获取完整数据格式。`);
+        } else if (totalEnriched > 0) {
+          this.$message.success(`节点数据关联完成！${totalEnriched}个节点已关联基本信息。您可以使用左上角的导出按钮获取完整数据格式。`);
+        } else {
+          this.$message.warning('节点数据关联完成，但未找到匹配的节点详情。您可以使用左上角的导出按钮获取当前数据格式。');
+        }
+        
+      } catch (error) {
+        console.error('❌ 关联节点数据与风险数据失败:', error);
+        this.$message.warning('关联节点数据失败: ' + error.message);
+      }
+    },
+
+    // 导出关联后的数据到JSON文件
+    exportEnrichedDataToJson() {
+      this.exportLoading = true;
+      try {
+        // 创建导出数据对象
+        const exportData = {
+          // 元数据
+          metadata: {
+            exportTime: new Date().toISOString(),
+            exportSource: 'ProcessOptimizationView',
+            dataVersion: '1.0.0',
+            description: '节点风险状态分析与节点详细数据关联后的完整数据'
+          },
+          
+          // 关联统计信息
+          enrichmentStats: {
+            totalHighRiskNodes: this.nodeRiskStatusData.highRiskNodes.length,
+            totalEnriched: 0,
+            subProcessEnriched: 0,
+            enrichmentRate: 0,
+            subProcessCoverage: 0
+          },
+          
+          // 原始风险分析数据
+          originalRiskAnalysis: this.processNodeRiskAnalysis,
+          
+          // 格式化后的风险状态数据
+          nodeRiskStatusData: this.nodeRiskStatusData,
+          
+          // 高危节点详细数据
+          highRiskNodeData: this.highRiskNodeData,
+          
+          // 数据增强信息
+          dataEnhancement: {
+            includesSubProcessDetails: false,
+            subProcessNodesFound: 0,
+            enhancementSource: 'purchase_flow_mermaid'
+          }
+        };
+
+        // 计算统计信息
+        let totalEnriched = 0;
+        let subProcessEnriched = 0;
+        
+        this.nodeRiskStatusData.highRiskNodes.forEach(node => {
+          if (node.nodeDetails) {
+            totalEnriched++;
+            if (node.nodeDetails.flowCount && node.nodeDetails.flowCount > 0) {
+              subProcessEnriched++;
+            }
+          }
+        });
+
+        exportData.enrichmentStats.totalEnriched = totalEnriched;
+        exportData.enrichmentStats.subProcessEnriched = subProcessEnriched;
+        exportData.enrichmentStats.enrichmentRate = totalEnriched / this.nodeRiskStatusData.highRiskNodes.length;
+        exportData.enrichmentStats.subProcessCoverage = totalEnriched > 0 ? subProcessEnriched / totalEnriched : 0;
+
+        // 检查数据增强情况
+        if (this.highRiskNodeData && this.highRiskNodeData.dataEnhancement) {
+          exportData.dataEnhancement = this.highRiskNodeData.dataEnhancement;
+        }
+
+        // 创建并下载JSON文件
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `node-risk-enriched-data-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        console.log('📁 关联数据已导出到JSON文件:', link.download);
+        this.$message.success('关联数据已导出到JSON文件供参考');
+        
+      } catch (error) {
+        console.error('❌ 导出JSON文件失败:', error);
+        this.$message.error('导出JSON文件失败: ' + error.message);
+      } finally {
+        this.exportLoading = false;
+      }
+    },
+
+    // 进入流程优化（修改后的方法）
+    async proceedToOptimization() {
+      try {
+        // 检查是否已完成节点风险分析
+        if (!this.nodeRiskStatusData) {
+          this.$message.warning('请先完成节点风险状态分析');
+          return;
+        }
+
+        this.$message.info('进入流程优化界面...');
+        
+        // 确保节点风险数据已保存到组件状态中
+        console.log('💾 保存节点风险分析数据供后续使用:', {
+          nodeRiskStatusData: this.nodeRiskStatusData,
+          processNodeRiskAnalysis: this.processNodeRiskAnalysis,
+          savedRiskData: this.savedRiskData,
+          savedAnalysisData: this.savedAnalysisData
+        });
+        
+        // 直接进入主要内容页面，保留所有风险分析数据
         this.showRiskAnalysis = false;
         this.showMainContent = true;
+        
+        // 在主要内容页面中，这些数据仍然可用：
+        // - this.nodeRiskStatusData (格式化后的节点风险数据)
+        // - this.processNodeRiskAnalysis (原始API返回数据)
+        // - this.savedRiskData (原始风险数据)
+        // - this.savedAnalysisData (风险分析结果)
+        
+      } catch (error) {
+        console.error('❌ 进入流程优化失败:', error);
+        this.$message.error('进入流程优化失败: ' + error.message);
       }
     },
 
@@ -1050,10 +1543,20 @@ export default {
       // 重置风险分析数据
       this.riskAnalysisData = null;
       this.riskAnalysisError = null;
+      // 重置节点风险分析数据
+      this.nodeRiskStatusData = null;
+      this.nodeRiskAnalysisLoading = false;
+      this.nodeRiskAnalysisError = null;
       // 重置保存的数据
       this.savedRiskData = null;
       this.savedAnalysisData = null;
       this.processNodeRiskAnalysis = null;
+      
+      // 重置高危节点数据
+      this.highRiskNodeData = null;
+      this.highRiskNodeIds = [];
+      this.nodeDataLoading = false;
+      this.nodeDataError = null;
     },
 
     // 转换步骤数组为对象格式
@@ -1082,11 +1585,26 @@ export default {
       });
     },
 
-    // 流程节点风险分析
-    async analyzeProcessNodeRisk() {
+    // 获取节点风险状态数据 - 统一的风险分析函数
+    async getNodeRiskStatus(forceRefresh = false) {
       try {
+        // 如果已有数据且不强制刷新，直接返回格式化的数据
+        if (this.processNodeRiskAnalysis && !forceRefresh) {
+          console.log('📋 使用缓存的节点风险状态数据');
+          const formattedData = this.formatNodeRiskData(this.processNodeRiskAnalysis.nodeRiskAnalysis);
+          return formattedData;
+        }
+
+        // 检查是否有必要的风险数据
+        if (!this.savedRiskData || !this.savedRiskData.length) {
+          console.warn('⚠️ 缺少风险数据，无法获取节点风险状态');
+          this.$message.warning('请先进行风险分析以获取风险数据');
+          return null;
+        }
+
         console.log('🔄 开始流程节点风险分析...');
-        
+        this.$message.info('正在分析节点风险状态...');
+
         // 准备分析参数 - 只传入风险数据，流程结构由后端从数据库获取
         const analysisParams = {
           riskData: this.savedRiskData // 来自 analyzeRiskStructure 的原始风险数据
@@ -1097,7 +1615,7 @@ export default {
           '流程结构数据源': '后端从数据库自动获取'
         });
 
-        // 调用新的API
+        // 调用API
         const response = await llmApi.analyzeProcessNodeRisk(analysisParams);
         
         if (!response.success) {
@@ -1105,17 +1623,127 @@ export default {
         }
 
         console.log('✅ 流程节点风险分析完成:', response.data);
-        this.$message.success('流程节点风险分析完成');
         
-        // 可以将分析结果保存到组件状态中，供后续使用
+        // 保存原始API结果到组件状态中
         this.processNodeRiskAnalysis = response.data;
-        
-        return response.data;
+
+        if (response.data && response.data.nodeRiskAnalysis) {
+          // 处理和格式化节点风险状态数据
+          const formattedData = this.formatNodeRiskData(response.data.nodeRiskAnalysis);
+          
+          console.log('✅ 节点风险状态数据获取成功:', formattedData);
+          this.$message.success('节点风险状态分析完成');
+          
+          return formattedData;
+        } else {
+          throw new Error('API返回数据格式不正确');
+        }
+
       } catch (error) {
-        console.error('❌ 流程节点风险分析失败:', error);
-        throw error;
+        console.error('❌ 获取节点风险状态失败:', error);
+        this.$message.error('获取节点风险状态失败: ' + error.message);
+        return null;
       }
-    }
+    },
+
+    // 格式化节点风险数据
+    formatNodeRiskData(nodeRiskAnalysis) {
+      if (!nodeRiskAnalysis) {
+        return null;
+      }
+
+      return {
+        // 高危节点列表
+        highRiskNodes: nodeRiskAnalysis.highRiskNodes || [],
+        
+        // 分析摘要
+        summary: nodeRiskAnalysis.summary || {},
+        
+        // 按风险等级分组的节点
+        nodesByRiskLevel: {
+          HIGH: (nodeRiskAnalysis.highRiskNodes || []).filter(node => node.riskLevel === 'HIGH'),
+          MEDIUM: (nodeRiskAnalysis.highRiskNodes || []).filter(node => node.riskLevel === 'MEDIUM'),
+          LOW: (nodeRiskAnalysis.highRiskNodes || []).filter(node => node.riskLevel === 'LOW')
+        },
+        
+        // 节点风险映射表（便于快速查找）
+        nodeRiskMap: this.createNodeRiskMap(nodeRiskAnalysis.highRiskNodes || []),
+        
+        // 关键风险路径
+        criticalPath: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.criticalPath) || '',
+        
+        // 主要建议
+        mainRecommendation: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.mainRecommendation) || '',
+        
+        // 风险统计
+        riskStatistics: {
+          totalNodes: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.totalNodes) || 0,
+          highRiskNodes: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.highRiskNodes) || 0,
+          mediumRiskNodes: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.mediumRiskNodes) || 0,
+          lowRiskNodes: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.lowRiskNodes) || 0,
+          overallRiskLevel: (nodeRiskAnalysis.summary && nodeRiskAnalysis.summary.overallRiskLevel) || 'UNKNOWN'
+        }
+      };
+    },
+
+    // 创建节点风险映射表
+    createNodeRiskMap(nodes) {
+      const riskMap = {};
+      
+      if (Array.isArray(nodes)) {
+        nodes.forEach(node => {
+          if (node.nodeId) {
+            riskMap[node.nodeId] = {
+              riskLevel: node.riskLevel,
+              riskScore: node.riskScore,
+              riskFactors: node.riskFactors || [],
+              riskReason: node.riskReason || '',
+              recommendation: node.recommendation || ''
+            };
+          }
+        });
+      }
+      
+      return riskMap;
+    },
+
+    // 根据节点ID获取风险状态
+    getNodeRiskById(nodeId) {
+      if (!this.processNodeRiskAnalysis || !nodeId) {
+        return null;
+      }
+
+      const formattedData = this.formatNodeRiskData(this.processNodeRiskAnalysis.nodeRiskAnalysis);
+      return (formattedData && formattedData.nodeRiskMap && formattedData.nodeRiskMap[nodeId]) || null;
+    },
+
+    // 获取高危节点列表
+    getHighRiskNodes() {
+      if (!this.processNodeRiskAnalysis) {
+        return [];
+      }
+
+      const formattedData = this.formatNodeRiskData(this.processNodeRiskAnalysis.nodeRiskAnalysis);
+      return (formattedData && formattedData.nodesByRiskLevel && formattedData.nodesByRiskLevel.HIGH) || [];
+    },
+
+    // 检查节点是否为高危节点
+    isHighRiskNode(nodeId) {
+      const nodeRisk = this.getNodeRiskById(nodeId);
+      return nodeRisk && nodeRisk.riskLevel === 'HIGH';
+    },
+
+    // 获取风险统计信息
+    getRiskStatistics() {
+      if (!this.processNodeRiskAnalysis) {
+        return null;
+      }
+
+      const formattedData = this.formatNodeRiskData(this.processNodeRiskAnalysis.nodeRiskAnalysis);
+      return (formattedData && formattedData.riskStatistics) || null;
+    },
+
+
   }
 }
 </script>
@@ -1439,6 +2067,34 @@ export default {
   }
 }
 
+/* 导出按钮样式 */
+.export-button-inline {
+  margin-left: 10px;
+  background: linear-gradient(135deg, #409EFF, #67C23A);
+  border: none;
+  color: white;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 4px 8px;
+  box-shadow: 0 1px 4px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.export-button-inline:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+}
+
+.export-button-inline:active {
+  transform: translateY(0);
+}
+
+.risk-data-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* 风险分析前置界面样式 */
 .risk-pre-page {
   display: flex;
@@ -1580,6 +2236,18 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.risk-data-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-data-summary {
+  font-size: 12px;
+  color: #67c23a;
+  font-weight: 500;
 }
 
 .section-title {
@@ -2211,6 +2879,237 @@ export default {
   
   .step-id {
     margin-right: 0;
+  }
+}
+
+
+
+/* 节点风险状态分析区域样式 */
+.node-risk-status-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #303133;
+  margin: 20px 0 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 节点风险统计卡片 */
+.node-risk-statistics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.node-stat-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.node-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.node-stat-card.total-nodes {
+  background: linear-gradient(135deg, #6c757d, #868e96);
+  color: white;
+}
+
+.node-stat-card.high-risk-nodes {
+  background: linear-gradient(135deg, #dc3545, #e55353);
+  color: white;
+}
+
+.node-stat-card.overall-risk {
+  background: linear-gradient(135deg, #ffc107, #ffcd39);
+  color: white;
+}
+
+/* 高危节点卡片列表 */
+.high-risk-nodes-list {
+  margin-bottom: 25px;
+}
+
+.high-risk-node-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 15px;
+}
+
+.risk-node-card {
+  padding: 20px;
+  border-radius: 8px;
+  background: white;
+  border-left: 4px solid #dc3545;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.risk-node-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.risk-node-card.high-risk {
+  border-left-color: #dc3545;
+  background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.node-id {
+  font-weight: bold;
+  color: #409EFF;
+  background: #e3f2fd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.node-name {
+  flex: 1;
+  font-weight: 600;
+  color: #303133;
+  font-size: 14px;
+}
+
+.node-score {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #606266;
+}
+
+.score-value {
+  font-weight: bold;
+  color: #dc3545;
+}
+
+.node-factors {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #606266;
+}
+
+.node-reason {
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #495057;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.node-recommendation {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #495057;
+  background: #e8f5e9;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid #28a745;
+}
+
+/* 关键风险路径区域 */
+.critical-path-section {
+  margin-top: 20px;
+}
+
+.critical-path-content {
+  padding: 10px 0;
+}
+
+.path-text {
+  font-weight: bold;
+  color: #e67e22;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.main-recommendation {
+  color: #495057;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* 节点风险分析加载状态 */
+.node-risk-loading {
+  margin: 20px 0;
+}
+
+.loading-card {
+  text-align: center;
+  border: 2px dashed #409EFF;
+}
+
+.loading-content {
+  padding: 30px;
+}
+
+.loading-icon {
+  font-size: 32px;
+  color: #409EFF;
+  margin-bottom: 15px;
+}
+
+.loading-content h4 {
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.loading-content p {
+  color: #606266;
+  font-size: 14px;
+}
+
+/* 节点风险分析错误状态 */
+.node-risk-error {
+  margin: 20px 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .node-risk-statistics {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .high-risk-node-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .node-stat-card {
+    padding: 12px;
+  }
+  
+  .risk-node-card {
+    padding: 15px;
+  }
+  
+  .node-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
   }
 }
 </style> 

@@ -113,6 +113,56 @@ export const subProcessDataApi = {
   },
 
   /**
+   * 获取特定节点的数据
+   * @param {string} type - 流程类型 (purchase, production, marketing, operation)
+   * @param {Array<string>} nodeIds - 节点ID数组
+   * @returns {Promise} 节点数据
+   */
+  async getNodeDataFromMermaid(type, nodeIds) {
+    try {
+      console.log(`🔍 正在获取 ${type} 流程中的节点数据:`, nodeIds);
+      
+      // 参数验证
+      if (!type || !nodeIds || !Array.isArray(nodeIds) || nodeIds.length === 0) {
+        throw new Error('参数错误：type和nodeIds必须提供，且nodeIds必须是非空数组');
+      }
+      
+      const response = await apiClient.post(`/mermaid-flow/${type}/nodes`, {
+        nodeIds: nodeIds
+      });
+      
+      const responseData = response.data || response;
+      
+      console.log(`✅ 成功获取 ${type} 流程节点数据:`, {
+        totalRequested: nodeIds.length,
+        totalFound: responseData.totalFound || 0,
+        nodeIds: nodeIds
+      });
+      
+      return {
+        success: true,
+        data: responseData,
+        message: `获取${type}流程节点数据成功`
+      };
+      
+    } catch (error) {
+      console.error(`获取${type}流程节点数据失败:`, error);
+      
+      const errorMessage = (error.response && error.response.data && error.response.data.error) || 
+                          (error.response && error.response.data && error.response.data.message) || 
+                          error.message || 
+                          `获取${type}流程节点数据失败`;
+      
+      return {
+        success: false,
+        data: null,
+        error: errorMessage,
+        message: errorMessage
+      };
+    }
+  },
+
+  /**
    * 获取所有Mermaid流程图数据
    * @returns {Promise} 所有Mermaid流程图数据
    */
