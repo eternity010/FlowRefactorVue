@@ -431,7 +431,7 @@
       </el-card>
     </div>
 
-    <!-- 主要内容 -->
+    <!-- 流程优化内容 -->
     <div v-if="showMainContent && !showRiskAnalysis">
       <!-- 数据检查 -->
       <div v-if="Object.keys(filteredOptPoints).length === 0" class="no-data-warning">
@@ -534,7 +534,7 @@
               <div class="opt-chart-block">
                 <div class="opt-chart-title">重构前流程</div>
                 <div class="chart-container">
-                  <div :ref="`chart-before-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'before')"></div>
+                  <MermaidChart :code="flowData.before" />
                 </div>
               </div>
               
@@ -542,14 +542,14 @@
               <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
                 <div class="opt-chart-title">强化学习平衡方案重构流程</div>
                 <div class="chart-container">
-                  <div :ref="`chart-after-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after')"></div>
+                  <MermaidChart :code="flowData.after" />
                 </div>
               </div>
               
               <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
                 <div class="opt-chart-title">强化学习资源优先重构流程</div>
                 <div class="chart-container">
-                  <div :ref="`chart-after2-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'after2')"></div>
+                  <MermaidChart :code="flowData.after2" />
                 </div>
               </div>
               
@@ -560,7 +560,7 @@
                   <el-tag size="mini" type="success" style="margin-left: 8px;">AI生成</el-tag>
                 </div>
                 <div class="chart-container">
-                  <div :ref="`chart-llm-${key}`" class="mermaid-chart" v-html="getRenderedChart(key, 'llm')"></div>
+                  <MermaidChart :code="flowData.llm" />
                 </div>
               </div>
             </div>
@@ -584,6 +584,156 @@
         </el-tabs>
       </div>
 
+      <!-- 高危节点风险分析展示区域 -->
+      <div v-if="nodeRiskStatusData && nodeRiskStatusData.highRiskNodes.length > 0" class="high-risk-nodes-section">
+        <el-card class="risk-nodes-card">
+          <div slot="header" class="risk-nodes-header">
+            <span>🔴 高危节点风险分析</span>
+            <el-tag size="small" type="danger">{{ nodeRiskStatusData.highRiskNodes.length }}个高危节点</el-tag>
+          </div>
+          
+          <!-- 高危节点概览 -->
+          <div class="risk-nodes-overview">
+            <el-alert
+              title="风险路径分析"
+              :description="`关键风险路径: ${nodeRiskStatusData.criticalPath || '未识别'}`"
+              type="warning"
+              :closable="false"
+              show-icon>
+            </el-alert>
+          </div>
+
+          <!-- 高危节点标签页 -->
+          <el-tabs v-model="activeRiskNodeTab" type="border-card" class="risk-nodes-tabs">
+            <el-tab-pane 
+              v-for="(node, index) in nodeRiskStatusData.highRiskNodes" 
+              :key="node.nodeId"
+              :label="`${node.nodeId} - ${node.nodeName}`" 
+              :name="node.nodeId"
+            >
+              <!-- 节点风险信息 -->
+              <div class="risk-node-info">
+                <div class="node-risk-summary">
+                  <div class="risk-score-display">
+                    <div class="score-circle" :class="getRiskLevelClass(node.riskLevel)">
+                      <span class="score-value">{{ (node.riskScore * 100).toFixed(0) }}</span>
+                      <span class="score-label">风险评分</span>
+                    </div>
+                    <div class="risk-details">
+                      <h4 class="node-title">{{ node.nodeName }}</h4>
+                      <div class="risk-factors">
+                        <span class="factors-label">风险因素:</span>
+                        <el-tag 
+                          v-for="factor in node.riskFactors" 
+                          :key="factor"
+                          size="mini" 
+                          type="warning" 
+                          class="factor-tag">
+                          {{ factor }}
+                        </el-tag>
+                      </div>
+                      <div class="risk-reason">
+                        <strong>风险原因:</strong> {{ node.riskReason }}
+                      </div>
+                      <div class="risk-recommendation">
+                        <strong>改进建议:</strong> {{ node.recommendation }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 子流程Mermaid图表 -->
+                <div v-if="node.nodeDetails && node.nodeDetails.flowCount > 0" class="node-subflow-section">
+                  <h4 class="subflow-title">
+                    <i class="el-icon-share"></i>
+                    子流程详情 ({{ node.nodeDetails.flowCount }}个流程版本)
+                  </h4>
+                  
+                  <div class="subflow-charts">
+                    <!-- 主流程 -->
+                    <div v-if="node.nodeDetails.mermaidDefinition1" class="subflow-chart-block">
+                      <div class="subflow-chart-header">
+                        <span class="chart-title">主流程 (标准流程)</span>
+                        <el-tag size="mini" type="primary">推荐方案</el-tag>
+                      </div>
+                      <div class="chart-container subflow-chart">
+                        <MermaidChart :code="node.nodeDetails.mermaidDefinition1" />
+                      </div>
+                    </div>
+
+                    <!-- 备用流程 -->
+                    <div v-if="node.nodeDetails.mermaidDefinition2" class="subflow-chart-block">
+                      <div class="subflow-chart-header">
+                        <span class="chart-title">备用流程 (快速流程)</span>
+                        <el-tag size="mini" type="info">备选方案</el-tag>
+                      </div>
+                      <div class="chart-container subflow-chart">
+                        <MermaidChart :code="node.nodeDetails.mermaidDefinition2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 子流程选择器 -->
+                  <div class="subflow-selector" v-if="node.nodeDetails && node.nodeDetails.flowCount > 0">
+                    <el-form inline label-width="100px">
+                      <el-form-item :label="`选择流程`">
+                        <el-select
+                          v-model="nodeFlowSelections[node.nodeId]"
+                          :placeholder="`当前：流程${node.nodeDetails.currentFlowNumber || 1}`"
+                          size="small"
+                          style="min-width: 160px;"
+                        >
+                          <el-option
+                            v-for="i in (node.nodeDetails.flowCount || 1)"
+                            :key="i"
+                            :label="`流程${i}`"
+                            :value="i"
+                          />
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button
+                          type="primary"
+                          size="small"
+                          :disabled="!nodeFlowSelections[node.nodeId] || nodeFlowSelections[node.nodeId] === (node.nodeDetails.currentFlowNumber || 1)"
+                          @click="applyNodeFlowSelection('purchase', node.nodeId)"
+                        >
+                          应用
+                        </el-button>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+
+                  
+                </div>
+
+                <!-- 无子流程时的提示 -->
+                <div v-else class="no-subflow-notice">
+                  <el-alert
+                    title="子流程信息"
+                    description="该节点暂无详细子流程定义"
+                    type="info"
+                    :closable="false"
+                    show-icon>
+                  </el-alert>
+                </div>
+              </div>
+              
+              <!-- 操作按钮区域 -->
+              <div class="node-action-buttons">
+                <el-button 
+                  type="warning" 
+                  size="medium"
+                  icon="el-icon-refresh"
+                  @click="useBackupSolution(node.nodeId)">
+                  使用备用方案
+                </el-button>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </el-card>
+      </div>
+
       </el-card>
       
       <!-- 资源变化确认对话框 -->
@@ -599,16 +749,20 @@
 </template>
 
 <script>
-// import MermaidChart from '@/components/MermaidChart.vue'
+import MermaidChart from '@/components/MermaidChart.vue'
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
 import { llmApi } from '@/api/llmApi.js'
 import { subProcessDataApi } from '@/api/subProcessDataApi.js'
+import { nodeDetailApi } from '@/api/nodeDetailApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { ResourceChangeConfirmation },
+  components: { 
+    ResourceChangeConfirmation,
+    MermaidChart
+  },
   data() {
     return {
       showMainContent: false, // 控制是否显示主要内容
@@ -641,10 +795,7 @@ export default {
       ragConfigLoading: false,
       parameterLastUpdated: null,
       ragLastUpdated: null,
-      // 添加mermaid相关属性
-      mermaidLoaded: false,
-      mermaidInitialized: false,
-      renderedCharts: {}, // 存储渲染的图表
+
       // 风险分析相关属性
       riskAnalysisLoading: false,
       riskAnalysisData: null,
@@ -667,7 +818,12 @@ export default {
       highRiskNodeIds: [], // 高危节点ID列表
       nodeDataLoading: false, // 节点数据加载状态
       nodeDataError: null, // 节点数据加载错误
-      exportLoading: false // 导出功能加载状态
+      exportLoading: false, // 导出功能加载状态
+      
+      // 高危节点展示相关状态
+      activeRiskNodeTab: '', // 当前激活的高危节点标签页
+      // 子流程选择：按节点保存选中的流程编号
+      nodeFlowSelections: {}
     }
   },
 
@@ -726,8 +882,6 @@ export default {
     await this.loadNeuralNetworkParams();
     // 加载已保存的RAG配置
     await this.loadRAGConfig();
-    // 加载mermaid脚本
-    this.loadMermaidScript();
   },
 
   methods: {
@@ -741,83 +895,52 @@ export default {
       }
     },
 
-    // Mermaid相关方法
-    loadMermaidScript() {
-      if (window.mermaid) {
-        this.mermaidLoaded = true;
-        this.initMermaid();
-        this.renderAllCharts();
-        return;
-      }
-      
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js';
-      script.onload = () => {
-        this.mermaidLoaded = true;
-        this.initMermaid();
-        this.renderAllCharts();
-      };
-      script.onerror = () => {
-        console.error('Failed to load mermaid script');
-      };
-      document.head.appendChild(script);
-    },
-    
-    initMermaid() {
-      if (this.mermaidInitialized || !window.mermaid) return;
-      
-      window.mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: 'loose',
-        theme: 'default',
-        flowchart: {
-          useMaxWidth: true,
-          htmlLabels: true,
-          curve: 'basis'
-        }
-      });
-      this.mermaidInitialized = true;
-    },
-    
-    async renderMermaidChart(code, chartId) {
-      if (!window.mermaid || !this.mermaidLoaded || !code) return '';
-      
+    // 应用节点的子流程选择
+    async applyNodeFlowSelection(nodeType, nodeId) {
       try {
-        const id = `mermaid-${chartId}-${Date.now()}`;
-        const { svg } = await window.mermaid.render(id, code);
-        return svg;
+        const selected = this.nodeFlowSelections[nodeId];
+        if (!selected) {
+          this.$message.warning('请先选择流程');
+          return;
+        }
+        // 调用后端切换当前流程
+        const res = await nodeDetailApi.switchNodeFlow(nodeType, nodeId, selected);
+        if (res && res.success) {
+          this.$message.success(`节点 ${nodeId} 已切换到流程 ${selected}`);
+          // 同步更新本地展示数据：更新对应高危节点的 currentFlowNumber
+          if (this.nodeRiskStatusData && Array.isArray(this.nodeRiskStatusData.highRiskNodes)) {
+            const target = this.nodeRiskStatusData.highRiskNodes.find(n => n.nodeId === nodeId);
+            if (target && target.nodeDetails) {
+              target.nodeDetails.currentFlowNumber = selected;
+            }
+          }
+          // 可选：重新获取该节点当前流程的Mermaid定义以确保一致
+          try {
+            const currentFlow = await nodeDetailApi.getNodeCurrentFlow(nodeType, nodeId);
+            if (currentFlow && currentFlow.success && currentFlow.data) {
+              // 根据 currentFlowNumber 覆盖对应的 mermaid 定义，方便立即预览
+              const targetList = this.nodeRiskStatusData && this.nodeRiskStatusData.highRiskNodes
+                ? this.nodeRiskStatusData.highRiskNodes
+                : [];
+              const target = targetList.find(n => n.nodeId === nodeId);
+              if (target && target.nodeDetails) {
+                // 不区分1/2字段名，这里仅同步编号，图形以当前展示为准
+                target.nodeDetails.currentFlowNumber = currentFlow.data.currentFlowNumber;
+              }
+            }
+          } catch (e) {
+            // 忽略刷新失败
+          }
+          this.$forceUpdate();
+        } else {
+          this.$message.error((res && res.error) || '切换流程失败');
+        }
       } catch (error) {
-        console.error('Mermaid rendering error:', error);
-        return '<div class="error-message">流程图渲染失败</div>';
+        this.$message.error(`切换流程失败：${error.message}`);
       }
     },
-    
-    async renderAllCharts() {
-      if (!this.mermaidLoaded || Object.keys(this.optPoints).length === 0) return;
-      
-      for (const [key, flowData] of Object.entries(this.filteredOptPoints)) {
-        if (flowData.before) {
-          this.renderedCharts[`${key}-before`] = await this.renderMermaidChart(flowData.before, `${key}-before`);
-        }
-        if (flowData.after) {
-          this.renderedCharts[`${key}-after`] = await this.renderMermaidChart(flowData.after, `${key}-after`);
-        }
-        if (flowData.after2) {
-          this.renderedCharts[`${key}-after2`] = await this.renderMermaidChart(flowData.after2, `${key}-after2`);
-        }
-        if (flowData.llm) {
-          this.renderedCharts[`${key}-llm`] = await this.renderMermaidChart(flowData.llm, `${key}-llm`);
-        }
-      }
-      
-      // 强制更新视图
-      this.$forceUpdate();
-    },
-    
-    getRenderedChart(key, type) {
-      const chartKey = `${key}-${type}`;
-      return this.renderedCharts[chartKey] || '<div class="loading-message">图表加载中...</div>';
-    },
+
+
 
     // 加载神经网络参数
     async loadNeuralNetworkParams() {
@@ -926,10 +1049,6 @@ export default {
         if (response.data.code === 200) {
           this.optPoints = response.data.data;
           console.log('流程优化数据加载成功:', this.optPoints);
-          // 数据加载成功后渲染图表
-          if (this.mermaidLoaded) {
-            this.renderAllCharts();
-          }
         } else {
           throw new Error(response.data.message || '数据加载失败');
         }
@@ -1742,6 +1861,29 @@ export default {
       const formattedData = this.formatNodeRiskData(this.processNodeRiskAnalysis.nodeRiskAnalysis);
       return (formattedData && formattedData.riskStatistics) || null;
     },
+
+    // 获取风险等级的CSS类名
+    getRiskLevelClass(riskLevel) {
+      switch (riskLevel) {
+        case 'HIGH':
+          return 'high-risk-score';
+        case 'MEDIUM':
+          return 'medium-risk-score';
+        case 'LOW':
+          return 'low-risk-score';
+        default:
+          return 'unknown-risk-score';
+      }
+    },
+
+    // 使用备用方案
+    useBackupSolution(nodeId) {
+      console.log('使用备用方案按钮被点击，节点ID:', nodeId);
+      // TODO: 在这里实现使用备用方案的具体功能
+      this.$message.info(`节点 ${nodeId} 的备用方案功能待实现`);
+    },
+
+
 
 
   }
@@ -3110,6 +3252,319 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
+  }
+}
+
+/* 高危节点风险分析展示区域样式 */
+.high-risk-nodes-section {
+  margin-top: 30px;
+}
+
+.risk-nodes-card {
+  border: 2px solid #f56c6c;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(245, 108, 108, 0.2);
+}
+
+.risk-nodes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: #f56c6c;
+}
+
+.risk-nodes-overview {
+  margin-bottom: 20px;
+}
+
+.risk-nodes-tabs {
+  min-height: 600px;
+}
+
+/* 节点风险信息样式 */
+.risk-node-info {
+  padding: 20px 0;
+}
+
+.node-risk-summary {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  border-radius: 8px;
+  border-left: 4px solid #f56c6c;
+}
+
+.risk-score-display {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.score-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.score-circle.high-risk-score {
+  background: linear-gradient(135deg, #f56c6c, #f78989);
+}
+
+.score-circle.medium-risk-score {
+  background: linear-gradient(135deg, #e6a23c, #f1c40f);
+}
+
+.score-circle.low-risk-score {
+  background: linear-gradient(135deg, #67c23a, #85ce61);
+}
+
+.score-circle.unknown-risk-score {
+  background: linear-gradient(135deg, #909399, #b4bccc);
+}
+
+.score-value {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 10px;
+  margin-top: 2px;
+  opacity: 0.9;
+}
+
+.risk-details {
+  flex: 1;
+}
+
+.node-title {
+  font-size: 18px;
+  color: #303133;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.risk-factors {
+  margin-bottom: 12px;
+}
+
+.factors-label {
+  font-weight: 500;
+  color: #606266;
+  margin-right: 8px;
+}
+
+.factor-tag {
+  margin: 0 4px 4px 0;
+}
+
+.risk-reason, .risk-recommendation {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  color: #606266;
+}
+
+.risk-reason strong, .risk-recommendation strong {
+  color: #f56c6c;
+}
+
+/* 子流程图表样式 */
+.node-subflow-section {
+  margin-top: 30px;
+}
+
+.subflow-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f2f5;
+}
+
+.subflow-title i {
+  color: #409eff;
+  font-size: 18px;
+}
+
+.subflow-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.subflow-chart-block {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.subflow-chart-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.subflow-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.chart-title {
+  font-weight: 600;
+  color: #303133;
+  font-size: 14px;
+}
+
+.subflow-chart {
+  background: white;
+  min-height: 300px;
+  padding: 16px;
+}
+
+.subflow-chart .mermaid-chart {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 子流程图表特殊样式 */
+.subflow-chart :deep(.mermaid-chart svg) {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+
+.subflow-chart :deep(.mermaid-chart .node rect),
+.subflow-chart :deep(.mermaid-chart .node circle),
+.subflow-chart :deep(.mermaid-chart .node ellipse),
+.subflow-chart :deep(.mermaid-chart .node polygon) {
+  fill: #e3f2fd !important;
+  stroke: #1976d2 !important;
+  stroke-width: 2px !important;
+}
+
+.subflow-chart :deep(.mermaid-chart .edgePath .path) {
+  stroke: #1976d2 !important;
+  stroke-width: 2px !important;
+}
+
+.subflow-chart :deep(.mermaid-chart .label) {
+  font-family: 'Microsoft YaHei', sans-serif !important;
+  font-size: 12px !important;
+  color: #333 !important;
+  font-weight: 500 !important;
+}
+
+
+
+/* 无子流程提示样式 */
+.no-subflow-notice {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* 节点操作按钮样式 */
+.node-action-buttons {
+  margin-top: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #ebeef5;
+  text-align: center;
+}
+
+.node-action-buttons .el-button {
+  min-width: 120px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(230, 162, 60, 0.3);
+  transition: all 0.3s ease;
+}
+
+.node-action-buttons .el-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(230, 162, 60, 0.4);
+}
+
+.node-action-buttons .el-button i {
+  margin-right: 6px;
+}
+
+/* 高危节点响应式设计 */
+@media (max-width: 768px) {
+  .risk-score-display {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .score-circle {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .score-value {
+    font-size: 18px;
+  }
+  
+  .subflow-charts {
+    gap: 20px;
+  }
+  
+  .subflow-chart {
+    padding: 12px;
+  }
+  
+  .subflow-chart-header {
+    padding: 10px 12px;
+  }
+  
+  .chart-title {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .risk-nodes-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .node-risk-summary {
+    padding: 15px;
+  }
+  
+  .node-title {
+    font-size: 16px;
+  }
+  
+  .subflow-title {
+    font-size: 14px;
+  }
+  
+  .factors-label {
+    display: block;
+    margin-bottom: 4px;
   }
 }
 </style> 
