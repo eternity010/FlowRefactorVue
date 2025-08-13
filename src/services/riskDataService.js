@@ -5,8 +5,8 @@ class RiskDataService {
     this.client = null;
     this.db = null;
     this.collection = null;
-    this.mongoUrl = 'mongodb://localhost:27017';
-    this.dbName = 'maintenance_system';
+    this.mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+    this.dbName = process.env.MONGODB_DB || 'maintenance_system';
     this.collectionName = 'risk_data';
   }
 

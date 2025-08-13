@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 
 // MongoDB连接配置
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const DATABASE_NAME = 'maintenance_system';
+const DATABASE_NAME = process.env.MONGODB_DB || 'maintenance_system';
 const COLLECTION_NAME = 'planning_time_data';
 const REFACTOR_TIMING_COLLECTION = 'refactor_timing_data';
 const LLM_ANALYSIS_COLLECTION = 'llm_analysis_data';

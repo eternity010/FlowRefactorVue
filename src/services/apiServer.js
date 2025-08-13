@@ -2082,6 +2082,16 @@ app.get('/api/node-flow-list/:nodeType/:nodeId', async (req, res) => {
   }
 });
 
+// 健康检查端点
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Backend service is healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // 启动服务器
 function startServer() {
   app.listen(PORT, async () => {

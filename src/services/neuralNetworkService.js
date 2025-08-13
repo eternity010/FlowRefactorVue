@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 
 // MongoDB连接配置
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const DATABASE_NAME = 'maintenance_system';
+const DATABASE_NAME = process.env.MONGODB_DB || 'maintenance_system';
 const NEURAL_NETWORK_COLLECTION = 'neural_network_parameters';
 const PARAMETER_CONFIGS_COLLECTION = 'neural_network_saved_configs';
 const RAG_CONFIG_COLLECTION = 'rag_config_data';

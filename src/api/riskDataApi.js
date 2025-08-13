@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// 获取API基础URL
-const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:3001';
+// 获取API基础URL（生产默认走前端Nginx反代）
+const API_BASE_URL = process.env.VUE_APP_API_URL || '';
 
 class RiskDataApi {
   constructor() {

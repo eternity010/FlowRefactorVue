@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API 基础URL
-const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:3001/api';
+// API 基础URL（生产默认走前端Nginx反代）
+const API_BASE_URL = process.env.VUE_APP_API_URL || '/api';
 
 // 创建axios实例
 const apiClient = axios.create({

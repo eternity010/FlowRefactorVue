@@ -2,8 +2,8 @@ const { MongoClient } = require('mongodb');
 
 class ProcessOptimizationService {
   constructor() {
-    this.uri = 'mongodb://localhost:27017';
-    this.dbName = 'maintenance_system';
+    this.uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+    this.dbName = process.env.MONGODB_DB || 'maintenance_system';
     this.collectionName = 'process_optimization_flow_data';
     this.client = null;
   }

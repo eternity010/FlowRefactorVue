@@ -3,11 +3,11 @@ const OpenAI = require('openai');
 class LLMService {
   constructor() {
     this.openai = new OpenAI({
-      apiKey: '13c67fe3-4c11-4ed8-9f77-3aad5eafa06a',
-      baseURL: 'https://ark.cn-beijing.volces.com/api/v3',
+      apiKey: 'EiXoPuxpGkt8fWhAb07wIQR3szJnHa',
+      baseURL: 'http://10.220.21.113:11434/llm/v1',
     });
     
-    this.model = 'ep-20250727172335-klkbs';
+    this.model = 'Qwen3-32B';
     this.defaultSystemMessage = '你是人工智能助手';
   }
 
