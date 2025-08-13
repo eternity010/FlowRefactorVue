@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # 前端Vue应用
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: myvue-frontend
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - myvue-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./logs/nginx:/var/log/nginx
+
+  # MongoDB数据库
+  mongo:
+    image: mongo:6.0
+    container_name: myvue-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=maintenance_system
+    volumes:
+      - mongo_data:/data/db
+      - ./MongoDB:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - myvue-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # MongoDB管理界面（可选）
+  mongo-express:
+    image: mongo-express:latest
+    container_name: myvue-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - myvue-network
+    profiles:
+      - dev
+
+networks:
+  myvue-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local

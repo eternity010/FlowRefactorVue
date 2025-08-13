@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"abb896ac92e842f995a34958c4b37043","collectionName":"node_risk_status_data","type":"collection"}

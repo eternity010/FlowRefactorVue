@@ -178,7 +178,7 @@
                 </div>
                 <div class="stat-content">
                   <div class="stat-number">{{ riskAnalysisData.highRiskCount }}</div>
-                  <div class="stat-label">高风险环节</div>
+                  <div class="stat-label">高风险因素</div>
                 </div>
               </div>
               
@@ -188,7 +188,7 @@
                 </div>
                 <div class="stat-content">
                   <div class="stat-number">{{ riskAnalysisData.mediumRiskCount }}</div>
-                  <div class="stat-label">中风险环节</div>
+                  <div class="stat-label">中风险因素</div>
                 </div>
               </div>
               
@@ -198,7 +198,7 @@
                 </div>
                 <div class="stat-content">
                   <div class="stat-number">{{ riskAnalysisData.lowRiskCount }}</div>
-                  <div class="stat-label">低风险环节</div>
+                  <div class="stat-label">低风险因素</div>
                 </div>
               </div>
               
@@ -208,7 +208,7 @@
                 </div>
                 <div class="stat-content">
                   <div class="stat-number">{{ riskAnalysisData.totalSteps }}</div>
-                  <div class="stat-label">总环节数</div>
+                  <div class="stat-label">总风险因素数</div>
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@
             <!-- 风险详情 -->
             <div class="risk-details">
               <el-tabs v-model="activeRiskTab" type="border-card">
-                <el-tab-pane label="高风险环节" name="high">
+                <el-tab-pane label="高风险因素" name="high">
                   <div class="risk-step-list">
                     <div v-for="step in riskAnalysisData.highRiskSteps" :key="step.id" class="risk-step-item high">
                       <div class="step-header">
@@ -229,7 +229,7 @@
                   </div>
                 </el-tab-pane>
                 
-                <el-tab-pane label="中风险环节" name="medium">
+                <el-tab-pane label="中风险因素" name="medium">
                   <div class="risk-step-list">
                     <div v-for="step in riskAnalysisData.mediumRiskSteps" :key="step.id" class="risk-step-item medium">
                       <div class="step-header">
@@ -242,7 +242,7 @@
                   </div>
                 </el-tab-pane>
                 
-                <el-tab-pane label="低风险环节" name="low">
+                <el-tab-pane label="低风险因素" name="low">
                   <div class="risk-step-list">
                     <div v-for="step in riskAnalysisData.lowRiskSteps" :key="step.id" class="risk-step-item low">
                       <div class="step-header">
@@ -475,117 +475,10 @@
         </div>
           </div>
       </div>
-      
-      <!-- Mermaid图表区域 -->
-      <div class="mermaid-container">
-        <h3 class="section-title">流程优化</h3>
-        
-        <!-- 方案选择器 -->
-        <div class="solution-selector">
-          <div class="selector-header">
-            <h4 class="selector-title">选择优化方案</h4>
-            <p class="selector-description">
-              页面将始终显示重构前流程和LLM智能重构流程，请选择要对比的强化学习重构方案
-            </p>
-          </div>
-                  <el-select 
-          v-model="selectedSolution" 
-          placeholder="选择优化方案"
-          @change="handleSolutionChange"
-          size="medium"
-          class="solution-select">
-          <el-option
-            label="强化学习平衡方案"
-            value="balanced"
-            :disabled="false">
-            <span>强化学习平衡方案</span>
-            <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
-          </el-option>
-          <el-option
-            label="强化学习资源优先"
-            value="resource-first"
-            :disabled="false">
-            <span>强化学习资源优先</span>
-            <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
-          </el-option>
-        </el-select>
-        </div>
-        
-        <el-tabs v-model="activeOptTab" type="border-card">
-          <el-tab-pane 
-            v-for="(flowData, key) in filteredOptPoints" 
-            :key="key"
-            :label="flowData.title" 
-            :name="key"
-          >
-            <!-- 优化策略描述 -->
-            <div class="strategy-description">
-              <el-alert
-                :title="getFlowTitle(key)"
-                :description="getFlowDescription(key)"
-                type="info"
-                :closable="false"
-                show-icon>
-              </el-alert>
-            </div>
-            
-            <div class="opt-chart-group">
-              <!-- 重构前流程图 -->
-              <div class="opt-chart-block">
-                <div class="opt-chart-title">重构前流程</div>
-                <div class="chart-container">
-                  <MermaidChart :code="flowData.before" />
-                </div>
-              </div>
-              
-              <!-- 根据选择的方案显示对应的重构流程 -->
-              <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
-                <div class="opt-chart-title">强化学习平衡方案重构流程</div>
-                <div class="chart-container">
-                  <MermaidChart :code="flowData.after" />
-                </div>
-              </div>
-              
-              <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
-                <div class="opt-chart-title">强化学习资源优先重构流程</div>
-                <div class="chart-container">
-                  <MermaidChart :code="flowData.after2" />
-                </div>
-              </div>
-              
-              <!-- LLM智能重构流程放在最右边 -->
-              <div class="opt-chart-block">
-                <div class="opt-chart-title">
-                  <span>LLM智能重构流程</span>
-                  <el-tag size="mini" type="success" style="margin-left: 8px;">AI生成</el-tag>
-                </div>
-                <div class="chart-container">
-                  <MermaidChart :code="flowData.llm" />
-                </div>
-              </div>
-            </div>
-
-            <!-- 新增操作按钮 -->
-            <div class="operation-buttons">
-              <el-button 
-                type="success" 
-                size="small"
-                @click="acceptChange(key)">
-                接受优化方案
-              </el-button>
-              <el-button 
-                type="danger" 
-                size="small"
-                @click="rejectChange(key)">
-                拒绝优化方案
-              </el-button>
-            </div>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
 
       <!-- 高危节点风险分析展示区域 -->
       <div v-if="nodeRiskStatusData && nodeRiskStatusData.highRiskNodes.length > 0" class="high-risk-nodes-section">
+        <h3 class="section-title">流程优化</h3>
         <el-card class="risk-nodes-card">
           <div slot="header" class="risk-nodes-header">
             <span>🔴 高危节点风险分析</span>
@@ -732,6 +625,114 @@
             </el-tab-pane>
           </el-tabs>
         </el-card>
+      </div>
+      
+      <!-- Mermaid图表区域 -->
+      <div class="mermaid-container">
+        <h3 class="section-title">流程重构</h3>
+        
+        <!-- 方案选择器 -->
+        <div class="solution-selector">
+          <div class="selector-header">
+            <h4 class="selector-title">选择优化方案</h4>
+            <p class="selector-description">
+              页面将始终显示重构前流程和LLM智能重构流程，请选择要对比的强化学习重构方案
+            </p>
+          </div>
+                  <el-select 
+          v-model="selectedSolution" 
+          placeholder="选择优化方案"
+          @change="handleSolutionChange"
+          size="medium"
+          class="solution-select">
+          <el-option
+            label="强化学习平衡方案"
+            value="balanced"
+            :disabled="false">
+            <span>强化学习平衡方案</span>
+            <span style="color: #8492a6; font-size: 13px; float: right;">综合考虑功能与资源</span>
+          </el-option>
+          <el-option
+            label="强化学习资源优先"
+            value="resource-first"
+            :disabled="false">
+            <span>强化学习资源优先</span>
+            <span style="color: #8492a6; font-size: 13px; float: right;">最小化资源投入</span>
+          </el-option>
+        </el-select>
+        </div>
+        
+        <el-tabs v-model="activeOptTab" type="border-card">
+          <el-tab-pane 
+            v-for="(flowData, key) in filteredOptPoints" 
+            :key="key"
+            :label="flowData.title" 
+            :name="key"
+          >
+            <!-- 优化策略描述 -->
+            <div class="strategy-description">
+              <el-alert
+                :title="getFlowTitle(key)"
+                :description="getFlowDescription(key)"
+                type="info"
+                :closable="false"
+                show-icon>
+              </el-alert>
+            </div>
+            
+            <div class="opt-chart-group">
+              <!-- 重构前流程图 -->
+              <div class="opt-chart-block">
+                <div class="opt-chart-title">重构前流程</div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.before" />
+                </div>
+              </div>
+              
+              <!-- 根据选择的方案显示对应的重构流程 -->
+              <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
+                <div class="opt-chart-title">强化学习平衡方案重构流程</div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.after" />
+                </div>
+              </div>
+              
+              <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
+                <div class="opt-chart-title">强化学习资源优先重构流程</div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.after2" />
+                </div>
+              </div>
+              
+              <!-- LLM智能重构流程放在最右边 -->
+              <div class="opt-chart-block">
+                <div class="opt-chart-title">
+                  <span>LLM智能重构流程</span>
+                  <el-tag size="mini" type="success" style="margin-left: 8px;">AI生成</el-tag>
+                </div>
+                <div class="chart-container">
+                  <MermaidChart :code="flowData.llm" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 新增操作按钮 -->
+            <div class="operation-buttons">
+              <el-button 
+                type="success" 
+                size="small"
+                @click="acceptChange(key)">
+                接受优化方案
+              </el-button>
+              <el-button 
+                type="danger" 
+                size="small"
+                @click="rejectChange(key)">
+                拒绝优化方案
+              </el-button>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
       </div>
 
       </el-card>
