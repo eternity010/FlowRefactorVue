@@ -7,11 +7,17 @@ WORKDIR /app
 # 复制package文件
 COPY package*.json ./
 
+# 为确保 postinstall 可执行，提前复制 scripts
+COPY scripts ./scripts
+
 # 安装依赖（使用npm install而不是npm ci，更稳定）
 RUN npm install
 
-# 复制前端源代码
+# 复制前端源代码（可能覆盖 static/ 目录，故后续再执行一次拷贝脚本）
 COPY . .
+
+# 确保 mermaid.min.js 存在于 static/（防止被上一步覆盖）
+RUN node scripts/copy-mermaid-to-static.js || true
 
 # 构建前端应用
 RUN npm run build || (echo "Build failed, checking logs..." && cat /app/npm-debug.log* 2>/dev/null || true && exit 1)

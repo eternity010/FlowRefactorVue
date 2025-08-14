@@ -37,7 +37,7 @@ export default {
         return;
       }
       const script = document.createElement('script');
-      script.src = 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js';
+      script.src = '/static/mermaid.min.js';
       script.onload = () => {
         this.mermaidLoaded = true;
         this.initMermaid();

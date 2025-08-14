@@ -157,7 +157,7 @@ export default {
       window.mermaidLoading = true;
       
       const script = document.createElement('script');
-      script.src = 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js';
+      script.src = '/static/mermaid.min.js';
       script.onload = () => {
         window.mermaidLoading = false;
         this.mermaidLoaded = true;
