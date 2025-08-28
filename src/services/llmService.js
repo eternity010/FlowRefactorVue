@@ -3,11 +3,11 @@ const OpenAI = require('openai');
 class LLMService {
   constructor() {
     this.openai = new OpenAI({
-      apiKey: 'EiXoPuxpGkt8fWhAb07wIQR3szJnHa',
-      baseURL: 'http://10.220.21.113:11434/llm/v1',
+      apiKey: 'sk-f9f7f832ec244f5a9e5d6beeff7b1f8d',
+      baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     });
     
-    this.model = 'Qwen3-32B';
+    this.model = 'qwen-plus';
     this.defaultSystemMessage = '你是人工智能助手';
   }
 
