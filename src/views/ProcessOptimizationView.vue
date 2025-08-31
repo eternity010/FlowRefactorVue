@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="process-optimization-container">
     <!-- 前置页面 -->
     <div v-if="!showMainContent && !showRiskAnalysis" class="pre-page">
@@ -61,29 +61,12 @@
             </div>
           </div>
           
-          <div class="parameter-summary" v-if="showParameterSummary">
-            <el-alert
-              title="当前神经网络参数配置"
-              type="info"
-              :closable="false"
-              show-icon>
-              <template slot="title">
-                <span style="font-size: 14px; font-weight: bold;">当前参数配置</span>
-                <span v-if="parameterLastUpdated" style="font-size: 12px; color: #909399; font-weight: normal; margin-left: 10px;">
-                  (更新于: {{ formatDateTime(parameterLastUpdated) }})
-                </span>
-              </template>
-              <div class="param-summary-content" v-loading="parameterLoading">
-                <span class="param-item">地缘政治影响: {{ neuralNetworkParams.geoPoliticalWeight }}</span>
-                <span class="param-item">价格波动敏感度: {{ neuralNetworkParams.marketVolatilityFactor }}</span>
-                <span class="param-item">备用供应商覆盖: {{ (neuralNetworkParams.backupSupplierRatio * 100).toFixed(0) }}%</span>
-                <span class="param-item">路径重评估: {{ neuralNetworkParams.routeReevalFrequency }}天</span>
-                <span class="param-item">成本延误权衡: {{ neuralNetworkParams.costDelayTradeoff }}</span>
-                <span class="param-item">节拍波动容忍: ±{{ (neuralNetworkParams.taktTimeVariance * 100).toFixed(0) }}%</span>
-                <span class="param-item">加班时长上限: {{ neuralNetworkParams.overtimeCostCap }}小时/月</span>
-              </div>
-            </el-alert>
-          </div>
+          <ParameterSummary
+            :visible="showParameterSummary"
+            :params="neuralNetworkParams"
+            :last-updated="parameterLastUpdated"
+            :loading="parameterLoading"
+          />
           
           <div class="rag-summary" v-if="showRAGSummary">
             <el-alert
@@ -171,202 +154,33 @@
           <!-- 风险分析结果 -->
           <div v-if="riskAnalysisData" class="risk-analysis-result">
             <!-- 风险等级统计 -->
-            <div class="risk-statistics">
-              <div class="stat-card high-risk">
-                <div class="stat-icon">
-                  <i class="el-icon-warning"></i>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-number">{{ riskAnalysisData.highRiskCount }}</div>
-                  <div class="stat-label">高风险因素</div>
-                </div>
-              </div>
-              
-              <div class="stat-card medium-risk">
-                <div class="stat-icon">
-                  <i class="el-icon-info"></i>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-number">{{ riskAnalysisData.mediumRiskCount }}</div>
-                  <div class="stat-label">中风险因素</div>
-                </div>
-              </div>
-              
-              <div class="stat-card low-risk">
-                <div class="stat-icon">
-                  <i class="el-icon-success"></i>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-number">{{ riskAnalysisData.lowRiskCount }}</div>
-                  <div class="stat-label">低风险因素</div>
-                </div>
-              </div>
-              
-              <div class="stat-card total">
-                <div class="stat-icon">
-                  <i class="el-icon-data-analysis"></i>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-number">{{ riskAnalysisData.totalSteps }}</div>
-                  <div class="stat-label">总风险因素数</div>
-                </div>
-              </div>
-            </div>
+            <RiskStatistics
+              :stats="{
+                highRiskCount: riskAnalysisData.highRiskCount,
+                mediumRiskCount: riskAnalysisData.mediumRiskCount,
+                lowRiskCount: riskAnalysisData.lowRiskCount,
+                totalSteps: riskAnalysisData.totalSteps
+              }"
+              :risk-data="{
+                highRiskSteps: riskAnalysisData.highRiskSteps,
+                mediumRiskSteps: riskAnalysisData.mediumRiskSteps,
+                lowRiskSteps: riskAnalysisData.lowRiskSteps,
+                criticalStep: riskAnalysisData.criticalStep,
+                recommendation: riskAnalysisData.recommendation
+              }"
+              :default-active-tab="activeRiskTab"
+            />
 
-            <!-- 风险详情 -->
-            <div class="risk-details">
-              <el-tabs v-model="activeRiskTab" type="border-card">
-                <el-tab-pane label="高风险因素" name="high">
-                  <div class="risk-step-list">
-                    <div v-for="step in riskAnalysisData.highRiskSteps" :key="step.id" class="risk-step-item high">
-                      <div class="step-header">
-                        <span class="step-id">{{ step.id }}</span>
-                        <span class="step-name">{{ step.name }}</span>
-                        <el-tag size="mini" type="danger">高风险</el-tag>
-                      </div>
-                      <div class="step-description">{{ step.description }}</div>
-                    </div>
-                  </div>
-                </el-tab-pane>
-                
-                <el-tab-pane label="中风险因素" name="medium">
-                  <div class="risk-step-list">
-                    <div v-for="step in riskAnalysisData.mediumRiskSteps" :key="step.id" class="risk-step-item medium">
-                      <div class="step-header">
-                        <span class="step-id">{{ step.id }}</span>
-                        <span class="step-name">{{ step.name }}</span>
-                        <el-tag size="mini" type="warning">中风险</el-tag>
-                      </div>
-                      <div class="step-description">{{ step.description }}</div>
-                    </div>
-                  </div>
-                </el-tab-pane>
-                
-                <el-tab-pane label="低风险因素" name="low">
-                  <div class="risk-step-list">
-                    <div v-for="step in riskAnalysisData.lowRiskSteps" :key="step.id" class="risk-step-item low">
-                      <div class="step-header">
-                        <span class="step-id">{{ step.id }}</span>
-                        <span class="step-name">{{ step.name }}</span>
-                        <el-tag size="mini" type="success">低风险</el-tag>
-                      </div>
-                      <div class="step-description">{{ step.description }}</div>
-                    </div>
-                  </div>
-                </el-tab-pane>
-              </el-tabs>
-            </div>
 
-            <!-- 分析建议 -->
-            <div class="risk-recommendations">
-              <el-alert
-                title="优化建议"
-                type="info"
-                :closable="false"
-                show-icon>
-                <div class="recommendation-content">
-                  <div class="recommendation-item">
-                    <strong>关键风险环节:</strong> {{ riskAnalysisData.criticalStep }}
-                  </div>
-                  <div class="recommendation-item">
-                    <strong>主要建议:</strong> {{ riskAnalysisData.recommendation }}
-                  </div>
-                </div>
-              </el-alert>
-            </div>
 
             <!-- 节点风险状态分析区域 -->
-            <div v-if="nodeRiskStatusData" class="node-risk-status-section">
-              <el-divider content-position="left">
-                <i class="el-icon-cpu"></i>
-                <span>节点风险状态分析</span>
-              </el-divider>
-              
-              <!-- 节点风险统计 -->
-              <div class="node-risk-statistics">
-                <div class="node-stat-card total-nodes">
-                  <div class="stat-icon">
-                    <i class="el-icon-data-analysis"></i>
-                  </div>
-                  <div class="stat-content">
-                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.totalNodes }}</div>
-                    <div class="stat-label">总节点数</div>
-                  </div>
-                </div>
-                
-                <div class="node-stat-card high-risk-nodes">
-                  <div class="stat-icon">
-                    <i class="el-icon-warning"></i>
-                  </div>
-                  <div class="stat-content">
-                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.highRiskNodes }}</div>
-                    <div class="stat-label">高危节点</div>
-                  </div>
-                </div>
-                
-                <div class="node-stat-card overall-risk">
-                  <div class="stat-icon">
-                    <i class="el-icon-pie-chart"></i>
-                  </div>
-                  <div class="stat-content">
-                    <div class="stat-number">{{ nodeRiskStatusData.riskStatistics.overallRiskLevel }}</div>
-                    <div class="stat-label">整体风险等级</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 高危节点列表 -->
-              <div v-if="nodeRiskStatusData.nodesByRiskLevel.HIGH.length > 0" class="high-risk-nodes-list">
-                <h4 class="section-subtitle">🔴 高危节点详情</h4>
-                <div class="high-risk-node-cards">
-                  <div 
-                    v-for="node in nodeRiskStatusData.nodesByRiskLevel.HIGH" 
-                    :key="node.nodeId"
-                    class="risk-node-card high-risk">
-                    <div class="node-header">
-                      <span class="node-id">{{ node.nodeId }}</span>
-                      <span class="node-name">{{ node.nodeName }}</span>
-                      <el-tag size="mini" type="danger">{{ node.riskLevel }}</el-tag>
-                    </div>
-                    <div class="node-score">
-                      <span>风险评分: </span>
-                      <span class="score-value">{{ node.riskScore }}</span>
-                    </div>
-                    <div class="node-factors">
-                      <span>风险因子: </span>
-                      <el-tag 
-                        v-for="factor in node.riskFactors" 
-                        :key="factor"
-                        size="mini" 
-                        type="warning" 
-                        style="margin: 0 2px;">
-                        {{ factor }}
-                      </el-tag>
-                    </div>
-                    <div class="node-reason">{{ node.riskReason }}</div>
-                    <div class="node-recommendation">
-                      <strong>建议:</strong> {{ node.recommendation }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 关键风险路径 -->
-              <div class="critical-path-section">
-                <el-alert
-                  title="关键风险路径"
-                  type="warning"
-                  :closable="false"
-                  show-icon>
-                  <div class="critical-path-content">
-                    <div class="path-text">{{ nodeRiskStatusData.criticalPath }}</div>
-                    <div class="main-recommendation">
-                      <strong>主要建议:</strong> {{ nodeRiskStatusData.mainRecommendation }}
-                    </div>
-                  </div>
-                </el-alert>
-              </div>
-            </div>
+            <NodeRiskStatusSection
+              v-if="nodeRiskStatusData"
+              :risk-statistics="nodeRiskStatusData.riskStatistics"
+              :high-risk-nodes="nodeRiskStatusData.nodesByRiskLevel.HIGH"
+              :critical-path="nodeRiskStatusData.criticalPath"
+              :main-recommendation="nodeRiskStatusData.mainRecommendation"
+            />
 
             <!-- 节点风险分析加载状态 -->
             <div v-if="nodeRiskAnalysisLoading" class="node-risk-loading">
@@ -752,6 +566,9 @@
 <script>
 import MermaidChart from '@/components/MermaidChart.vue'
 import ResourceChangeConfirmation from '@/components/ResourceChangeConfirmation.vue'
+import ParameterSummary from '@/components/ParameterSummary.vue'
+import RiskStatistics from '@/components/RiskStatistics.vue'
+import NodeRiskStatusSection from '@/components/NodeRiskStatusSection.vue'
 import { processOptimizationApi } from '@/api/processOptimizationApi.js'
 import { neuralNetworkApi } from '@/api/neuralNetworkApi'
 import { llmApi } from '@/api/llmApi.js'
@@ -760,9 +577,12 @@ import { nodeDetailApi } from '@/api/nodeDetailApi.js'
 
 export default {
   name: 'ProcessOptimizationView',
-  components: { 
+  components: {
     ResourceChangeConfirmation,
-    MermaidChart
+    MermaidChart,
+    ParameterSummary,
+    RiskStatistics,
+    NodeRiskStatusSection
   },
   data() {
     return {
@@ -1883,10 +1703,6 @@ export default {
       // TODO: 在这里实现使用备用方案的具体功能
       this.$message.info(`节点 ${nodeId} 的备用方案功能待实现`);
     },
-
-
-
-
   }
 }
 </script>
@@ -2037,30 +1853,7 @@ export default {
   margin-right: 6px;
 }
 
-.parameter-summary {
-  margin-top: 25px;
-  animation: fadeInUp 0.5s ease-out;
-}
 
-.param-summary-content {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 10px;
-  padding: 0;
-}
-
-.param-item {
-  font-size: 12px;
-  color: #606266;
-  background-color: #f8f9fa;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border-left: 3px solid #409EFF;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .rag-summary {
   margin-top: 20px;
@@ -2117,10 +1910,7 @@ export default {
 }
 
 @media (max-width: 1024px) and (min-width: 769px) {
-  .param-summary-content {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+
   
   .rag-status-grid {
     grid-template-columns: 1fr;
@@ -2168,14 +1958,7 @@ export default {
     min-width: 120px;
   }
   
-  .param-summary-content {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-  
-  .param-item {
-    font-size: 11px;
-  }
+
   
   .rag-status-grid {
     grid-template-columns: 1fr;
@@ -2794,148 +2577,9 @@ export default {
 }
 
 /* 风险统计卡片 */
-.risk-statistics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
 
-.stat-card {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
 
-.stat-card:hover {
-  transform: translateY(-2px);
-}
 
-.stat-card.high-risk {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-  color: white;
-}
-
-.stat-card.medium-risk {
-  background: linear-gradient(135deg, #ffa726, #ffb74d);
-  color: white;
-}
-
-.stat-card.low-risk {
-  background: linear-gradient(135deg, #66bb6a, #81c784);
-  color: white;
-}
-
-.stat-card.total {
-  background: linear-gradient(135deg, #42a5f5, #64b5f6);
-  color: white;
-}
-
-.stat-icon {
-  margin-right: 15px;
-}
-
-.stat-icon i {
-  font-size: 32px;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.stat-label {
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* 风险详情 */
-.risk-details {
-  margin-bottom: 30px;
-}
-
-.risk-step-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.risk-step-item {
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border-left: 4px solid;
-  background-color: #f8f9fa;
-}
-
-.risk-step-item.high {
-  border-left-color: #f56c6c;
-  background-color: #fef0f0;
-}
-
-.risk-step-item.medium {
-  border-left-color: #e6a23c;
-  background-color: #fdf6ec;
-}
-
-.risk-step-item.low {
-  border-left-color: #67c23a;
-  background-color: #f0f9ff;
-}
-
-.step-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.step-id {
-  font-weight: bold;
-  color: #409EFF;
-  margin-right: 10px;
-  min-width: 60px;
-}
-
-.step-name {
-  flex: 1;
-  font-weight: 600;
-  color: #303133;
-}
-
-.step-description {
-  color: #606266;
-  line-height: 1.5;
-  font-size: 14px;
-}
-
-/* 风险建议 */
-.risk-recommendations {
-  margin-bottom: 30px;
-}
-
-.recommendation-content {
-  padding: 10px 0;
-}
-
-.recommendation-item {
-  margin-bottom: 10px;
-  line-height: 1.6;
-}
-
-.recommendation-item:last-child {
-  margin-bottom: 0;
-}
-
-.recommendation-item strong {
-  color: #409EFF;
-}
 
 /* 错误状态 */
 .risk-error {
@@ -2978,26 +2622,7 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .risk-statistics {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-  
-  .stat-card {
-    padding: 15px;
-  }
-  
-  .stat-icon i {
-    font-size: 24px;
-  }
-  
-  .stat-number {
-    font-size: 20px;
-  }
-  
-  .stat-label {
-    font-size: 12px;
-  }
+
   
   .risk-analysis-actions {
     flex-direction: column;
@@ -3010,189 +2635,18 @@ export default {
 }
 
 @media (max-width: 480px) {
-  .risk-statistics {
-    grid-template-columns: 1fr;
-  }
+
   
-  .step-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  
-  .step-id {
-    margin-right: 0;
-  }
+
 }
 
 
 
-/* 节点风险状态分析区域样式 */
-.node-risk-status-section {
-  margin-top: 30px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-}
 
-.section-subtitle {
-  font-size: 16px;
-  font-weight: bold;
-  color: #303133;
-  margin: 20px 0 15px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-/* 节点风险统计卡片 */
-.node-risk-statistics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
 
-.node-stat-card {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
 
-.node-stat-card:hover {
-  transform: translateY(-2px);
-}
 
-.node-stat-card.total-nodes {
-  background: linear-gradient(135deg, #6c757d, #868e96);
-  color: white;
-}
-
-.node-stat-card.high-risk-nodes {
-  background: linear-gradient(135deg, #dc3545, #e55353);
-  color: white;
-}
-
-.node-stat-card.overall-risk {
-  background: linear-gradient(135deg, #ffc107, #ffcd39);
-  color: white;
-}
-
-/* 高危节点卡片列表 */
-.high-risk-nodes-list {
-  margin-bottom: 25px;
-}
-
-.high-risk-node-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 15px;
-}
-
-.risk-node-card {
-  padding: 20px;
-  border-radius: 8px;
-  background: white;
-  border-left: 4px solid #dc3545;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.risk-node-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.risk-node-card.high-risk {
-  border-left-color: #dc3545;
-  background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
-}
-
-.node-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.node-id {
-  font-weight: bold;
-  color: #409EFF;
-  background: #e3f2fd;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.node-name {
-  flex: 1;
-  font-weight: 600;
-  color: #303133;
-  font-size: 14px;
-}
-
-.node-score {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #606266;
-}
-
-.score-value {
-  font-weight: bold;
-  color: #dc3545;
-}
-
-.node-factors {
-  margin-bottom: 10px;
-  font-size: 13px;
-  color: #606266;
-}
-
-.node-reason {
-  margin-bottom: 10px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #495057;
-  background: #f8f9fa;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-.node-recommendation {
-  font-size: 13px;
-  line-height: 1.5;
-  color: #495057;
-  background: #e8f5e9;
-  padding: 8px;
-  border-radius: 4px;
-  border-left: 3px solid #28a745;
-}
-
-/* 关键风险路径区域 */
-.critical-path-section {
-  margin-top: 20px;
-}
-
-.critical-path-content {
-  padding: 10px 0;
-}
-
-.path-text {
-  font-weight: bold;
-  color: #e67e22;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.main-recommendation {
-  color: #495057;
-  line-height: 1.6;
-  font-size: 14px;
-}
 
 /* 节点风险分析加载状态 */
 .node-risk-loading {
@@ -3231,29 +2685,7 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .node-risk-statistics {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .high-risk-node-cards {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .node-stat-card {
-    padding: 12px;
-  }
-  
-  .risk-node-card {
-    padding: 15px;
-  }
-  
-  .node-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
+
 }
 
 /* 高危节点风险分析展示区域样式 */
