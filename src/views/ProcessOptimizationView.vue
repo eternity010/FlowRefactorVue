@@ -504,17 +504,17 @@
               </div>
               
               <!-- 根据选择的方案显示对应的重构流程 -->
-              <div v-if="selectedSolution === 'balanced'" class="opt-chart-block">
+              <div class="opt-chart-block" v-show="selectedSolution === 'balanced'">
                 <div class="opt-chart-title">强化学习平衡方案重构流程</div>
                 <div class="chart-container">
-                  <MermaidChart :code="flowData.after" />
+                  <MermaidChart :code="flowData.after" :key="`balanced-${activeOptTab}`" />
                 </div>
               </div>
-              
-              <div v-if="selectedSolution === 'resource-first'" class="opt-chart-block">
+
+              <div class="opt-chart-block" v-show="selectedSolution === 'resource-first'">
                 <div class="opt-chart-title">强化学习资源优先重构流程</div>
                 <div class="chart-container">
-                  <MermaidChart :code="flowData.after2" />
+                  <MermaidChart :code="flowData.after2" :key="`resource-${activeOptTab}`" />
                 </div>
               </div>
               
@@ -675,7 +675,7 @@ export default {
       }
       // 根据选择的方案返回对应的资源数据
       const optimizationData = this.optPoints[this.currentOptimizationKey];
-      
+
       if (this.selectedSolution === 'balanced') {
         return {
           ...optimizationData.resourceChanges,
@@ -687,12 +687,29 @@ export default {
           ganttData: optimizationData.ganttData2
         };
       }
-      
+
         // 默认返回强化学习平衡方案
       return {
         ...optimizationData.resourceChanges,
         ganttData: optimizationData.ganttData
       };
+    },
+
+    // 获取当前激活标签页的重构后流程数据
+    currentOptimizedFlow() {
+      const activeKey = this.activeOptTab;
+      if (!activeKey || !this.optPoints[activeKey]) {
+        return '';
+      }
+
+      const flowData = this.optPoints[activeKey];
+      if (this.selectedSolution === 'balanced') {
+        return flowData.after || '';
+      } else if (this.selectedSolution === 'resource-first') {
+        return flowData.after2 || '';
+      }
+
+      return flowData.after || '';
     }
   },
 
@@ -870,6 +887,11 @@ export default {
         if (response.data.code === 200) {
           this.optPoints = response.data.data;
           console.log('流程优化数据加载成功:', this.optPoints);
+
+          // 数据加载完成后，强制触发视图更新以确保Mermaid图表正确渲染
+          this.$nextTick(() => {
+            this.$forceUpdate();
+          });
         } else {
           throw new Error(response.data.message || '数据加载失败');
         }
@@ -965,9 +987,17 @@ export default {
     handleSolutionChange(value) {
       // 处理方案选择的逻辑
       console.log('Selected solution:', value);
-      // 强制更新视图以重新渲染对应的图表
+
+      // 方案切换时，强制触发Mermaid图表的重新渲染
       this.$nextTick(() => {
-        this.$forceUpdate();
+        // 通过改变selectedSolution的引用来触发响应式更新
+        this.selectedSolution = value;
+
+        // 等待DOM更新后，触发所有MermaidChart组件的重新渲染
+        this.$nextTick(() => {
+          // 通知所有子组件重新渲染
+          this.$forceUpdate();
+        });
       });
     },
 
@@ -1451,7 +1481,7 @@ export default {
         }
 
         this.$message.info('进入流程优化界面...');
-        
+
         // 确保节点风险数据已保存到组件状态中
         console.log('💾 保存节点风险分析数据供后续使用:', {
           nodeRiskStatusData: this.nodeRiskStatusData,
@@ -1459,17 +1489,23 @@ export default {
           savedRiskData: this.savedRiskData,
           savedAnalysisData: this.savedAnalysisData
         });
-        
+
         // 直接进入主要内容页面，保留所有风险分析数据
         this.showRiskAnalysis = false;
         this.showMainContent = true;
-        
+
         // 在主要内容页面中，这些数据仍然可用：
         // - this.nodeRiskStatusData (格式化后的节点风险数据)
         // - this.processNodeRiskAnalysis (原始API返回数据)
         // - this.savedRiskData (原始风险数据)
         // - this.savedAnalysisData (风险分析结果)
-        
+
+        // 页面切换后，确保Mermaid图表能够正确渲染
+        this.$nextTick(() => {
+          console.log('🔄 页面切换完成，开始重新渲染Mermaid图表');
+          this.$forceUpdate();
+        });
+
       } catch (error) {
         console.error('❌ 进入流程优化失败:', error);
         this.$message.error('进入流程优化失败: ' + error.message);

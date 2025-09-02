@@ -55,26 +55,46 @@ export default {
       this.mermaidInitialized = true;
     },
     async renderMermaid() {
-      if (!window.mermaid || !this.mermaidLoaded) return;
+      if (!window.mermaid || !this.mermaidLoaded) {
+        console.warn('Mermaid 未加载，跳过渲染');
+        return;
+      }
+
+      if (!this.code || this.code.trim() === '') {
+        console.warn('Mermaid 代码为空，跳过渲染');
+        return;
+      }
+
       await this.$nextTick();
       const container = this.$refs.container;
-      if (!container) return;
-      const id = `mermaid-${Date.now()}`;
+      if (!container) {
+        console.warn('Mermaid 容器不存在');
+        return;
+      }
+
+      const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       container.innerHTML = '';
+
       try {
+        console.log('开始渲染 Mermaid 图表:', id);
+
         const renderRes = window.mermaid.render(id, this.code);
+
         // Mermaid v10 及以上返回 Promise
         if (renderRes instanceof Promise) {
           const { svg } = await renderRes;
           container.innerHTML = svg;
+          console.log('Mermaid 图表渲染完成 (Promise):', id);
         } else {
           // 兼容旧版本 callback 写法
           window.mermaid.render(id, this.code, (svgCode) => {
             container.innerHTML = svgCode;
+            console.log('Mermaid 图表渲染完成 (Callback):', id);
           });
         }
       } catch (error) {
         console.error('Mermaid 渲染失败:', error);
+        container.innerHTML = `<div style="color: #f56c6c; text-align: center; padding: 20px;">图表渲染失败: ${error.message}</div>`;
       }
     }
   }

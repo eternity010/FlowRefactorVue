@@ -1,0 +1,433 @@
+[{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd7d"
+  },
+  "mermaidDefinition": "flowchart LR\n    %% 所有节点定义\n    MK1[获取市场需求信息]\n    MK2[分析市场机会]\n    MK3[定位目标市场]\n    MK4[确定潜在客户]\n    MK5[发掘客户需求]\n    MK6[编制技术方案]\n    MK7[沟通客户需求]\n    MK8[提供技术支持提供人员支持]\n    MK9[提供LCC支持]\n    MK10[提供原材料采购成本及询价支持]\n    MK11[提供用工和人工成本支持]\n    MK12[提供成本和财务支持]\n    MK13[确定产品和价格策略]\n    MK14[提供技术支持提供人员支持]\n    MK15[提供品牌推广提供公司宣传]\n    MK16[进行风险评估及法律支持]\n    MK17[确定渠道和销售策略]\n    MK18[提供技术支持提供人员支持]\n    MK19[提供品牌推广提供公司宣传]\n    MK20[进行风险评估及法律支持]\n    MK21[开展知识产权管理]\n    MK22[建立客户档案分类管理客户评价客户信誉]\n    MK23[项目立项]\n    MK24[招标文件评审]\n    MK25[制作投标文件]\n    MK26[投标文件评审]\n    MK27[项目中标]\n    MK28[合同签署]\n    MK29[合同执行]\n    MK30[交付回款]\n\n    %% 所有边的定义\n    MK1-->|市场需求表|MK2\n    MK2-->|市场机会表|MK3\n    MK3-->|确定市场目标|MK4\n    MK4-->|潜在客户表|MK5\n    MK5-->|客户需求表|MK6\n    MK6-->|技术方案|MK7\n    MK7-->|修改客户需求表|MK8\n    MK7-->|修改客户需求表|MK9\n    MK7-->|修改客户需求表|MK10\n    MK7-->|修改客户需求表|MK11\n    MK7-->|修改客户需求表|MK12\n    MK8-->|BOM信息|MK13\n    MK9-->|BOM信息|MK13\n    MK10-->|BOM信息|MK13\n    MK11-->|BOM信息|MK13\n    MK12-->|BOM信息|MK13\n    MK13-->|产品和价格策略确定|MK14\n    MK13-->|产品和价格策略确定|MK15\n    MK13-->|产品和价格策略确定|MK16\n    MK14-->MK17\n    MK15-->MK17\n    MK16-->MK17\n    MK17-->|确定渠道及销售策略|MK18\n    MK17-->|确定渠道及销售策略|MK19\n    MK17-->|确定渠道及销售策略|MK20\n    MK17-->|确定渠道及销售策略|MK21\n    MK18-->MK22\n    MK19-->MK22\n    MK20-->MK22\n    MK21-->MK22\n    MK22-->MK23\n    MK23-->|立项书|MK24\n    MK24-->MK25\n    MK25-->|投标文件|MK26\n    MK26-->MK27\n    MK27-->|中标通知书|MK28\n    MK28-->|签订合同|MK29\n    MK29-->MK30",
+  "nodes": [
+    {
+      "id": "MK1",
+      "type": "rect",
+      "text": "获取市场需求信息"
+    },
+    {
+      "id": "MK2",
+      "type": "rect",
+      "text": "分析市场机会"
+    },
+    {
+      "id": "MK3",
+      "type": "rect",
+      "text": "定位目标市场"
+    },
+    {
+      "id": "MK4",
+      "type": "rect",
+      "text": "确定潜在客户"
+    },
+    {
+      "id": "MK5",
+      "type": "rect",
+      "text": "发掘客户需求"
+    },
+    {
+      "id": "MK6",
+      "type": "rect",
+      "text": "编制技术方案"
+    },
+    {
+      "id": "MK7",
+      "type": "rect",
+      "text": "沟通客户需求"
+    },
+    {
+      "id": "MK8",
+      "type": "rect",
+      "text": "提供技术支持提供人员支持"
+    },
+    {
+      "id": "MK9",
+      "type": "rect",
+      "text": "提供LCC支持"
+    },
+    {
+      "id": "MK10",
+      "type": "rect",
+      "text": "提供原材料采购成本及询价支持"
+    },
+    {
+      "id": "MK11",
+      "type": "rect",
+      "text": "提供用工和人工成本支持"
+    },
+    {
+      "id": "MK12",
+      "type": "rect",
+      "text": "提供成本和财务支持"
+    },
+    {
+      "id": "MK13",
+      "type": "rect",
+      "text": "确定产品和价格策略"
+    },
+    {
+      "id": "MK14",
+      "type": "rect",
+      "text": "提供技术支持提供人员支持"
+    },
+    {
+      "id": "MK15",
+      "type": "rect",
+      "text": "提供品牌推广提供公司宣传"
+    },
+    {
+      "id": "MK16",
+      "type": "rect",
+      "text": "进行风险评估及法律支持"
+    },
+    {
+      "id": "MK17",
+      "type": "rect",
+      "text": "确定渠道和销售策略"
+    },
+    {
+      "id": "MK18",
+      "type": "rect",
+      "text": "提供技术支持提供人员支持"
+    },
+    {
+      "id": "MK19",
+      "type": "rect",
+      "text": "提供品牌推广提供公司宣传"
+    },
+    {
+      "id": "MK20",
+      "type": "rect",
+      "text": "进行风险评估及法律支持"
+    },
+    {
+      "id": "MK21",
+      "type": "rect",
+      "text": "开展知识产权管理"
+    },
+    {
+      "id": "MK22",
+      "type": "rect",
+      "text": "建立客户档案分类管理客户评价客户信誉"
+    },
+    {
+      "id": "MK23",
+      "type": "rect",
+      "text": "项目立项"
+    },
+    {
+      "id": "MK24",
+      "type": "rect",
+      "text": "招标文件评审"
+    },
+    {
+      "id": "MK25",
+      "type": "rect",
+      "text": "制作投标文件"
+    },
+    {
+      "id": "MK26",
+      "type": "rect",
+      "text": "投标文件评审"
+    },
+    {
+      "id": "MK27",
+      "type": "rect",
+      "text": "项目中标"
+    },
+    {
+      "id": "MK28",
+      "type": "rect",
+      "text": "合同签署"
+    },
+    {
+      "id": "MK29",
+      "type": "rect",
+      "text": "合同执行"
+    },
+    {
+      "id": "MK30",
+      "type": "rect",
+      "text": "交付回款"
+    }
+  ],
+  "edges": [
+    {
+      "id": "mke1",
+      "type": "polyline",
+      "sourceNodeId": "MK1",
+      "targetNodeId": "MK2",
+      "text": "市场需求表"
+    },
+    {
+      "id": "mke2",
+      "type": "polyline",
+      "sourceNodeId": "MK2",
+      "targetNodeId": "MK3",
+      "text": "市场机会表"
+    },
+    {
+      "id": "mke3",
+      "type": "polyline",
+      "sourceNodeId": "MK3",
+      "targetNodeId": "MK4",
+      "text": "确定市场目标"
+    },
+    {
+      "id": "mke4",
+      "type": "polyline",
+      "sourceNodeId": "MK4",
+      "targetNodeId": "MK5",
+      "text": "潜在客户表"
+    },
+    {
+      "id": "mke5",
+      "type": "polyline",
+      "sourceNodeId": "MK5",
+      "targetNodeId": "MK6",
+      "text": "客户需求表"
+    },
+    {
+      "id": "mke6",
+      "type": "polyline",
+      "sourceNodeId": "MK6",
+      "targetNodeId": "MK7",
+      "text": "技术方案"
+    },
+    {
+      "id": "mke7",
+      "type": "polyline",
+      "sourceNodeId": "MK7",
+      "targetNodeId": "MK8",
+      "text": "修改客户需求表"
+    },
+    {
+      "id": "mke8",
+      "type": "polyline",
+      "sourceNodeId": "MK7",
+      "targetNodeId": "MK9",
+      "text": "修改客户需求表"
+    },
+    {
+      "id": "mke9",
+      "type": "polyline",
+      "sourceNodeId": "MK7",
+      "targetNodeId": "MK10",
+      "text": "修改客户需求表"
+    },
+    {
+      "id": "mke10",
+      "type": "polyline",
+      "sourceNodeId": "MK7",
+      "targetNodeId": "MK11",
+      "text": "修改客户需求表"
+    },
+    {
+      "id": "mke11",
+      "type": "polyline",
+      "sourceNodeId": "MK7",
+      "targetNodeId": "MK12",
+      "text": "修改客户需求表"
+    },
+    {
+      "id": "mke12",
+      "type": "polyline",
+      "sourceNodeId": "MK8",
+      "targetNodeId": "MK13",
+      "text": "BOM信息"
+    },
+    {
+      "id": "mke13",
+      "type": "polyline",
+      "sourceNodeId": "MK9",
+      "targetNodeId": "MK13",
+      "text": "BOM信息"
+    },
+    {
+      "id": "mke14",
+      "type": "polyline",
+      "sourceNodeId": "MK10",
+      "targetNodeId": "MK13",
+      "text": "BOM信息"
+    },
+    {
+      "id": "mke15",
+      "type": "polyline",
+      "sourceNodeId": "MK11",
+      "targetNodeId": "MK13",
+      "text": "BOM信息"
+    },
+    {
+      "id": "mke16",
+      "type": "polyline",
+      "sourceNodeId": "MK12",
+      "targetNodeId": "MK13",
+      "text": "BOM信息"
+    },
+    {
+      "id": "mke17",
+      "type": "polyline",
+      "sourceNodeId": "MK13",
+      "targetNodeId": "MK14",
+      "text": "产品和价格策略确定"
+    },
+    {
+      "id": "mke18",
+      "type": "polyline",
+      "sourceNodeId": "MK13",
+      "targetNodeId": "MK15",
+      "text": "产品和价格策略确定"
+    },
+    {
+      "id": "mke19",
+      "type": "polyline",
+      "sourceNodeId": "MK13",
+      "targetNodeId": "MK16",
+      "text": "产品和价格策略确定"
+    },
+    {
+      "id": "mke20",
+      "type": "polyline",
+      "sourceNodeId": "MK14",
+      "targetNodeId": "MK17",
+      "text": ""
+    },
+    {
+      "id": "mke21",
+      "type": "polyline",
+      "sourceNodeId": "MK15",
+      "targetNodeId": "MK17",
+      "text": ""
+    },
+    {
+      "id": "mke22",
+      "type": "polyline",
+      "sourceNodeId": "MK16",
+      "targetNodeId": "MK17",
+      "text": ""
+    },
+    {
+      "id": "mke23",
+      "type": "polyline",
+      "sourceNodeId": "MK17",
+      "targetNodeId": "MK18",
+      "text": "确定渠道及销售策略"
+    },
+    {
+      "id": "mke24",
+      "type": "polyline",
+      "sourceNodeId": "MK17",
+      "targetNodeId": "MK19",
+      "text": "确定渠道及销售策略"
+    },
+    {
+      "id": "mke25",
+      "type": "polyline",
+      "sourceNodeId": "MK17",
+      "targetNodeId": "MK20",
+      "text": "确定渠道及销售策略"
+    },
+    {
+      "id": "mke26",
+      "type": "polyline",
+      "sourceNodeId": "MK17",
+      "targetNodeId": "MK21",
+      "text": "确定渠道及销售策略"
+    },
+    {
+      "id": "mke27",
+      "type": "polyline",
+      "sourceNodeId": "MK18",
+      "targetNodeId": "MK22",
+      "text": ""
+    },
+    {
+      "id": "mke28",
+      "type": "polyline",
+      "sourceNodeId": "MK19",
+      "targetNodeId": "MK22",
+      "text": ""
+    },
+    {
+      "id": "mke29",
+      "type": "polyline",
+      "sourceNodeId": "MK20",
+      "targetNodeId": "MK22",
+      "text": ""
+    },
+    {
+      "id": "mke30",
+      "type": "polyline",
+      "sourceNodeId": "MK21",
+      "targetNodeId": "MK22",
+      "text": ""
+    },
+    {
+      "id": "mke31",
+      "type": "polyline",
+      "sourceNodeId": "MK22",
+      "targetNodeId": "MK23",
+      "text": ""
+    },
+    {
+      "id": "mke32",
+      "type": "polyline",
+      "sourceNodeId": "MK23",
+      "targetNodeId": "MK24",
+      "text": "立项书"
+    },
+    {
+      "id": "mke33",
+      "type": "polyline",
+      "sourceNodeId": "MK24",
+      "targetNodeId": "MK25",
+      "text": ""
+    },
+    {
+      "id": "mke34",
+      "type": "polyline",
+      "sourceNodeId": "MK25",
+      "targetNodeId": "MK26",
+      "text": "投标文件"
+    },
+    {
+      "id": "mke35",
+      "type": "polyline",
+      "sourceNodeId": "MK26",
+      "targetNodeId": "MK27",
+      "text": ""
+    },
+    {
+      "id": "mke36",
+      "type": "polyline",
+      "sourceNodeId": "MK27",
+      "targetNodeId": "MK28",
+      "text": "中标通知书"
+    },
+    {
+      "id": "mke37",
+      "type": "polyline",
+      "sourceNodeId": "MK28",
+      "targetNodeId": "MK29",
+      "text": "签订合同"
+    },
+    {
+      "id": "mke38",
+      "type": "polyline",
+      "sourceNodeId": "MK29",
+      "targetNodeId": "MK30",
+      "text": ""
+    }
+  ],
+  "importedAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  },
+  "source": "marketingFlowMermaid.json",
+  "description": "营销流程 Mermaid 图表数据 - 包含节点、边和流程图定义",
+  "flowType": "marketing",
+  "version": "1.0"
+}]

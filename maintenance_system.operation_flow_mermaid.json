@@ -1,0 +1,404 @@
+[{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487e6"
+  },
+  "mermaidDefinition": "flowchart LR\n    %%所有节点定义\n    OP1[里程数周期性维护]\n    OP2[客户整改需求]\n    OP3[故障报警]\n    OP4[安排维修人员]\n    OP5[检查现场情况]\n    OP6[现场情况分析]\n    OP7[设备维保]\n    OP8{是否存在故障}\n    OP9{是否需要返厂}\n    OP10[现场修]\n    OP11[返厂修]\n    OP12{是否需要技术支持}\n    OP13[选择已有方案]\n    OP14[设计部门支持]\n    OP15[工艺部门支持]\n    OP16[质量管理部门支持]\n    OP17[供应商支持]\n    OP18[事业部门支持]\n    OP19[确定运维方案]\n    OP20[人员派遣]\n    OP21[备件供应]\n    OP22[费用管理]\n    OP23[执行运维方案]\n    OP24[维修效果检验]\n    OP25{是否需要改进}\n    OP26[运维信息反馈]\n    OP27[技术文件更新]\n\n    %%所有边定义\n    OP1-->|里程报道单|OP7\n    OP2-->|派遣单|OP4\n    OP3-->|派遣单|OP4\n    OP4-->|维修人员表|OP5\n    OP5-->|现场情况记录表|OP6\n    OP6-->|现场报告书|OP8\n    OP8-->|否|OP7\n    OP7-->|设备维保单|OP9\n    OP8-->OP9\n    OP9-->|否|OP10\n    OP9-->|是|OP11\n    OP10-->OP12\n    OP11-->OP12\n    OP12-->|否|OP13\n    OP12-->|是|OP14\n    OP12-->|是|OP15\n    OP12-->|是|OP16\n    OP12-->|是|OP17\n    OP12-->|是|OP18\n    OP13-->|运维指导书|OP19\n    OP14-->|运维指导书|OP19\n    OP15-->|运维指导书|OP19\n    OP16-->|运维指导书|OP19\n    OP17-->|运维指导书|OP19\n    OP18-->|运维指导书|OP19\n    OP19-->|运维方案书|OP20\n    OP19-->|运维方案书|OP21\n    OP19-->|运维方案书|OP22\n    OP20-->|调度方案|OP23\n    OP21-->|调度方案|OP23\n    OP22-->|调度方案|OP23\n    OP23-->|运维方案执行表|OP24\n    OP24-->|维修校验表|OP25\n    OP25-->|否|OP26\n    OP25-->|是|OP12\n    OP26-->|运维信息反馈单|OP27",
+  "nodes": [
+    {
+      "id": "OP1",
+      "type": "rect",
+      "text": "里程数周期性维护"
+    },
+    {
+      "id": "OP2",
+      "type": "rect",
+      "text": "客户整改需求"
+    },
+    {
+      "id": "OP3",
+      "type": "rect",
+      "text": "故障报警"
+    },
+    {
+      "id": "OP4",
+      "type": "rect",
+      "text": "安排维修人员"
+    },
+    {
+      "id": "OP5",
+      "type": "rect",
+      "text": "检查现场情况"
+    },
+    {
+      "id": "OP6",
+      "type": "rect",
+      "text": "现场情况分析"
+    },
+    {
+      "id": "OP7",
+      "type": "rect",
+      "text": "设备维保"
+    },
+    {
+      "id": "OP8",
+      "type": "diamond",
+      "text": "是否存在故障"
+    },
+    {
+      "id": "OP9",
+      "type": "diamond",
+      "text": "是否需要返厂"
+    },
+    {
+      "id": "OP10",
+      "type": "rect",
+      "text": "现场修"
+    },
+    {
+      "id": "OP11",
+      "type": "rect",
+      "text": "返厂修"
+    },
+    {
+      "id": "OP12",
+      "type": "diamond",
+      "text": "是否需要技术支持"
+    },
+    {
+      "id": "OP13",
+      "type": "rect",
+      "text": "选择已有方案"
+    },
+    {
+      "id": "OP14",
+      "type": "rect",
+      "text": "设计部门支持"
+    },
+    {
+      "id": "OP15",
+      "type": "rect",
+      "text": "工艺部门支持"
+    },
+    {
+      "id": "OP16",
+      "type": "rect",
+      "text": "质量管理部门支持"
+    },
+    {
+      "id": "OP17",
+      "type": "rect",
+      "text": "供应商支持"
+    },
+    {
+      "id": "OP18",
+      "type": "rect",
+      "text": "事业部门支持"
+    },
+    {
+      "id": "OP19",
+      "type": "rect",
+      "text": "确定运维方案"
+    },
+    {
+      "id": "OP20",
+      "type": "rect",
+      "text": "人员派遣"
+    },
+    {
+      "id": "OP21",
+      "type": "rect",
+      "text": "备件供应"
+    },
+    {
+      "id": "OP22",
+      "type": "rect",
+      "text": "费用管理"
+    },
+    {
+      "id": "OP23",
+      "type": "rect",
+      "text": "执行运维方案"
+    },
+    {
+      "id": "OP24",
+      "type": "rect",
+      "text": "维修效果检验"
+    },
+    {
+      "id": "OP25",
+      "type": "diamond",
+      "text": "是否需要改进"
+    },
+    {
+      "id": "OP26",
+      "type": "rect",
+      "text": "运维信息反馈"
+    },
+    {
+      "id": "OP27",
+      "type": "rect",
+      "text": "技术文件更新"
+    }
+  ],
+  "edges": [
+    {
+      "id": "ope1",
+      "type": "polyline",
+      "sourceNodeId": "OP1",
+      "targetNodeId": "OP7",
+      "text": "里程报道单"
+    },
+    {
+      "id": "ope2",
+      "type": "polyline",
+      "sourceNodeId": "OP2",
+      "targetNodeId": "OP4",
+      "text": "派遣单"
+    },
+    {
+      "id": "ope3",
+      "type": "polyline",
+      "sourceNodeId": "OP3",
+      "targetNodeId": "OP4",
+      "text": "派遣单"
+    },
+    {
+      "id": "ope4",
+      "type": "polyline",
+      "sourceNodeId": "OP4",
+      "targetNodeId": "OP5",
+      "text": "维修人员表"
+    },
+    {
+      "id": "ope5",
+      "type": "polyline",
+      "sourceNodeId": "OP5",
+      "targetNodeId": "OP6",
+      "text": "现场情况记录表"
+    },
+    {
+      "id": "ope6",
+      "type": "polyline",
+      "sourceNodeId": "OP6",
+      "targetNodeId": "OP8",
+      "text": "现场报告书"
+    },
+    {
+      "id": "ope7",
+      "type": "polyline",
+      "sourceNodeId": "OP8",
+      "targetNodeId": "OP7",
+      "text": "否"
+    },
+    {
+      "id": "ope8",
+      "type": "polyline",
+      "sourceNodeId": "OP7",
+      "targetNodeId": "OP9",
+      "text": "设备维保单"
+    },
+    {
+      "id": "ope9",
+      "type": "polyline",
+      "sourceNodeId": "OP8",
+      "targetNodeId": "OP9",
+      "text": ""
+    },
+    {
+      "id": "ope10",
+      "type": "polyline",
+      "sourceNodeId": "OP9",
+      "targetNodeId": "OP10",
+      "text": "否"
+    },
+    {
+      "id": "ope11",
+      "type": "polyline",
+      "sourceNodeId": "OP9",
+      "targetNodeId": "OP11",
+      "text": "是"
+    },
+    {
+      "id": "ope12",
+      "type": "polyline",
+      "sourceNodeId": "OP10",
+      "targetNodeId": "OP12",
+      "text": ""
+    },
+    {
+      "id": "ope13",
+      "type": "polyline",
+      "sourceNodeId": "OP11",
+      "targetNodeId": "OP12",
+      "text": ""
+    },
+    {
+      "id": "ope14",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP13",
+      "text": "否"
+    },
+    {
+      "id": "ope15",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP14",
+      "text": "是"
+    },
+    {
+      "id": "ope16",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP15",
+      "text": "是"
+    },
+    {
+      "id": "ope17",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP16",
+      "text": "是"
+    },
+    {
+      "id": "ope18",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP17",
+      "text": "是"
+    },
+    {
+      "id": "ope19",
+      "type": "polyline",
+      "sourceNodeId": "OP12",
+      "targetNodeId": "OP18",
+      "text": "是"
+    },
+    {
+      "id": "ope20",
+      "type": "polyline",
+      "sourceNodeId": "OP13",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope21",
+      "type": "polyline",
+      "sourceNodeId": "OP14",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope22",
+      "type": "polyline",
+      "sourceNodeId": "OP15",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope23",
+      "type": "polyline",
+      "sourceNodeId": "OP16",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope24",
+      "type": "polyline",
+      "sourceNodeId": "OP17",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope25",
+      "type": "polyline",
+      "sourceNodeId": "OP18",
+      "targetNodeId": "OP19",
+      "text": "运维指导书"
+    },
+    {
+      "id": "ope26",
+      "type": "polyline",
+      "sourceNodeId": "OP19",
+      "targetNodeId": "OP20",
+      "text": "运维方案书"
+    },
+    {
+      "id": "ope27",
+      "type": "polyline",
+      "sourceNodeId": "OP19",
+      "targetNodeId": "OP21",
+      "text": "运维方案书"
+    },
+    {
+      "id": "ope28",
+      "type": "polyline",
+      "sourceNodeId": "OP19",
+      "targetNodeId": "OP22",
+      "text": "运维方案书"
+    },
+    {
+      "id": "ope29",
+      "type": "polyline",
+      "sourceNodeId": "OP20",
+      "targetNodeId": "OP23",
+      "text": "调度方案"
+    },
+    {
+      "id": "ope30",
+      "type": "polyline",
+      "sourceNodeId": "OP21",
+      "targetNodeId": "OP23",
+      "text": "调度方案"
+    },
+    {
+      "id": "ope31",
+      "type": "polyline",
+      "sourceNodeId": "OP22",
+      "targetNodeId": "OP23",
+      "text": "调度方案"
+    },
+    {
+      "id": "ope32",
+      "type": "polyline",
+      "sourceNodeId": "OP23",
+      "targetNodeId": "OP24",
+      "text": "运维方案执行表"
+    },
+    {
+      "id": "ope33",
+      "type": "polyline",
+      "sourceNodeId": "OP24",
+      "targetNodeId": "OP25",
+      "text": "维修校验表"
+    },
+    {
+      "id": "ope34",
+      "type": "polyline",
+      "sourceNodeId": "OP25",
+      "targetNodeId": "OP26",
+      "text": "否"
+    },
+    {
+      "id": "ope35",
+      "type": "polyline",
+      "sourceNodeId": "OP25",
+      "targetNodeId": "OP12",
+      "text": "是"
+    },
+    {
+      "id": "ope36",
+      "type": "polyline",
+      "sourceNodeId": "OP26",
+      "targetNodeId": "OP27",
+      "text": "运维信息反馈单"
+    }
+  ],
+  "importedAt": {
+    "$date": "2025-07-19T07:25:03.711Z"
+  },
+  "source": "operationFlowMermaid.json",
+  "description": "运维流程 Mermaid 图表数据 - 包含设备维护、故障处理、技术支持、方案执行、效果检验等完整运维流程",
+  "flowType": "operation",
+  "version": "1.0"
+}]

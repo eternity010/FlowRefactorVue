@@ -1,0 +1,449 @@
+[{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a895"
+  },
+  "mermaidDefinition": "flowchart LR\n    %% 所有节点定义\n    PD1[物料清单BOM]\n    PD2[录入生产信息]\n    PD3[编制阶段计划]\n    PD4[编制工位计划]\n    PD5[创建生产订单]\n    PD6[开工前发料]\n    PD7[生产设备点检]\n    PD8[生产订单派工]\n    PD9[金属加工]\n    PD10[电气、电子件加工]\n    PD11[非金属件加工]\n    PD12[车体焊接]\n    PD13[转向架焊接]\n    PD14[辅助结构焊接]\n    PD15[车体涂装处理]\n    PD16[零部件涂装处理]\n    PD17[车体总成]\n    PD18[转向架总成]\n    PD19[牵引系统总成]\n    PD20[辅助系统总成]\n    PD21[车体模块连接]\n    PD22[电气系统布线]\n    PD23[最终装配]\n    PD24[功能测试]\n    PD25[整机可靠性试验]\n    PD26[生产完工]\n    PD27[订单报工]\n    PD28[生产交付]\n    PD29[产品质量档案]\n\n    %%所有的边定义\n    PD1-->|BOM信息|PD2\n    PD2-->|更新系统信息|PD3\n    PD3-->|阶段计划|PD4\n    PD4-->|工位计划|PD5\n    PD5-->|生产订单|PD6\n    PD6-->|生产物料|PD7\n    PD7-->|点检报告|PD8\n    PD8-->|原材料/零部件|PD9\n    PD8-->|原材料/零部件|PD10\n    PD8-->|原材料/零部件|PD11\n    PD9-->|加工件|PD12\n    PD10-->|加工件|PD13\n    PD11-->|加工件|PD14\n    PD12-->|过程件|PD15\n    PD13-->|过程件|PD15\n    PD13-->|过程件|PD16\n    PD14-->|过程件|PD16\n    PD15-->|过程件|PD17\n    PD15-->PD18\n    PD15-->PD19\n    PD15-->PD20\n    PD16-->PD17\n    PD16-->PD18\n    PD16-->PD19\n    PD16-->|过程件|PD20\n    PD17-->PD21\n    PD18-->PD21\n    PD19-->PD21\n    PD20-->PD21\n    PD17-->PD22\n    PD18-->PD22\n    PD19-->PD22\n    PD20-->PD22\n    PD21-->PD23\n    PD22-->PD23\n    PD23-->|整车|PD24\n    PD24-->|测试报告|PD25\n    PD25-->|试验报告|PD26\n    PD26-->|完工报告|PD27\n    PD27-->|订单信息|PD28\n    PD28-->|产品档案|PD29",
+  "nodes": [
+    {
+      "id": "PD1",
+      "type": "rect",
+      "text": "物料清单BOM"
+    },
+    {
+      "id": "PD2",
+      "type": "rect",
+      "text": "录入生产信息"
+    },
+    {
+      "id": "PD3",
+      "type": "rect",
+      "text": "编制阶段计划"
+    },
+    {
+      "id": "PD4",
+      "type": "rect",
+      "text": "编制工位计划"
+    },
+    {
+      "id": "PD5",
+      "type": "rect",
+      "text": "创建生产订单"
+    },
+    {
+      "id": "PD6",
+      "type": "rect",
+      "text": "开工前发料"
+    },
+    {
+      "id": "PD7",
+      "type": "rect",
+      "text": "生产设备点检"
+    },
+    {
+      "id": "PD8",
+      "type": "rect",
+      "text": "生产订单派工"
+    },
+    {
+      "id": "PD9",
+      "type": "rect",
+      "text": "金属加工"
+    },
+    {
+      "id": "PD10",
+      "type": "rect",
+      "text": "电气、电子件加工"
+    },
+    {
+      "id": "PD11",
+      "type": "rect",
+      "text": "非金属件加工"
+    },
+    {
+      "id": "PD12",
+      "type": "rect",
+      "text": "车体焊接"
+    },
+    {
+      "id": "PD13",
+      "type": "rect",
+      "text": "转向架焊接"
+    },
+    {
+      "id": "PD14",
+      "type": "rect",
+      "text": "辅助结构焊接"
+    },
+    {
+      "id": "PD15",
+      "type": "rect",
+      "text": "车体涂装处理"
+    },
+    {
+      "id": "PD16",
+      "type": "rect",
+      "text": "零部件涂装处理"
+    },
+    {
+      "id": "PD17",
+      "type": "rect",
+      "text": "车体总成"
+    },
+    {
+      "id": "PD18",
+      "type": "rect",
+      "text": "转向架总成"
+    },
+    {
+      "id": "PD19",
+      "type": "rect",
+      "text": "牵引系统总成"
+    },
+    {
+      "id": "PD20",
+      "type": "rect",
+      "text": "辅助系统总成"
+    },
+    {
+      "id": "PD21",
+      "type": "rect",
+      "text": "车体模块连接"
+    },
+    {
+      "id": "PD22",
+      "type": "rect",
+      "text": "电气系统布线"
+    },
+    {
+      "id": "PD23",
+      "type": "rect",
+      "text": "最终装配"
+    },
+    {
+      "id": "PD24",
+      "type": "rect",
+      "text": "功能测试"
+    },
+    {
+      "id": "PD25",
+      "type": "rect",
+      "text": "整机可靠性试验"
+    },
+    {
+      "id": "PD26",
+      "type": "rect",
+      "text": "生产完工"
+    },
+    {
+      "id": "PD27",
+      "type": "rect",
+      "text": "订单报工"
+    },
+    {
+      "id": "PD28",
+      "type": "rect",
+      "text": "生产交付"
+    },
+    {
+      "id": "PD29",
+      "type": "rect",
+      "text": "产品质量档案"
+    }
+  ],
+  "edges": [
+    {
+      "id": "pde1",
+      "type": "polyline",
+      "sourceNodeId": "PD1",
+      "targetNodeId": "PD2",
+      "text": "BOM信息"
+    },
+    {
+      "id": "pde2",
+      "type": "polyline",
+      "sourceNodeId": "PD2",
+      "targetNodeId": "PD3",
+      "text": "更新系统信息"
+    },
+    {
+      "id": "pde3",
+      "type": "polyline",
+      "sourceNodeId": "PD3",
+      "targetNodeId": "PD4",
+      "text": "阶段计划"
+    },
+    {
+      "id": "pde4",
+      "type": "polyline",
+      "sourceNodeId": "PD4",
+      "targetNodeId": "PD5",
+      "text": "工位计划"
+    },
+    {
+      "id": "pde5",
+      "type": "polyline",
+      "sourceNodeId": "PD5",
+      "targetNodeId": "PD6",
+      "text": "生产订单"
+    },
+    {
+      "id": "pde6",
+      "type": "polyline",
+      "sourceNodeId": "PD6",
+      "targetNodeId": "PD7",
+      "text": "生产物料"
+    },
+    {
+      "id": "pde7",
+      "type": "polyline",
+      "sourceNodeId": "PD7",
+      "targetNodeId": "PD8",
+      "text": "点检报告"
+    },
+    {
+      "id": "pde8",
+      "type": "polyline",
+      "sourceNodeId": "PD8",
+      "targetNodeId": "PD9",
+      "text": "原材料/零部件"
+    },
+    {
+      "id": "pde9",
+      "type": "polyline",
+      "sourceNodeId": "PD8",
+      "targetNodeId": "PD10",
+      "text": "原材料/零部件"
+    },
+    {
+      "id": "pde10",
+      "type": "polyline",
+      "sourceNodeId": "PD8",
+      "targetNodeId": "PD11",
+      "text": "原材料/零部件"
+    },
+    {
+      "id": "pde11",
+      "type": "polyline",
+      "sourceNodeId": "PD9",
+      "targetNodeId": "PD12",
+      "text": "加工件"
+    },
+    {
+      "id": "pde12",
+      "type": "polyline",
+      "sourceNodeId": "PD10",
+      "targetNodeId": "PD13",
+      "text": "加工件"
+    },
+    {
+      "id": "pde13",
+      "type": "polyline",
+      "sourceNodeId": "PD11",
+      "targetNodeId": "PD14",
+      "text": "加工件"
+    },
+    {
+      "id": "pde14",
+      "type": "polyline",
+      "sourceNodeId": "PD12",
+      "targetNodeId": "PD15",
+      "text": "过程件"
+    },
+    {
+      "id": "pde15",
+      "type": "polyline",
+      "sourceNodeId": "PD13",
+      "targetNodeId": "PD15",
+      "text": "过程件"
+    },
+    {
+      "id": "pde16",
+      "type": "polyline",
+      "sourceNodeId": "PD13",
+      "targetNodeId": "PD16",
+      "text": "过程件"
+    },
+    {
+      "id": "pde17",
+      "type": "polyline",
+      "sourceNodeId": "PD14",
+      "targetNodeId": "PD16",
+      "text": "过程件"
+    },
+    {
+      "id": "pde18",
+      "type": "polyline",
+      "sourceNodeId": "PD15",
+      "targetNodeId": "PD17",
+      "text": "过程件"
+    },
+    {
+      "id": "pde19",
+      "type": "polyline",
+      "sourceNodeId": "PD15",
+      "targetNodeId": "PD18",
+      "text": ""
+    },
+    {
+      "id": "pde20",
+      "type": "polyline",
+      "sourceNodeId": "PD15",
+      "targetNodeId": "PD19",
+      "text": ""
+    },
+    {
+      "id": "pde21",
+      "type": "polyline",
+      "sourceNodeId": "PD15",
+      "targetNodeId": "PD20",
+      "text": ""
+    },
+    {
+      "id": "pde22",
+      "type": "polyline",
+      "sourceNodeId": "PD16",
+      "targetNodeId": "PD17",
+      "text": ""
+    },
+    {
+      "id": "pde23",
+      "type": "polyline",
+      "sourceNodeId": "PD16",
+      "targetNodeId": "PD18",
+      "text": ""
+    },
+    {
+      "id": "pde24",
+      "type": "polyline",
+      "sourceNodeId": "PD16",
+      "targetNodeId": "PD19",
+      "text": ""
+    },
+    {
+      "id": "pde25",
+      "type": "polyline",
+      "sourceNodeId": "PD16",
+      "targetNodeId": "PD20",
+      "text": "过程件"
+    },
+    {
+      "id": "pde26",
+      "type": "polyline",
+      "sourceNodeId": "PD17",
+      "targetNodeId": "PD21",
+      "text": ""
+    },
+    {
+      "id": "pde27",
+      "type": "polyline",
+      "sourceNodeId": "PD18",
+      "targetNodeId": "PD21",
+      "text": ""
+    },
+    {
+      "id": "pde28",
+      "type": "polyline",
+      "sourceNodeId": "PD19",
+      "targetNodeId": "PD21",
+      "text": ""
+    },
+    {
+      "id": "pde29",
+      "type": "polyline",
+      "sourceNodeId": "PD20",
+      "targetNodeId": "PD21",
+      "text": ""
+    },
+    {
+      "id": "pde30",
+      "type": "polyline",
+      "sourceNodeId": "PD17",
+      "targetNodeId": "PD22",
+      "text": ""
+    },
+    {
+      "id": "pde31",
+      "type": "polyline",
+      "sourceNodeId": "PD18",
+      "targetNodeId": "PD22",
+      "text": ""
+    },
+    {
+      "id": "pde32",
+      "type": "polyline",
+      "sourceNodeId": "PD19",
+      "targetNodeId": "PD22",
+      "text": ""
+    },
+    {
+      "id": "pde33",
+      "type": "polyline",
+      "sourceNodeId": "PD20",
+      "targetNodeId": "PD22",
+      "text": ""
+    },
+    {
+      "id": "pde34",
+      "type": "polyline",
+      "sourceNodeId": "PD21",
+      "targetNodeId": "PD23",
+      "text": ""
+    },
+    {
+      "id": "pde35",
+      "type": "polyline",
+      "sourceNodeId": "PD22",
+      "targetNodeId": "PD23",
+      "text": ""
+    },
+    {
+      "id": "pde36",
+      "type": "polyline",
+      "sourceNodeId": "PD23",
+      "targetNodeId": "PD24",
+      "text": "整车"
+    },
+    {
+      "id": "pde37",
+      "type": "polyline",
+      "sourceNodeId": "PD24",
+      "targetNodeId": "PD25",
+      "text": "测试报告"
+    },
+    {
+      "id": "pde38",
+      "type": "polyline",
+      "sourceNodeId": "PD25",
+      "targetNodeId": "PD26",
+      "text": "试验报告"
+    },
+    {
+      "id": "pde39",
+      "type": "polyline",
+      "sourceNodeId": "PD26",
+      "targetNodeId": "PD27",
+      "text": "完工报告"
+    },
+    {
+      "id": "pde40",
+      "type": "polyline",
+      "sourceNodeId": "PD27",
+      "targetNodeId": "PD28",
+      "text": "订单信息"
+    },
+    {
+      "id": "pde41",
+      "type": "polyline",
+      "sourceNodeId": "PD28",
+      "targetNodeId": "PD29",
+      "text": "产品档案"
+    }
+  ],
+  "importedAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  },
+  "source": "productionFlowMermaid.json",
+  "description": "生产流程 Mermaid 图表数据 - 包含物料清单、生产计划、加工装配、测试交付等完整生产流程",
+  "flowType": "production",
+  "version": "1.0"
+}]
