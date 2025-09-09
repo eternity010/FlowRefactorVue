@@ -14,6 +14,7 @@ import AIDataCollectionView from '@/views/AIDataCollectionView'
 import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
 import LLMChatView from '@/views/LLMChatView'
+import TaskAssignmentView from '@/views/TaskAssignmentView'
 
 Vue.use(Router)
 
@@ -87,6 +88,11 @@ export default new Router({
           path: 'llm-chat',
           name: 'LLMChatView',
           component: LLMChatView
+        },
+        {
+          path: 'task-assignment',
+          name: 'TaskAssignmentView',
+          component: TaskAssignmentView
         }
       ]
     },
