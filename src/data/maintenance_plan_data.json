@@ -1,0 +1,325 @@
+[{
+  "_id": {
+    "$oid": "66f1a8012d62af6615abcd01"
+  },
+  "model_run_batch": "2025-09-08_TSY_0402_A",
+  "plan_id": "1",
+  "plan_code": "MP-202509-0001",
+  "train_info": {
+    "train_id": "CR400AF-2151",
+    "carriage_no": "03车"
+  },
+  "system_module": "受电弓系统",
+  "maintenance_type": "临修",
+  "priority": "高",
+  "plan_status": "待执行",
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2025-09-09T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2025-09-09T12:00:00Z"
+    },
+    "predicted_downtime_hours": 3.5,
+    "sla_deadline": {
+      "$date": "2025-09-10T18:00:00Z"
+    }
+  },
+  "location": {
+    "station_location": "唐山检修库A"
+  },
+  "responsible": {
+    "team": "受电弓一班",
+    "person": "王工",
+    "contact": "13800000021"
+  },
+  "risk_level": "高",
+  "resources": {
+    "required_parts": "轴承6205*2, 风机密封圈*1",
+    "required_skill": "受电弓检修"
+  },
+  "dependency_order_id": "700003",
+  "remark": "依据故障报修单 REP-202509-0003",
+  "del_flag": 0,
+  "create": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "update": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2025-09-10T08:00:00Z"
+  },
+  "source": "dm_topic0402_output_maintenance_plan.csv",
+  "description": "运维计划数据 - 包含列车检修维护计划、时间安排、责任人等信息",
+  "dataType": "maintenance_plan",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "66f1a8012d62af6615abcd02"
+  },
+  "model_run_batch": "2025-09-08_TSY_0402_A",
+  "plan_id": "2",
+  "plan_code": "MP-202509-0002",
+  "train_info": {
+    "train_id": "CR400AF-2151",
+    "carriage_no": "05车"
+  },
+  "system_module": "牵引系统",
+  "maintenance_type": "加改修",
+  "priority": "中",
+  "plan_status": "待执行",
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2025-09-10T09:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2025-09-10T12:00:00Z"
+    },
+    "predicted_downtime_hours": 2,
+    "sla_deadline": {
+      "$date": "2025-09-11T18:00:00Z"
+    }
+  },
+  "location": {
+    "station_location": "唐山检修库B"
+  },
+  "responsible": {
+    "team": "牵引系统班",
+    "person": "钱工",
+    "contact": "13800000022"
+  },
+  "risk_level": "中",
+  "resources": {
+    "required_parts": "冷却管路密封圈*2",
+    "required_skill": "牵引系统检修"
+  },
+  "dependency_order_id": "700005",
+  "remark": "主轴冷却泵更换后复测",
+  "del_flag": 0,
+  "create": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "update": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2025-09-10T08:00:00Z"
+  },
+  "source": "dm_topic0402_output_maintenance_plan.csv",
+  "description": "运维计划数据 - 包含列车检修维护计划、时间安排、责任人等信息",
+  "dataType": "maintenance_plan",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "66f1a8012d62af6615abcd03"
+  },
+  "model_run_batch": "2025-09-08_TSY_0402_A",
+  "plan_id": "3",
+  "plan_code": "MP-202509-0003",
+  "train_info": {
+    "train_id": "CR400AF-2152",
+    "carriage_no": "02车"
+  },
+  "system_module": "制动系统",
+  "maintenance_type": "定检",
+  "priority": "中",
+  "plan_status": "待执行",
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2025-09-11T08:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2025-09-11T17:00:00Z"
+    },
+    "predicted_downtime_hours": 8,
+    "sla_deadline": {
+      "$date": "2025-09-12T20:00:00Z"
+    }
+  },
+  "location": {
+    "station_location": "唐山检修库A"
+  },
+  "responsible": {
+    "team": "制动一班",
+    "person": "刘工",
+    "contact": "13800000023"
+  },
+  "risk_level": "中",
+  "resources": {
+    "required_parts": "闸片*8, 制动缸密封包*2",
+    "required_skill": "制动系统检修"
+  },
+  "dependency_order_id": null,
+  "remark": "季度A检",
+  "del_flag": 0,
+  "create": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "update": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2025-09-10T08:00:00Z"
+  },
+  "source": "dm_topic0402_output_maintenance_plan.csv",
+  "description": "运维计划数据 - 包含列车检修维护计划、时间安排、责任人等信息",
+  "dataType": "maintenance_plan",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "66f1a8012d62af6615abcd04"
+  },
+  "model_run_batch": "2025-09-08_TSY_0402_A",
+  "plan_id": "4",
+  "plan_code": "MP-202509-0004",
+  "train_info": {
+    "train_id": "CR400AF-2153",
+    "carriage_no": "06车"
+  },
+  "system_module": "转向架系统",
+  "maintenance_type": "临修",
+  "priority": "高",
+  "plan_status": "待执行",
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2025-09-09T13:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2025-09-09T18:00:00Z"
+    },
+    "predicted_downtime_hours": 4.5,
+    "sla_deadline": {
+      "$date": "2025-09-10T12:00:00Z"
+    }
+  },
+  "location": {
+    "station_location": "线路应急库"
+  },
+  "responsible": {
+    "team": "转向架二班",
+    "person": "董工",
+    "contact": "13800000024"
+  },
+  "risk_level": "高",
+  "resources": {
+    "required_parts": "轴箱轴承*2, 弹簧隔垫*4",
+    "required_skill": "转向架检修"
+  },
+  "dependency_order_id": "700010",
+  "remark": "运行异响定位处理",
+  "del_flag": 0,
+  "create": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "update": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2025-09-10T08:00:00Z"
+  },
+  "source": "dm_topic0402_output_maintenance_plan.csv",
+  "description": "运维计划数据 - 包含列车检修维护计划、时间安排、责任人等信息",
+  "dataType": "maintenance_plan",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "66f1a8012d62af6615abcd05"
+  },
+  "model_run_batch": "2025-09-08_TSY_0402_A",
+  "plan_id": "5",
+  "plan_code": "MP-202509-0005",
+  "train_info": {
+    "train_id": "CR400AF-2151",
+    "carriage_no": "07车"
+  },
+  "system_module": "空调系统",
+  "maintenance_type": "定检",
+  "priority": "低",
+  "plan_status": "待执行",
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2025-09-12T09:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2025-09-12T11:30:00Z"
+    },
+    "predicted_downtime_hours": 2.5,
+    "sla_deadline": {
+      "$date": "2025-09-13T18:00:00Z"
+    }
+  },
+  "location": {
+    "station_location": "唐山检修库C"
+  },
+  "responsible": {
+    "team": "空调保养班",
+    "person": "郝工",
+    "contact": "13800000025"
+  },
+  "risk_level": "低",
+  "resources": {
+    "required_parts": "空调滤网*2, 冷媒R134a*1罐",
+    "required_skill": "空调系统检修"
+  },
+  "dependency_order_id": null,
+  "remark": "乘客区温控优化",
+  "del_flag": 0,
+  "create": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "update": {
+    "id": "-1",
+    "name": "",
+    "time": {
+      "$date": "2025-09-09T13:21:24Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2025-09-10T08:00:00Z"
+  },
+  "source": "dm_topic0402_output_maintenance_plan.csv",
+  "description": "运维计划数据 - 包含列车检修维护计划、时间安排、责任人等信息",
+  "dataType": "maintenance_plan",
+  "version": "1.0"
+}]

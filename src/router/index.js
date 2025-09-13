@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '@/views/Login'
 import Dashbord from '@/views/Dashbord'
 import ProcessManagement from '@/views/ProcessManagement'
 import SubProcessManagement from '@/views/SubProcessManagement'
@@ -15,6 +14,8 @@ import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
 import LLMChatView from '@/views/LLMChatView'
 import TaskAssignmentView from '@/views/TaskAssignmentView'
+import ProductionRefactor from '@/views/ProductionRefactor'
+import MaintenancePlanView from '@/views/MaintenancePlanView'
 
 Vue.use(Router)
 
@@ -22,12 +23,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/login'
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
+      redirect: '/home'
     },
     {
       path: '/home',
@@ -93,6 +89,16 @@ export default new Router({
           path: 'task-assignment',
           name: 'TaskAssignmentView',
           component: TaskAssignmentView
+        },
+        {
+          path: 'production-refactor',
+          name: 'ProductionRefactor',
+          component: ProductionRefactor
+        },
+        {
+          path: 'maintenance-plan',
+          name: 'MaintenancePlanView',
+          component: MaintenancePlanView
         }
       ]
     },

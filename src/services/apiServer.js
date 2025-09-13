@@ -6,6 +6,8 @@ const NeuralNetworkService = require('./neuralNetworkService');
 const ProcessOptimizationService = require('./processOptimizationService');
 const LLMApiServer = require('./llmApiServer');
 const RiskDataService = require('./riskDataService');
+const MySQLService = require('./mysqlService');
+const Topic01Service = require('./topic01Service');
 
 const app = express();
 const PORT = 3001;
@@ -20,6 +22,8 @@ const planningTimeService = new PlanningTimeService();
 const neuralNetworkService = new NeuralNetworkService();
 const processOptimizationService = new ProcessOptimizationService();
 const riskDataService = new RiskDataService();
+const mysqlService = new MySQLService();
+const topic01Service = new Topic01Service();
 const llmApiServer = new LLMApiServer({
   flowDataService: flowDataService,
   riskDataService: riskDataService
@@ -32,8 +36,10 @@ async function initializeService() {
     await planningTimeService.connect();
     await neuralNetworkService.connect();
     await riskDataService.connect();
+    await mysqlService.connect();
+    await topic01Service.initialize();
     await llmApiServer.initialize();
-    console.log('✅ API服务已连接到MongoDB');
+    console.log('✅ API服务已连接到MongoDB和MySQL，Topic01服务已启动');
   } catch (error) {
     console.error('❌ 数据库连接失败:', error);
   }
@@ -1491,6 +1497,388 @@ app.get('/api/risk-data/connection', async (req, res) => {
 });
 
 // ================================
+// MySQL数据库 API 路由
+// ================================
+
+// 检查MySQL数据库连接状态
+app.get('/api/mysql/connection', async (req, res) => {
+  try {
+    const result = await mysqlService.checkConnection();
+    res.json({
+      success: result.success,
+      data: result.data,
+      message: result.success ? 'MySQL数据库连接正常' : 'MySQL数据库连接异常'
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取所有数据库表
+app.get('/api/mysql/tables', async (req, res) => {
+  try {
+    const result = await mysqlService.getAllTables();
+    sendResponse(res, result, '获取数据库表列表失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取表结构
+app.get('/api/mysql/tables/:tableName/structure', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const result = await mysqlService.getTableStructure(tableName);
+    sendResponse(res, result, `获取表 ${tableName} 结构失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取表数据
+app.get('/api/mysql/tables/:tableName/data', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const options = {
+      limit: parseInt(req.query.limit) || 100,
+      offset: parseInt(req.query.offset) || 0,
+      columns: req.query.columns || '*',
+      orderBy: req.query.orderBy || null
+    };
+    
+    // 处理WHERE条件
+    if (req.query.where_condition && req.query.where_params) {
+      options.where = {
+        condition: req.query.where_condition,
+        params: JSON.parse(req.query.where_params)
+      };
+    }
+    
+    const result = await mysqlService.getTableData(tableName, options);
+    sendResponse(res, result, `获取表 ${tableName} 数据失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 插入数据
+app.post('/api/mysql/tables/:tableName/data', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const data = req.body;
+    
+    if (!data || typeof data !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: '数据格式错误'
+      });
+    }
+    
+    const result = await mysqlService.insertData(tableName, data);
+    sendResponse(res, result, `插入数据到表 ${tableName} 失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 更新数据
+app.put('/api/mysql/tables/:tableName/data', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { data, where } = req.body;
+    
+    if (!data || !where || typeof data !== 'object' || typeof where !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: '数据或条件格式错误'
+      });
+    }
+    
+    const result = await mysqlService.updateData(tableName, data, where);
+    sendResponse(res, result, `更新表 ${tableName} 数据失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 删除数据
+app.delete('/api/mysql/tables/:tableName/data', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { where } = req.body;
+    
+    if (!where || typeof where !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: '删除条件不能为空'
+      });
+    }
+    
+    const result = await mysqlService.deleteData(tableName, where);
+    sendResponse(res, result, `删除表 ${tableName} 数据失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 执行自定义SQL查询
+app.post('/api/mysql/query', async (req, res) => {
+  try {
+    const { sql, params = [] } = req.body;
+    
+    if (!sql || typeof sql !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'SQL语句不能为空'
+      });
+    }
+    
+    // 安全检查：防止危险的SQL操作
+    const upperSQL = sql.trim().toUpperCase();
+    const dangerousOperations = ['DROP', 'DELETE', 'UPDATE', 'INSERT', 'CREATE', 'ALTER', 'TRUNCATE'];
+    const isDangerous = dangerousOperations.some(op => upperSQL.startsWith(op));
+    
+    if (isDangerous) {
+      return res.status(403).json({
+        success: false,
+        error: '出于安全考虑，不允许执行修改类SQL语句'
+      });
+    }
+    
+    const result = await mysqlService.executeCustomQuery(sql, params);
+    sendResponse(res, result, 'SQL查询执行失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取数据库统计信息
+app.get('/api/mysql/stats', async (req, res) => {
+  try {
+    const result = await mysqlService.getDatabaseStats();
+    sendResponse(res, result, '获取数据库统计信息失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 批量插入数据
+app.post('/api/mysql/tables/:tableName/bulk-insert', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { data } = req.body;
+    
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '批量插入数据必须是非空数组'
+      });
+    }
+    
+    // 简单的批量插入实现 - 逐条插入
+    const results = [];
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 0; i < data.length; i++) {
+      try {
+        const result = await mysqlService.insertData(tableName, data[i]);
+        if (result.success) {
+          successCount++;
+        } else {
+          errorCount++;
+        }
+        results.push({ index: i, result: result });
+      } catch (error) {
+        errorCount++;
+        results.push({ index: i, result: { success: false, error: error.message } });
+      }
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        total: data.length,
+        successCount: successCount,
+        errorCount: errorCount,
+        results: results
+      },
+      message: `批量插入完成: 成功${successCount}条，失败${errorCount}条`
+    });
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 导出表数据
+app.get('/api/mysql/tables/:tableName/export', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { limit = 1000 } = req.query;
+    
+    const result = await mysqlService.getTableData(tableName, {
+      limit: parseInt(limit)
+    });
+    
+    if (result.success) {
+      // 设置下载文件头
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename=${tableName}_export_${new Date().toISOString().split('T')[0]}.json`);
+      
+      res.json({
+        success: true,
+        data: {
+          tableName: tableName,
+          exportTime: new Date().toISOString(),
+          recordCount: result.data.records.length,
+          records: result.data.records
+        },
+        message: `表 ${tableName} 数据导出成功`
+      });
+    } else {
+      sendResponse(res, result, `导出表 ${tableName} 数据失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取表的索引信息
+app.get('/api/mysql/tables/:tableName/indexes', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const sql = 'SHOW INDEX FROM ??';
+    const result = await mysqlService.query(sql, [tableName]);
+    sendResponse(res, result, `获取表 ${tableName} 索引信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 测试SQL语句（只读操作）
+app.post('/api/mysql/test-query', async (req, res) => {
+  try {
+    const { sql, params = [] } = req.body;
+    
+    if (!sql || typeof sql !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'SQL语句不能为空'
+      });
+    }
+    
+    // 严格限制只能是SELECT语句
+    const trimmedSQL = sql.trim().toUpperCase();
+    if (!trimmedSQL.startsWith('SELECT')) {
+      return res.status(403).json({
+        success: false,
+        error: '测试查询只允许SELECT语句'
+      });
+    }
+    
+    // 添加LIMIT限制防止大量数据返回
+    let testSQL = sql;
+    if (!trimmedSQL.includes('LIMIT')) {
+      testSQL += ' LIMIT 100';
+    }
+    
+    const result = await mysqlService.executeCustomQuery(testSQL, params);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        data: {
+          sql: testSQL,
+          params: params,
+          rowCount: result.data.length,
+          executionTime: new Date().toISOString(),
+          preview: result.data.slice(0, 10), // 只返回前10条记录作为预览
+          hasMore: result.data.length > 10
+        },
+        message: '测试查询执行成功'
+      });
+    } else {
+      sendResponse(res, result, 'SQL测试查询失败');
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// Topic01 API 路由
+// ================================
+
+// 获取数据
+app.get('/api/topic01/data', async (req, res) => {
+  try {
+    const result = await topic01Service.getData(req.query);
+    sendResponse(res, result, '获取Topic01数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 保存数据
+app.post('/api/topic01/data', async (req, res) => {
+  try {
+    const result = await topic01Service.saveData(req.body);
+    sendResponse(res, result, '保存Topic01数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 更新数据
+app.put('/api/topic01/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await topic01Service.saveData({ id, ...req.body });
+    sendResponse(res, result, `更新Topic01数据${id}失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 删除数据
+app.delete('/api/topic01/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await topic01Service.processData({ action: 'delete', id });
+    sendResponse(res, result, `删除Topic01数据${id}失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 处理业务逻辑
+app.post('/api/topic01/process', async (req, res) => {
+  try {
+    const result = await topic01Service.processData(req.body);
+    sendResponse(res, result, 'Topic01业务处理失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取状态信息
+app.get('/api/topic01/status', async (req, res) => {
+  try {
+    const result = {
+      success: true,
+      data: {
+        service: 'Topic01Service',
+        status: 'running',
+        timestamp: new Date().toISOString()
+      }
+    };
+    sendResponse(res, result, '获取Topic01状态失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
 // LLM API服务初始化
 // ================================
 llmApiServer.setupRoutes(app);
@@ -1618,6 +2006,8 @@ process.on('SIGINT', async () => {
   await planningTimeService.disconnect();
   await neuralNetworkService.disconnect();
   await riskDataService.disconnect();
+  await mysqlService.disconnect();
+  await topic01Service.cleanup();
   process.exit(0);
 });
 

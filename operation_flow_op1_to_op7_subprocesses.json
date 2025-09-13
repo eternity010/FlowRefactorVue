@@ -1,0 +1,99 @@
+[
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487e7"
+  },
+  "nodeId": "OP1",
+  "description": "里程数周期性维护",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP1 [里程数周期性维护] - 主子流程 （系统化预防性维护）\n\n    %% 所有节点定义\n    OP1_M1[系统自动提醒]\n    OP1_M2[维护计划制定]\n    OP1_M3[维护工单生成]\n    OP1_M4[维护资源准备]\n    OP1_M5[执行维护作业]\n    OP1_M6[维护记录更新]\n\n    %% 所有边的定义\n    OP1_M1 --> OP1_M2\n    OP1_M2 --> OP1_M3\n    OP1_M3 --> OP1_M4\n    OP1_M4 --> OP1_M5\n    OP1_M5 --> OP1_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP1 [里程数周期性维护] - 备用子流程 （经验性维护）\n\n    %% 所有节点定义\n    OP1_A1[人工检查里程数]\n    OP1_A2[查阅维护手册]\n    OP1_A3[简单维护作业]\n    OP1_A4[手工记录]\n\n    %% 所有边的定义\n    OP1_A1 --> OP1_A2\n    OP1_A2 --> OP1_A3\n    OP1_A3 --> OP1_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487e8"
+  },
+  "nodeId": "OP2",
+  "description": "客户整改需求",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP2 [客户整改需求] - 主子流程 （正式需求管理流程）\n\n    %% 所有节点定义\n    OP2_M1[客户需求接收]\n    OP2_M2[需求分析评估]\n    OP2_M3[技术可行性评审]\n    OP2_M4[整改方案制定]\n    OP2_M5[客户确认]\n    OP2_M6[工单创建]\n\n    %% 所有边的定义\n    OP2_M1 --> OP2_M2\n    OP2_M2 --> OP2_M3\n    OP2_M3 --> OP2_M4\n    OP2_M4 --> OP2_M5\n    OP2_M5 --> OP2_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP2 [客户整改需求] - 备用子流程 （快速响应流程）\n\n    %% 所有节点定义\n    OP2_A1[电话/邮件接收]\n    OP2_A2[现场工程师评估]\n    OP2_A3[口头确认方案]\n    OP2_A4[直接安排执行]\n\n    %% 所有边的定义\n    OP2_A1 --> OP2_A2\n    OP2_A2 --> OP2_A3\n    OP2_A3 --> OP2_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487e9"
+  },
+  "nodeId": "OP3",
+  "description": "故障报警",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP3 [故障报警] - 主子流程 （自动化监控报警）\n\n    %% 所有节点定义\n    OP3_M1[传感器监测]\n    OP3_M2[系统自动判断]\n    OP3_M3[分级报警触发]\n    OP3_M4[多渠道通知]\n    OP3_M5[故障记录生成]\n    OP3_M6[响应确认]\n\n    %% 所有边的定义\n    OP3_M1 --> OP3_M2\n    OP3_M2 --> OP3_M3\n    OP3_M3 --> OP3_M4\n    OP3_M4 --> OP3_M5\n    OP3_M5 --> OP3_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP3 [故障报警] - 备用子流程 （人工巡检发现）\n\n    %% 所有节点定义\n    OP3_A1[定期巡检]\n    OP3_A2[异常发现]\n    OP3_A3[电话/对讲机报告]\n    OP3_A4[手工记录]\n\n    %% 所有边的定义\n    OP3_A1 --> OP3_A2\n    OP3_A2 --> OP3_A3\n    OP3_A3 --> OP3_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487ea"
+  },
+  "nodeId": "OP4",
+  "description": "安排维修人员",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP4 [安排维修人员] - 主子流程 （系统化人员调度）\n\n    %% 所有节点定义\n    OP4_M1[技能需求分析]\n    OP4_M2[人员资源查询]\n    OP4_M3[最优调度算法]\n    OP4_M4[调度方案生成]\n    OP4_M5[人员确认]\n    OP4_M6[派工单下达]\n\n    %% 所有边的定义\n    OP4_M1 --> OP4_M2\n    OP4_M2 --> OP4_M3\n    OP4_M3 --> OP4_M4\n    OP4_M4 --> OP4_M5\n    OP4_M5 --> OP4_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP4 [安排维修人员] - 备用子流程 （应急人员安排）\n\n    %% 所有节点定义\n    OP4_A1[查看值班表]\n    OP4_A2[电话联系可用人员]\n    OP4_A3[就近原则派遣]\n    OP4_A4[口头派工]\n\n    %% 所有边的定义\n    OP4_A1 --> OP4_A2\n    OP4_A2 --> OP4_A3\n    OP4_A3 --> OP4_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487eb"
+  },
+  "nodeId": "OP5",
+  "description": "检查现场情况",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP5 [检查现场情况] - 主子流程 （标准化现场检查）\n\n    %% 所有节点定义\n    OP5_M1[安全检查评估]\n    OP5_M2[设备状态检查]\n    OP5_M3[环境条件评估]\n    OP5_M4[标准检查表填写]\n    OP5_M5[照片视频记录]\n    OP5_M6[检查报告生成]\n\n    %% 所有边的定义\n    OP5_M1 --> OP5_M2\n    OP5_M2 --> OP5_M3\n    OP5_M3 --> OP5_M4\n    OP5_M4 --> OP5_M5\n    OP5_M5 --> OP5_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP5 [检查现场情况] - 备用子流程 （快速现场评估）\n\n    %% 所有节点定义\n    OP5_A1[目视检查]\n    OP5_A2[简单测量]\n    OP5_A3[经验判断]\n    OP5_A4[简要记录]\n\n    %% 所有边的定义\n    OP5_A1 --> OP5_A2\n    OP5_A2 --> OP5_A3\n    OP5_A3 --> OP5_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487ec"
+  },
+  "nodeId": "OP6",
+  "description": "现场情况分析",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP6 [现场情况分析] - 主子流程 （专业团队分析）\n\n    %% 所有节点定义\n    OP6_M1[数据收集整理]\n    OP6_M2[多专业会诊]\n    OP6_M3[根因分析]\n    OP6_M4[风险评估]\n    OP6_M5[解决方案制定]\n    OP6_M6[分析报告编制]\n\n    %% 所有边的定义\n    OP6_M1 --> OP6_M2\n    OP6_M2 --> OP6_M3\n    OP6_M3 --> OP6_M4\n    OP6_M4 --> OP6_M5\n    OP6_M5 --> OP6_M6",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP6 [现场情况分析] - 备用子流程 （现场工程师经验判断）\n\n    %% 所有节点定义\n    OP6_A1[现场观察]\n    OP6_A2[经验对比]\n    OP6_A3[快速判断]\n    OP6_A4[口头汇报]\n\n    %% 所有边的定义\n    OP6_A1 --> OP6_A2\n    OP6_A2 --> OP6_A3\n    OP6_A3 --> OP6_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b484fa0d88405cdb487ed"
+  },
+  "nodeId": "OP7",
+  "description": "设备维保",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: OP7 [设备维保] - 主子流程 （标准维保作业流程）\n\n    %% 所有节点定义\n    OP7_M1[维保方案确认]\n    OP7_M2[设备停机安全确认]\n    OP7_M3[按标准作业指导书操作]\n    OP7_M4[关键参数测量记录]\n    OP7_M5[维保质量检验]\n    OP7_M6[设备试运行]\n    OP7_M7[维保记录归档]\n\n    %% 所有边的定义\n    OP7_M1 --> OP7_M2\n    OP7_M2 --> OP7_M3\n    OP7_M3 --> OP7_M4\n    OP7_M4 --> OP7_M5\n    OP7_M5 --> OP7_M6\n    OP7_M6 --> OP7_M7",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: OP7 [设备维保] - 备用子流程 （应急维保处理）\n\n    %% 所有节点定义\n    OP7_A1[简单安全确认]\n    OP7_A2[凭经验操作]\n    OP7_A3[基础功能验证]\n    OP7_A4[简要记录]\n\n    %% 所有边的定义\n    OP7_A1 --> OP7_A2\n    OP7_A2 --> OP7_A3\n    OP7_A3 --> OP7_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-09-13T07:25:03.711Z"
+  }
+}]

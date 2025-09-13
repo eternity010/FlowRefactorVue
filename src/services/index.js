@@ -5,6 +5,8 @@ export { planningTimeApi } from '../api/planningTimeApi';
 export { processDataApi } from '../api/processDataApi';
 export { subProcessDataApi } from '../api/subProcessDataApi';
 export { llmApi } from '../api/llmApi';
+export { mysqlApi } from '../api/mysqlApi';
+export { topic01Api } from '../api/topic01Api';
 
 // 服务层说明
 /**

@@ -1,0 +1,540 @@
+[{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd01"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "1",
+  "equipment_code": "EQP001",
+  "equipment_desc": "数控下料机A",
+  "supplier_id": "1001",
+  "organization_id": "1001",
+  "charge_id": "101",
+  "area": {
+    "id": "101",
+    "code": "A01",
+    "desc": "下料区域"
+  },
+  "status": 1,
+  "equipment_model": "NC-DL-2023",
+  "arrive_date": {
+    "$date": "2023-01-10T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT001",
+    "name": "下料设备"
+  },
+  "remark": "高精度数控下料设备",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-4",
+  "energy": {
+    "unit_process": 5.5,
+    "unit_idle": 2.1
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd02"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "2",
+  "equipment_code": "EQP002",
+  "equipment_desc": "数控粗加工机A",
+  "supplier_id": "1002",
+  "organization_id": "1001",
+  "charge_id": "102",
+  "area": {
+    "id": "102",
+    "code": "B01",
+    "desc": "粗加工区域"
+  },
+  "status": 1,
+  "equipment_model": "NC-CA-2023",
+  "arrive_date": {
+    "$date": "2023-10-15T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT002",
+    "name": "粗加工设备"
+  },
+  "remark": "数控粗加工中心",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-3",
+  "energy": {
+    "unit_process": 4.2,
+    "unit_idle": 1.8
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd03"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "3",
+  "equipment_code": "EQP003",
+  "equipment_desc": "精密加工中心A",
+  "supplier_id": "1003",
+  "organization_id": "1001",
+  "charge_id": "103",
+  "area": {
+    "id": "103",
+    "code": "C01",
+    "desc": "精加工区域"
+  },
+  "status": 1,
+  "equipment_model": "PC-FA-2023",
+  "arrive_date": {
+    "$date": "2023-10-20T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT003",
+    "name": "精加工设备"
+  },
+  "remark": "高精度精密加工设备",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-4",
+  "energy": {
+    "unit_process": 3.8,
+    "unit_idle": 1.5
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd04"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "6",
+  "equipment_code": "EQP006",
+  "equipment_desc": "检验包装设备A",
+  "supplier_id": "1006",
+  "organization_id": "1002",
+  "charge_id": "106",
+  "area": {
+    "id": "106",
+    "code": "F01",
+    "desc": "检验包装区域"
+  },
+  "status": 1,
+  "equipment_model": "QC-PK-2023",
+  "arrive_date": {
+    "$date": "2023-11-05T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT006",
+    "name": "检验包装设备"
+  },
+  "remark": "自动检验包装线",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-2",
+  "energy": {
+    "unit_process": 1.0,
+    "unit_idle": 0.5
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd05"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "7",
+  "equipment_code": "EQP007",
+  "equipment_desc": "数控下料机B",
+  "supplier_id": "1001",
+  "organization_id": "1001",
+  "charge_id": "101",
+  "area": {
+    "id": "101",
+    "code": "A01",
+    "desc": "下料区域"
+  },
+  "status": 1,
+  "equipment_model": "NC-DL-2023B",
+  "arrive_date": {
+    "$date": "2023-11-10T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT001",
+    "name": "下料设备"
+  },
+  "remark": "高精度数控下料设备B",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-4",
+  "energy": {
+    "unit_process": 5.8,
+    "unit_idle": 2.1
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd06"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "8",
+  "equipment_code": "EQP008",
+  "equipment_desc": "数控粗加工机B",
+  "supplier_id": "1002",
+  "organization_id": "1001",
+  "charge_id": "102",
+  "area": {
+    "id": "102",
+    "code": "B01",
+    "desc": "粗加工区域"
+  },
+  "status": 1,
+  "equipment_model": "NC-CA-2023B",
+  "arrive_date": {
+    "$date": "2023-11-15T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT002",
+    "name": "粗加工设备"
+  },
+  "remark": "数控粗加工中心B",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-3",
+  "energy": {
+    "unit_process": 4.5,
+    "unit_idle": 1.8
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd07"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "9",
+  "equipment_code": "EQP009",
+  "equipment_desc": "精密加工中心B",
+  "supplier_id": "1003",
+  "organization_id": "1001",
+  "charge_id": "103",
+  "area": {
+    "id": "103",
+    "code": "C01",
+    "desc": "精加工区域"
+  },
+  "status": 1,
+  "equipment_model": "PC-FA-2023B",
+  "arrive_date": {
+    "$date": "2023-11-20T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT003",
+    "name": "精加工设备"
+  },
+  "remark": "高精度精密加工设备B",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-4",
+  "energy": {
+    "unit_process": 4.0,
+    "unit_idle": 1.5
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd08"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "12",
+  "equipment_code": "EQP012",
+  "equipment_desc": "检验包装设备B",
+  "supplier_id": "1006",
+  "organization_id": "1002",
+  "charge_id": "106",
+  "area": {
+    "id": "106",
+    "code": "F01",
+    "desc": "检验包装区域"
+  },
+  "status": 1,
+  "equipment_model": "QC-PK-2023B",
+  "arrive_date": {
+    "$date": "2023-12-05T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT006",
+    "name": "检验包装设备"
+  },
+  "remark": "自动检验包装线B",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-2",
+  "energy": {
+    "unit_process": 1.2,
+    "unit_idle": 0.5
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd09"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "15",
+  "equipment_code": "EQP015",
+  "equipment_desc": "数控下料机C",
+  "supplier_id": "1001",
+  "organization_id": "1001",
+  "charge_id": "101",
+  "area": {
+    "id": "101",
+    "code": "A01",
+    "desc": "下料区域"
+  },
+  "status": 1,
+  "equipment_model": "NC-DL-2024",
+  "arrive_date": {
+    "$date": "2024-01-10T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT001",
+    "name": "下料设备"
+  },
+  "remark": "高精度数控下料设备C",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-3",
+  "energy": {
+    "unit_process": 5.2,
+    "unit_idle": 2.1
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abcd10"
+  },
+  "model_run_batch": "20240905",
+  "equipment_id": "16",
+  "equipment_code": "EQP016",
+  "equipment_desc": "精密加工中心C",
+  "supplier_id": "1003",
+  "organization_id": "1001",
+  "charge_id": "103",
+  "area": {
+    "id": "103",
+    "code": "C01",
+    "desc": "精加工区域"
+  },
+  "status": 1,
+  "equipment_model": "PC-FA-2024",
+  "arrive_date": {
+    "$date": "2024-01-15T00:00:00Z"
+  },
+  "category": {
+    "code": "CAT003",
+    "name": "精加工设备"
+  },
+  "remark": "高精度精密加工设备C",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "speed_range": "1-3",
+  "energy": {
+    "unit_process": 3.5,
+    "unit_idle": 1.5
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_equipment.csv",
+  "description": "生产设备基础数据 - 包含设备信息、区域、能耗等数据",
+  "dataType": "equipment",
+  "version": "1.0"
+}]

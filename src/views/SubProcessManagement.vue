@@ -50,54 +50,84 @@
     <div v-else-if="dataLoaded" class="content-container">
       <!-- ==================== 上半部分 ==================== -->
       <div class="upper-section">
-        <!-- 上半部分内容：四个信息卡片 -->
+        <!-- 上半部分内容：三个风险级别卡片 -->
         <div class="info-blocks-container">
-          <el-card class="info-block" shadow="hover">
+          <!-- 高风险节点卡片 -->
+          <el-card class="info-block risk-high" shadow="hover">
             <div class="info-block-content">
-              <div class="card-title">{{ currentData.productionTitle }}</div>
-              <div ref="productionChart" class="chart-container"></div>
-            </div>
-          </el-card>
-          
-          <el-card class="info-block" shadow="hover">
-            <div class="info-block-content">
-              <div class="card-title">当月目标完成百分比</div>
-              <div class="progress-container">
-                <div ref="progressChart" class="progress-chart"></div>
-                <div class="progress-compare">较昨日<span class="progress-up">{{ currentData.progressChange }}</span></div>
+              <div class="card-title">
+                <i :class="currentRiskData.highRisk.icon"></i>
+                {{ currentRiskData.highRisk.title }}
               </div>
-            </div>
-          </el-card>
-          
-          <el-card class="info-block" shadow="hover">
-            <div class="info-block-content">
-              <div class="card-title">风险事项</div>
-              <div class="risk-items">
+              <div class="risk-count-container">
+                <div class="risk-count">{{ currentRiskData.highRisk.count }}</div>
+                <div class="risk-total">/ {{ currentRiskData.total }}</div>
+              </div>
+              <div class="risk-percentage">
+                {{ getPercentage(currentRiskData.highRisk.count, currentRiskData.total) }}%
+              </div>
+              <div class="risk-nodes-list" v-if="currentRiskData.highRisk.nodes.length > 0">
                 <div 
-                  v-for="(risk, index) in currentData.risks" 
+                  v-for="(node, index) in currentRiskData.highRisk.nodes.slice(0, 3)" 
                   :key="index"
-                  :class="['risk-item', risk.level]"
+                  class="risk-node-item"
                 >
-                  <i class="el-icon-warning"></i>
-                  <span>{{ risk.text }}</span>
+                  {{ node }}
+                </div>
+                <div v-if="currentRiskData.highRisk.nodes.length > 3" class="more-nodes">
+                  +{{ currentRiskData.highRisk.nodes.length - 3 }}更多
                 </div>
               </div>
             </div>
           </el-card>
           
-          <el-card class="info-block" shadow="hover">
+          <!-- 中风险节点卡片 -->
+          <el-card class="info-block risk-medium" shadow="hover">
             <div class="info-block-content">
-              <div class="card-title">{{ currentData.efficiency.title }}</div>
-              <div class="efficiency-container">
-                <div class="efficiency-metrics">
-                  <div class="metric-item" v-for="(metric, index) in currentData.efficiency.metrics" :key="index">
-                    <div class="metric-value">{{ metric.value }}<span class="metric-unit">{{ metric.unit }}</span></div>
-                    <div class="metric-label">{{ metric.label }}</div>
-                    <div class="metric-trend" :class="{ 'positive': metric.isPositive, 'negative': !metric.isPositive }">
-                      <i :class="metric.isPositive ? 'el-icon-top' : 'el-icon-bottom'"></i>
-                      {{ metric.trend }}
-                    </div>
-                  </div>
+              <div class="card-title">
+                <i :class="currentRiskData.mediumRisk.icon"></i>
+                {{ currentRiskData.mediumRisk.title }}
+              </div>
+              <div class="risk-count-container">
+                <div class="risk-count">{{ currentRiskData.mediumRisk.count }}</div>
+                <div class="risk-total">/ {{ currentRiskData.total }}</div>
+              </div>
+              <div class="risk-percentage">
+                {{ getPercentage(currentRiskData.mediumRisk.count, currentRiskData.total) }}%
+              </div>
+              <div class="risk-nodes-list" v-if="currentRiskData.mediumRisk.nodes.length > 0">
+                <div 
+                  v-for="(node, index) in currentRiskData.mediumRisk.nodes.slice(0, 3)" 
+                  :key="index"
+                  class="risk-node-item"
+                >
+                  {{ node }}
+                </div>
+                <div v-if="currentRiskData.mediumRisk.nodes.length > 3" class="more-nodes">
+                  +{{ currentRiskData.mediumRisk.nodes.length - 3 }}更多
+                </div>
+              </div>
+            </div>
+          </el-card>
+          
+          <!-- 正常节点卡片 -->
+          <el-card class="info-block risk-normal" shadow="hover">
+            <div class="info-block-content">
+              <div class="card-title">
+                <i :class="currentRiskData.normal.icon"></i>
+                {{ currentRiskData.normal.title }}
+              </div>
+              <div class="risk-count-container">
+                <div class="risk-count">{{ currentRiskData.normal.count }}</div>
+                <div class="risk-total">/ {{ currentRiskData.total }}</div>
+              </div>
+              <div class="risk-percentage">
+                {{ getPercentage(currentRiskData.normal.count, currentRiskData.total) }}%
+              </div>
+              <div class="normal-status">
+                <div class="status-item success">
+                  <i class="el-icon-success"></i>
+                  <span>运行正常</span>
                 </div>
               </div>
             </div>
@@ -130,10 +160,10 @@
 </template>
 
 <script>
-import * as echarts from 'echarts'
 import SubProcessFlow from '@/components/SubProcessFlow.vue'
 import { subProcessDataApi } from '@/api/subProcessDataApi'
 import { processCardsData } from '@/data/subProcessCardsData'
+import { nodeRiskData } from '@/data/node_risk_data'
 
 export default {
   name: 'SubProcessManagement',
@@ -143,8 +173,6 @@ export default {
   data() {
     return {
       currentProcess: 'purchase', // 默认选择采购环节
-      productionChart: null,
-      progressChart: null,
       
       // 数据状态
       loading: false,
@@ -154,7 +182,10 @@ export default {
       processData: null,
       
       // 备用静态数据
-      fallbackData: processCardsData
+      fallbackData: processCardsData,
+      
+      // 节点风险数据
+      riskData: nodeRiskData
     }
   },
   computed: {
@@ -170,40 +201,31 @@ export default {
       }
       // 如果API数据不可用，使用备用数据
       return this.fallbackData[this.currentProcess] || this.fallbackData.purchase;
+    },
+    
+    // 当前选中环节的风险数据
+    currentRiskData() {
+      return this.riskData[this.currentProcess] || this.riskData.purchase;
     }
   },
   watch: {
-    // 监听数据加载状态变化
-    dataLoaded(newVal) {
-      if (newVal && this.processData) {
-        console.log('📊 SubProcessManagement组件数据加载完成，准备初始化图表');
-        this.$nextTick(() => {
-          this.initCharts();
-        });
-      }
-    },
-    
     // 监听当前流程变化
     currentProcess(newVal, oldVal) {
-      if (newVal !== oldVal && this.dataLoaded) {
+      if (newVal !== oldVal) {
         console.log(`🔄 SubProcessManagement组件流程切换: ${oldVal} -> ${newVal}`);
-        this.$nextTick(() => {
-          this.updateCharts();
-        });
       }
     }
   },
   async mounted() {
     await this.loadData();
-    
-    // 数据加载完成后，等待DOM更新再初始化图表
-    if (this.dataLoaded) {
-      this.$nextTick(() => {
-        this.initCharts();
-      });
-    }
   },
   methods: {
+    // 计算百分比
+    getPercentage(count, total) {
+      if (total === 0) return 0;
+      return Math.round((count / total) * 100);
+    },
+    
     // 从API加载数据
     async loadData() {
       this.loading = true;
@@ -256,263 +278,13 @@ export default {
         await this.loadData();
       }
       
-      this.$nextTick(() => {
-        this.updateCharts();
-        console.log(`✅ ${processKey}图表更新完成`);
-      });
+      console.log(`✅ ${processKey}风险数据切换完成`);
     },
     
-    // 初始化所有图表
-    initCharts() {
-      if (!this.dataLoaded) {
-        console.warn('⚠️  SubProcessManagement组件数据未加载完成，跳过图表初始化');
-        return;
-      }
-      
-      if (!this.$refs.productionChart || !this.$refs.progressChart) {
-        console.warn('⚠️  SubProcessManagement组件DOM元素未准备好，延迟初始化图表');
-        this.$nextTick(() => {
-          this.initCharts();
-        });
-        return;
-      }
-      
-      console.log('📈 SubProcessManagement组件开始初始化图表');
-      this.initProductionChart();
-      this.initProgressChart();
-      console.log('✅ SubProcessManagement组件图表初始化完成');
-    },
     
-    // 更新所有图表
-    updateCharts() {
-      console.log('📈 SubProcessManagement组件开始更新图表', {
-        currentProcess: this.currentProcess,
-        hasProgressChart: !!this.progressChart,
-        hasProductionChart: !!this.productionChart,
-        progressPercent: this.currentData.progressPercent,
-        productionDataCount: this.currentData.productionData.length
-      });
-      
-      // 更新进度图表
-      if (this.progressChart) {
-        const option = this.progressChart.getOption();
-        option.series[0].data[0].value = this.currentData.progressPercent;
-        this.progressChart.setOption(option);
-        console.log('✅ 进度图表更新完成:', this.currentData.progressPercent + '%');
-      }
-      
-      // 更新生产图表
-      if (this.productionChart) {
-        const option = this.productionChart.getOption();
-        option.xAxis[0].data = this.currentData.productionData.map(item => item.month);
-        option.series[0].data = this.currentData.productionData.map(item => item.value);
-        
-        // 根据不同环节调整Y轴
-        let yAxisConfig = { min: 80, max: 150 }; // 默认值
-        if (this.currentProcess === 'operation') {
-          yAxisConfig = { min: 10, max: 30 };
-        } else if (this.currentProcess === 'marketing') {
-          yAxisConfig = { min: 60, max: 180 };
-        }
-        
-        option.yAxis[0].min = yAxisConfig.min;
-        option.yAxis[0].max = yAxisConfig.max;
-        
-        this.productionChart.setOption(option);
-        console.log('✅ 生产图表更新完成:', {
-          process: this.currentProcess,
-          yAxis: yAxisConfig,
-          dataPoints: this.currentData.productionData.length
-        });
-      }
-    },
     
-    initProductionChart() {
-      this.productionChart = echarts.init(this.$refs.productionChart)
-      
-      const option = {
-        grid: {
-          top: 10,
-          right: 10,
-          bottom: 35,
-          left: 30
-        },
-        tooltip: {
-          trigger: 'axis',
-          formatter: '{b}: {c}台'
-        },
-        xAxis: {
-          type: 'category',
-          data: this.currentData.productionData.map(item => item.month),
-          axisLabel: {
-            show: true,
-            fontSize: 12,
-            color: '#333',
-            interval: 0,
-          },
-          axisLine: {
-            lineStyle: {
-              color: '#666'
-            }
-          }
-        },
-        yAxis: {
-          type: 'value',
-          name: '数量',
-          nameTextStyle: {
-            fontSize: 10,
-            color: '#666',
-          },
-          min: 80,
-          max: 150,
-          interval: 20,
-          axisLabel: {
-            fontSize: 10,
-          },
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: '#666'
-            }
-          },
-          splitLine: {
-            lineStyle: {
-              type: 'dashed',
-              color: '#ddd'
-            }
-          }
-        },
-        series: [{
-          data: this.currentData.productionData.map(item => item.value),
-          type: 'line',
-          name: '数量',
-          smooth: true,
-          symbol: 'circle',
-          symbolSize: 8,
-          itemStyle: {
-            color: '#1890ff'
-          },
-          lineStyle: {
-            width: 3,
-            color: '#1890ff'
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [{
-                offset: 0, 
-                color: 'rgba(24, 144, 255, 0.3)'
-              }, {
-                offset: 1, 
-                color: 'rgba(24, 144, 255, 0.1)'
-              }]
-            }
-          }
-        }]
-      }
-      
-      // 应用选项
-      this.productionChart.setOption(option)
-      
-      // 添加窗口调整监听
-      window.addEventListener('resize', this.resizeChart)
-    },
     
-    initProgressChart() {
-      // 创建ECharts实例
-      this.progressChart = echarts.init(this.$refs.progressChart)
-      
-      // 设置图表选项
-      const option = {
-        series: [
-          {
-            type: 'gauge',
-            startAngle: 90,
-            endAngle: -270,
-            radius: '100%',
-            center: ['50%', '50%'],
-            pointer: {
-              show: false
-            },
-            progress: {
-              show: true,
-              overlap: false,
-              roundCap: true,
-              clip: false,
-              itemStyle: {
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0,
-                      color: '#1a98ff'
-                    },
-                    {
-                      offset: 1,
-                      color: '#6fdaff'
-                    }
-                  ]
-                }
-              }
-            },
-            axisLine: {
-              lineStyle: {
-                width: 12,
-                color: [
-                  [1, '#eee']
-                ]
-              }
-            },
-            splitLine: {
-              show: false
-            },
-            axisTick: {
-              show: false
-            },
-            axisLabel: {
-              show: false
-            },
-            data: [
-              {
-                value: this.currentData.progressPercent,
-                name: '',
-                detail: {
-                  show: true,
-                  offsetCenter: ['0%', '0%'],
-                  width: 50,
-                  height: 14,
-                  fontSize: 28,
-                  color: '#1890ff',
-                  formatter: '{value}%'
-                }
-              }
-            ]
-          }
-        ]
-      }
-      
-      // 应用选项
-      this.progressChart.setOption(option)
-      
-      // 添加窗口调整监听
-      window.addEventListener('resize', this.resizeProgressChart)
-    },
     
-    resizeChart() {
-      this.productionChart && this.productionChart.resize()
-    },
-    
-    resizeProgressChart() {
-      this.progressChart && this.progressChart.resize()
-    },
     
     /**
      * 刷新子流程数据
@@ -528,14 +300,11 @@ export default {
       await this.loadData();
       
       if (!this.error && this.processData) {
-        this.$nextTick(() => {
-          // 如果图表还未初始化，先初始化
-          if (!this.productionChart || !this.progressChart) {
-            this.initCharts();
-          } else {
-            // 否则只更新图表数据
-            this.updateCharts();
-          }
+        console.log('✅ 子流程数据刷新完成');
+        this.$message({
+          message: '子流程数据刷新成功',
+          type: 'success',
+          duration: 2000
         });
       }
     },
@@ -604,11 +373,8 @@ export default {
     }
   },
   beforeDestroy() {
-    // 清除监听和图表实例
-    window.removeEventListener('resize', this.resizeChart)
-    window.removeEventListener('resize', this.resizeProgressChart)
-    this.productionChart && this.productionChart.dispose()
-    this.progressChart && this.progressChart.dispose()
+    // 清除监听
+    console.log('🔄 SubProcessManagement组件销毁');
   }
 }
 </script>
@@ -690,7 +456,7 @@ export default {
 }
 
 .info-block {
-  width: 24%;
+  width: 30%;
   height: 200px;
   margin: 0;
   border-radius: 8px !important;
@@ -702,6 +468,19 @@ export default {
 .info-block:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 风险级别卡片样式 */
+.info-block.risk-high {
+  border: 2px solid #f5222d !important;
+}
+
+.info-block.risk-medium {
+  border: 2px solid #fa8c16 !important;
+}
+
+.info-block.risk-normal {
+  border: 2px solid #52c41a !important;
 }
 
 /* 覆盖Element UI卡片的内部样式 */
@@ -723,11 +502,103 @@ export default {
   font-size: 12px;
   font-weight: 500;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.chart-container {
+.card-title i {
+  font-size: 14px;
+}
+
+/* 风险计数容器样式 */
+.risk-count-container {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin: 15px 0 10px 0;
+}
+
+.risk-count {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.risk-high .risk-count {
+  color: #f5222d;
+}
+
+.risk-medium .risk-count {
+  color: #fa8c16;
+}
+
+.risk-normal .risk-count {
+  color: #52c41a;
+}
+
+.risk-total {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin-left: 5px;
+}
+
+/* 风险百分比样式 */
+.risk-percentage {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.risk-high .risk-percentage {
+  color: #f5222d;
+}
+
+.risk-medium .risk-percentage {
+  color: #fa8c16;
+}
+
+.risk-normal .risk-percentage {
+  color: #52c41a;
+}
+
+/* 风险节点列表样式 */
+.risk-nodes-list {
   flex: 1;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60px;
+  overflow: hidden;
+}
+
+.risk-node-item {
+  font-size: 11px;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-nodes {
+  font-size: 10px;
+  color: #999;
+  text-align: center;
+  font-style: italic;
+}
+
+/* 正常状态样式 */
+.normal-status {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .lower-section {
@@ -746,30 +617,6 @@ export default {
 h2 {
   color: #303133;
   margin: 0;
-}
-
-.progress-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.progress-chart {
-  width: 120px;
-  height: 120px;
-}
-
-.progress-compare {
-  margin-top: 0px;
-  font-size: 14px;
-  color: #666;
-}
-
-.progress-up {
-  color: #1a98ff;
-  font-weight: 500;
 }
 
 .risk-items {
@@ -845,65 +692,6 @@ h2 {
   color: #f5222d;
 }
 
-/* 效率指标卡片样式 */
-.efficiency-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 10px 0;
-}
-
-.efficiency-metrics {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-
-.metric-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-  width: 100%;
-}
-
-.metric-value {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1890ff;
-  line-height: 1.2;
-}
-
-.metric-unit {
-  font-size: 12px;
-  font-weight: normal;
-  margin-left: 2px;
-}
-
-.metric-label {
-  font-size: 13px;
-  color: #666;
-  margin: 6px 0;
-}
-
-.metric-trend {
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.metric-trend.positive {
-  color: #52c41a;
-}
-
-.metric-trend.negative {
-  color: #f5222d;
-}
 
 /* 加载状态样式 */
 .loading-container {

@@ -35,7 +35,8 @@
     "test-risk-structure-api": "node scripts/test-risk-structure-api.js",
     "demo-risk-api": "node scripts/demo-risk-structure-api.js",
     "import-procurement-data": "node scripts/import-procurement-data-to-mongodb.js",
-    "test-procurement-data": "node scripts/test-procurement-data-queries.js"
+    "test-procurement-data": "node scripts/test-procurement-data-queries.js",
+    "test-mysql": "node scripts/test-mysql-service.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",
@@ -52,6 +53,7 @@
     "metaeditor-mxgraph": "^2.0.7",
     "mongodb": "^6.17.0",
     "mxgraph": "^4.2.2",
+    "mysql2": "^3.14.5",
     "openai": "^5.10.2",
     "vue": "^2.5.2",
     "vue-flowchart": "^0.1.1",

@@ -1,0 +1,2020 @@
+[{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce01"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "1001",
+    "work_no": "W001",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO001",
+    "order_no": "ORD001",
+    "order_need_num": 100,
+    "plan_no": "P001",
+    "work_order_no": "WO001",
+    "batch_no": "B001",
+    "dispatch_order_no": "D001",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "1",
+    "code": "101",
+    "name": "下料",
+    "content": "原材料下料切割",
+    "order": 1,
+    "plan_preparation_time": 30,
+    "plan_work_time": 120
+  },
+  "receive": {
+    "id": "1001",
+    "name": "张三",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "product": {
+    "id": "1001",
+    "code": "PROD001",
+    "name": "轴承座"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T10:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T08:30:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T10:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "101",
+    "no": "J001",
+    "name": "李师傅"
+  },
+  "equipment": {
+    "ids": ["1", "7", "15"],
+    "speed_range": "1-4",
+    "unit_process_energy": 5.5,
+    "unit_idle_energy": 2.1
+  },
+  "work_center": {
+    "id": "1001",
+    "code": "WC01",
+    "name": "机加工中心1"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce02"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "1002",
+    "work_no": "W002",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO001",
+    "order_no": "ORD001",
+    "order_need_num": 100,
+    "plan_no": "P001",
+    "work_order_no": "WO001",
+    "batch_no": "B001",
+    "dispatch_order_no": "D002",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "2",
+    "code": "102",
+    "name": "粗加工",
+    "content": "工件粗加工成型",
+    "order": 2,
+    "plan_preparation_time": 20,
+    "plan_work_time": 90
+  },
+  "receive": {
+    "id": "1002",
+    "name": "李四",
+    "time": {
+      "$date": "2024-09-03T08:03:00Z"
+    }
+  },
+  "product": {
+    "id": "1001",
+    "code": "PROD001",
+    "name": "轴承座"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T11:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T12:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T11:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T12:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "102",
+    "no": "J002",
+    "name": "王师傅"
+  },
+  "equipment": {
+    "ids": ["2", "8"],
+    "speed_range": "1-3",
+    "unit_process_energy": 4.2,
+    "unit_idle_energy": 1.8
+  },
+  "work_center": {
+    "id": "1002",
+    "code": "WC02",
+    "name": "机加工中心2"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce03"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "1003",
+    "work_no": "W003",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO001",
+    "order_no": "ORD001",
+    "order_need_num": 100,
+    "plan_no": "P001",
+    "work_order_no": "WO001",
+    "batch_no": "B001",
+    "dispatch_order_no": "D003",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "3",
+    "code": "103",
+    "name": "精加工",
+    "content": "工件精密加工",
+    "order": 3,
+    "plan_preparation_time": 15,
+    "plan_work_time": 75
+  },
+  "receive": {
+    "id": "1003",
+    "name": "赵五",
+    "time": {
+      "$date": "2024-09-03T08:06:00Z"
+    }
+  },
+  "product": {
+    "id": "1001",
+    "code": "PROD001",
+    "name": "轴承座"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T13:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T14:15:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T13:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T14:15:00Z"
+    }
+  },
+  "operator": {
+    "id": "103",
+    "no": "J003",
+    "name": "刘师傅"
+  },
+  "equipment": {
+    "ids": ["3", "9", "16"],
+    "speed_range": "1-4",
+    "unit_process_energy": 3.8,
+    "unit_idle_energy": 1.5
+  },
+  "work_center": {
+    "id": "1003",
+    "code": "WC03",
+    "name": "精密加工中心"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce04"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "1004",
+    "work_no": "W004",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO001",
+    "order_no": "ORD001",
+    "order_need_num": 100,
+    "plan_no": "P001",
+    "work_order_no": "WO001",
+    "batch_no": "B001",
+    "dispatch_order_no": "D004",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "4",
+    "code": "106",
+    "name": "检验包装",
+    "content": "成品检验包装",
+    "order": 4,
+    "plan_preparation_time": 20,
+    "plan_work_time": 30
+  },
+  "receive": {
+    "id": "1006",
+    "name": "周八",
+    "time": {
+      "$date": "2024-09-03T08:15:00Z"
+    }
+  },
+  "product": {
+    "id": "1001",
+    "code": "PROD001",
+    "name": "轴承座"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T17:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T17:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T17:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T17:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "106",
+    "no": "J006",
+    "name": "郑师傅"
+  },
+  "equipment": {
+    "ids": ["6", "12"],
+    "speed_range": "1-2",
+    "unit_process_energy": 1.0,
+    "unit_idle_energy": 0.5
+  },
+  "work_center": {
+    "id": "1006",
+    "code": "WC06",
+    "name": "检验包装中心"
+  },
+  "production_line": {
+    "id": "2002",
+    "code": "LINE02",
+    "name": "生产线2"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce05"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "2001",
+    "work_no": "W005",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO002",
+    "order_no": "ORD002",
+    "order_need_num": 150,
+    "plan_no": "P002",
+    "work_order_no": "WO002",
+    "batch_no": "B002",
+    "dispatch_order_no": "D005",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "1",
+    "code": "101",
+    "name": "下料",
+    "content": "原材料下料切割",
+    "order": 1,
+    "plan_preparation_time": 30,
+    "plan_work_time": 120
+  },
+  "receive": {
+    "id": "1007",
+    "name": "张三",
+    "time": {
+      "$date": "2024-09-03T08:22:00Z"
+    }
+  },
+  "product": {
+    "id": "1002",
+    "code": "PROD002",
+    "name": "法兰盘"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T10:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T08:30:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T10:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "101",
+    "no": "J001",
+    "name": "李师傅"
+  },
+  "equipment": {
+    "ids": ["1", "7", "15"],
+    "speed_range": "1-4",
+    "unit_process_energy": 5.5,
+    "unit_idle_energy": 2.1
+  },
+  "work_center": {
+    "id": "1001",
+    "code": "WC01",
+    "name": "机加工中心1"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce06"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "2002",
+    "work_no": "W006",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO002",
+    "order_no": "ORD002",
+    "order_need_num": 150,
+    "plan_no": "P002",
+    "work_order_no": "WO002",
+    "batch_no": "B002",
+    "dispatch_order_no": "D006",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "2",
+    "code": "102",
+    "name": "粗加工",
+    "content": "工件粗加工成型",
+    "order": 2,
+    "plan_preparation_time": 20,
+    "plan_work_time": 90
+  },
+  "receive": {
+    "id": "1008",
+    "name": "李四",
+    "time": {
+      "$date": "2024-09-03T08:25:00Z"
+    }
+  },
+  "product": {
+    "id": "1002",
+    "code": "PROD002",
+    "name": "法兰盘"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T11:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T12:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T11:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T12:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "102",
+    "no": "J002",
+    "name": "王师傅"
+  },
+  "equipment": {
+    "ids": ["2", "8"],
+    "speed_range": "1-3",
+    "unit_process_energy": 4.2,
+    "unit_idle_energy": 1.8
+  },
+  "work_center": {
+    "id": "1002",
+    "code": "WC02",
+    "name": "机加工中心2"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce07"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "2003",
+    "work_no": "W007",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO002",
+    "order_no": "ORD002",
+    "order_need_num": 150,
+    "plan_no": "P002",
+    "work_order_no": "WO002",
+    "batch_no": "B002",
+    "dispatch_order_no": "D007",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "3",
+    "code": "103",
+    "name": "精加工",
+    "content": "工件精密加工",
+    "order": 3,
+    "plan_preparation_time": 15,
+    "plan_work_time": 75
+  },
+  "receive": {
+    "id": "1009",
+    "name": "赵五",
+    "time": {
+      "$date": "2024-09-03T08:28:00Z"
+    }
+  },
+  "product": {
+    "id": "1002",
+    "code": "PROD002",
+    "name": "法兰盘"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T13:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T14:15:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T13:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T14:15:00Z"
+    }
+  },
+  "operator": {
+    "id": "103",
+    "no": "J003",
+    "name": "刘师傅"
+  },
+  "equipment": {
+    "ids": ["3", "9", "16"],
+    "speed_range": "1-4",
+    "unit_process_energy": 3.8,
+    "unit_idle_energy": 1.5
+  },
+  "work_center": {
+    "id": "1003",
+    "code": "WC03",
+    "name": "精密加工中心"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce08"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "2004",
+    "work_no": "W008",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO002",
+    "order_no": "ORD002",
+    "order_need_num": 150,
+    "plan_no": "P002",
+    "work_order_no": "WO002",
+    "batch_no": "B002",
+    "dispatch_order_no": "D008",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "4",
+    "code": "106",
+    "name": "检验包装",
+    "content": "成品检验包装",
+    "order": 4,
+    "plan_preparation_time": 20,
+    "plan_work_time": 30
+  },
+  "receive": {
+    "id": "1012",
+    "name": "周八",
+    "time": {
+      "$date": "2024-09-03T08:37:00Z"
+    }
+  },
+  "product": {
+    "id": "1002",
+    "code": "PROD002",
+    "name": "法兰盘"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-09-03T17:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-09-03T17:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-09-03T17:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-09-03T17:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "106",
+    "no": "J006",
+    "name": "郑师傅"
+  },
+  "equipment": {
+    "ids": ["6", "12"],
+    "speed_range": "1-2",
+    "unit_process_energy": 1.0,
+    "unit_idle_energy": 0.5
+  },
+  "work_center": {
+    "id": "1006",
+    "code": "WC06",
+    "name": "检验包装中心"
+  },
+  "production_line": {
+    "id": "2002",
+    "code": "LINE02",
+    "name": "生产线2"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce09"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "3001",
+    "work_no": "W009",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO003",
+    "order_no": "ORD003",
+    "order_need_num": 200,
+    "plan_no": "P003",
+    "work_order_no": "WO003",
+    "batch_no": "B003",
+    "dispatch_order_no": "D009",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "1",
+    "code": "101",
+    "name": "下料",
+    "content": "原材料下料切割",
+    "order": 1,
+    "plan_preparation_time": 30,
+    "plan_work_time": 120
+  },
+  "receive": {
+    "id": "1013",
+    "name": "张三",
+    "time": {
+      "$date": "2024-09-03T08:45:00Z"
+    }
+  },
+  "product": {
+    "id": "1003",
+    "code": "PROD003",
+    "name": "连接器"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-10-03T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-10-03T10:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-10-03T08:30:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-10-03T10:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "101",
+    "no": "J001",
+    "name": "李师傅"
+  },
+  "equipment": {
+    "ids": ["1", "7", "15"],
+    "speed_range": "1-4",
+    "unit_process_energy": 5.5,
+    "unit_idle_energy": 2.1
+  },
+  "work_center": {
+    "id": "1001",
+    "code": "WC01",
+    "name": "机加工中心1"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce10"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "3002",
+    "work_no": "W010",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO003",
+    "order_no": "ORD003",
+    "order_need_num": 200,
+    "plan_no": "P003",
+    "work_order_no": "WO003",
+    "batch_no": "B003",
+    "dispatch_order_no": "D010",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "2",
+    "code": "102",
+    "name": "粗加工",
+    "content": "工件粗加工成型",
+    "order": 2,
+    "plan_preparation_time": 20,
+    "plan_work_time": 90
+  },
+  "receive": {
+    "id": "1014",
+    "name": "李四",
+    "time": {
+      "$date": "2024-09-03T08:48:00Z"
+    }
+  },
+  "product": {
+    "id": "1003",
+    "code": "PROD003",
+    "name": "连接器"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-10-03T11:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-10-03T12:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-10-03T11:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-10-03T12:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "102",
+    "no": "J002",
+    "name": "王师傅"
+  },
+  "equipment": {
+    "ids": ["2", "8"],
+    "speed_range": "1-3",
+    "unit_process_energy": 4.2,
+    "unit_idle_energy": 1.8
+  },
+  "work_center": {
+    "id": "1002",
+    "code": "WC02",
+    "name": "机加工中心2"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce11"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "3003",
+    "work_no": "W011",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO003",
+    "order_no": "ORD003",
+    "order_need_num": 200,
+    "plan_no": "P003",
+    "work_order_no": "WO003",
+    "batch_no": "B003",
+    "dispatch_order_no": "D011",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "3",
+    "code": "103",
+    "name": "精加工",
+    "content": "工件精密加工",
+    "order": 3,
+    "plan_preparation_time": 15,
+    "plan_work_time": 75
+  },
+  "receive": {
+    "id": "1015",
+    "name": "赵五",
+    "time": {
+      "$date": "2024-09-03T08:51:00Z"
+    }
+  },
+  "product": {
+    "id": "1003",
+    "code": "PROD003",
+    "name": "连接器"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-10-03T13:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-10-03T14:15:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-10-03T13:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-10-03T14:15:00Z"
+    }
+  },
+  "operator": {
+    "id": "103",
+    "no": "J003",
+    "name": "刘师傅"
+  },
+  "equipment": {
+    "ids": ["3", "9", "16"],
+    "speed_range": "1-4",
+    "unit_process_energy": 3.8,
+    "unit_idle_energy": 1.5
+  },
+  "work_center": {
+    "id": "1003",
+    "code": "WC03",
+    "name": "精密加工中心"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce12"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "3004",
+    "work_no": "W012",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO003",
+    "order_no": "ORD003",
+    "order_need_num": 200,
+    "plan_no": "P003",
+    "work_order_no": "WO003",
+    "batch_no": "B003",
+    "dispatch_order_no": "D012",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "4",
+    "code": "106",
+    "name": "检验包装",
+    "content": "成品检验包装",
+    "order": 4,
+    "plan_preparation_time": 20,
+    "plan_work_time": 30
+  },
+  "receive": {
+    "id": "1018",
+    "name": "周八",
+    "time": {
+      "$date": "2024-09-03T09:00:00Z"
+    }
+  },
+  "product": {
+    "id": "1003",
+    "code": "PROD003",
+    "name": "连接器"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-10-03T17:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-10-03T17:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-10-03T17:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-10-03T17:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "106",
+    "no": "J006",
+    "name": "郑师傅"
+  },
+  "equipment": {
+    "ids": ["6", "12"],
+    "speed_range": "1-2",
+    "unit_process_energy": 1.0,
+    "unit_idle_energy": 0.5
+  },
+  "work_center": {
+    "id": "1006",
+    "code": "WC06",
+    "name": "检验包装中心"
+  },
+  "production_line": {
+    "id": "2002",
+    "code": "LINE02",
+    "name": "生产线2"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce13"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "4001",
+    "work_no": "W013",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO004",
+    "order_no": "ORD004",
+    "order_need_num": 80,
+    "plan_no": "P004",
+    "work_order_no": "WO004",
+    "batch_no": "B004",
+    "dispatch_order_no": "D013",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "1",
+    "code": "101",
+    "name": "下料",
+    "content": "原材料下料切割",
+    "order": 1,
+    "plan_preparation_time": 30,
+    "plan_work_time": 120
+  },
+  "receive": {
+    "id": "1019",
+    "name": "张三",
+    "time": {
+      "$date": "2024-09-03T09:03:00Z"
+    }
+  },
+  "product": {
+    "id": "1004",
+    "code": "PROD004",
+    "name": "齿轮"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-11-03T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-11-03T10:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-11-03T08:30:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-11-03T10:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "101",
+    "no": "J001",
+    "name": "李师傅"
+  },
+  "equipment": {
+    "ids": ["1", "7", "15"],
+    "speed_range": "1-4",
+    "unit_process_energy": 5.5,
+    "unit_idle_energy": 2.1
+  },
+  "work_center": {
+    "id": "1001",
+    "code": "WC01",
+    "name": "机加工中心1"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce14"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "4002",
+    "work_no": "W014",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO004",
+    "order_no": "ORD004",
+    "order_need_num": 80,
+    "plan_no": "P004",
+    "work_order_no": "WO004",
+    "batch_no": "B004",
+    "dispatch_order_no": "D014",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "2",
+    "code": "102",
+    "name": "粗加工",
+    "content": "工件粗加工成型",
+    "order": 2,
+    "plan_preparation_time": 20,
+    "plan_work_time": 90
+  },
+  "receive": {
+    "id": "1020",
+    "name": "李四",
+    "time": {
+      "$date": "2024-09-03T09:06:00Z"
+    }
+  },
+  "product": {
+    "id": "1004",
+    "code": "PROD004",
+    "name": "齿轮"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-11-03T11:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-11-03T12:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-11-03T11:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-11-03T12:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "102",
+    "no": "J002",
+    "name": "王师傅"
+  },
+  "equipment": {
+    "ids": ["2", "8"],
+    "speed_range": "1-3",
+    "unit_process_energy": 4.2,
+    "unit_idle_energy": 1.8
+  },
+  "work_center": {
+    "id": "1002",
+    "code": "WC02",
+    "name": "机加工中心2"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce15"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "4003",
+    "work_no": "W015",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO004",
+    "order_no": "ORD004",
+    "order_need_num": 80,
+    "plan_no": "P004",
+    "work_order_no": "WO004",
+    "batch_no": "B004",
+    "dispatch_order_no": "D015",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "3",
+    "code": "103",
+    "name": "精加工",
+    "content": "工件精密加工",
+    "order": 3,
+    "plan_preparation_time": 15,
+    "plan_work_time": 75
+  },
+  "receive": {
+    "id": "1021",
+    "name": "赵五",
+    "time": {
+      "$date": "2024-09-03T09:09:00Z"
+    }
+  },
+  "product": {
+    "id": "1004",
+    "code": "PROD004",
+    "name": "齿轮"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-11-03T13:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-11-03T14:15:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-11-03T13:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-11-03T14:15:00Z"
+    }
+  },
+  "operator": {
+    "id": "103",
+    "no": "J003",
+    "name": "刘师傅"
+  },
+  "equipment": {
+    "ids": ["3", "9", "16"],
+    "speed_range": "1-4",
+    "unit_process_energy": 3.8,
+    "unit_idle_energy": 1.5
+  },
+  "work_center": {
+    "id": "1003",
+    "code": "WC03",
+    "name": "精密加工中心"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce16"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "4004",
+    "work_no": "W016",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO004",
+    "order_no": "ORD004",
+    "order_need_num": 80,
+    "plan_no": "P004",
+    "work_order_no": "WO004",
+    "batch_no": "B004",
+    "dispatch_order_no": "D016",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "4",
+    "code": "106",
+    "name": "检验包装",
+    "content": "成品检验包装",
+    "order": 4,
+    "plan_preparation_time": 20,
+    "plan_work_time": 30
+  },
+  "receive": {
+    "id": "1024",
+    "name": "周八",
+    "time": {
+      "$date": "2024-09-03T09:18:00Z"
+    }
+  },
+  "product": {
+    "id": "1004",
+    "code": "PROD004",
+    "name": "齿轮"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-11-03T17:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-11-03T17:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-11-03T17:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-11-03T17:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "106",
+    "no": "J006",
+    "name": "郑师傅"
+  },
+  "equipment": {
+    "ids": ["6", "12"],
+    "speed_range": "1-2",
+    "unit_process_energy": 1.0,
+    "unit_idle_energy": 0.5
+  },
+  "work_center": {
+    "id": "1006",
+    "code": "WC06",
+    "name": "检验包装中心"
+  },
+  "production_line": {
+    "id": "2002",
+    "code": "LINE02",
+    "name": "生产线2"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce17"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "5001",
+    "work_no": "W017",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO005",
+    "order_no": "ORD005",
+    "order_need_num": 120,
+    "plan_no": "P005",
+    "work_order_no": "WO005",
+    "batch_no": "B005",
+    "dispatch_order_no": "D017",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "1",
+    "code": "101",
+    "name": "下料",
+    "content": "原材料下料切割",
+    "order": 1,
+    "plan_preparation_time": 30,
+    "plan_work_time": 120
+  },
+  "receive": {
+    "id": "1025",
+    "name": "张三",
+    "time": {
+      "$date": "2024-09-03T09:25:00Z"
+    }
+  },
+  "product": {
+    "id": "1005",
+    "code": "PROD005",
+    "name": "支架"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-12-03T08:30:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-12-03T10:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-12-03T08:30:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-12-03T10:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "101",
+    "no": "J001",
+    "name": "李师傅"
+  },
+  "equipment": {
+    "ids": ["1", "7", "15"],
+    "speed_range": "1-4",
+    "unit_process_energy": 5.5,
+    "unit_idle_energy": 2.1
+  },
+  "work_center": {
+    "id": "1001",
+    "code": "WC01",
+    "name": "机加工中心1"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce18"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "5002",
+    "work_no": "W018",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO005",
+    "order_no": "ORD005",
+    "order_need_num": 120,
+    "plan_no": "P005",
+    "work_order_no": "WO005",
+    "batch_no": "B005",
+    "dispatch_order_no": "D018",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "2",
+    "code": "102",
+    "name": "粗加工",
+    "content": "工件粗加工成型",
+    "order": 2,
+    "plan_preparation_time": 20,
+    "plan_work_time": 90
+  },
+  "receive": {
+    "id": "1026",
+    "name": "李四",
+    "time": {
+      "$date": "2024-09-03T09:28:00Z"
+    }
+  },
+  "product": {
+    "id": "1005",
+    "code": "PROD005",
+    "name": "支架"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-12-03T11:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-12-03T12:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-12-03T11:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-12-03T12:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "102",
+    "no": "J002",
+    "name": "王师傅"
+  },
+  "equipment": {
+    "ids": ["2", "8"],
+    "speed_range": "1-3",
+    "unit_process_energy": 4.2,
+    "unit_idle_energy": 1.8
+  },
+  "work_center": {
+    "id": "1002",
+    "code": "WC02",
+    "name": "机加工中心2"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce19"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "5003",
+    "work_no": "W019",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO005",
+    "order_no": "ORD005",
+    "order_need_num": 120,
+    "plan_no": "P005",
+    "work_order_no": "WO005",
+    "batch_no": "B005",
+    "dispatch_order_no": "D019",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "3",
+    "code": "103",
+    "name": "精加工",
+    "content": "工件精密加工",
+    "order": 3,
+    "plan_preparation_time": 15,
+    "plan_work_time": 75
+  },
+  "receive": {
+    "id": "1027",
+    "name": "赵五",
+    "time": {
+      "$date": "2024-09-03T09:31:00Z"
+    }
+  },
+  "product": {
+    "id": "1005",
+    "code": "PROD005",
+    "name": "支架"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-12-03T13:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-12-03T14:15:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-12-03T13:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-12-03T14:15:00Z"
+    }
+  },
+  "operator": {
+    "id": "103",
+    "no": "J003",
+    "name": "刘师傅"
+  },
+  "equipment": {
+    "ids": ["3", "9", "16"],
+    "speed_range": "1-4",
+    "unit_process_energy": 3.8,
+    "unit_idle_energy": 1.5
+  },
+  "work_center": {
+    "id": "1003",
+    "code": "WC03",
+    "name": "精密加工中心"
+  },
+  "production_line": {
+    "id": "2001",
+    "code": "LINE01",
+    "name": "生产线1"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "65f1a8012d62af6615abce20"
+  },
+  "model_run_batch": "20240905",
+  "task": {
+    "id": "5004",
+    "work_no": "W020",
+    "task_num": 4,
+    "report_num": 0
+  },
+  "order": {
+    "sale_order_no": "SO005",
+    "order_no": "ORD005",
+    "order_need_num": 120,
+    "plan_no": "P005",
+    "work_order_no": "WO005",
+    "batch_no": "B005",
+    "dispatch_order_no": "D020",
+    "order_type": 2
+  },
+  "procedure": {
+    "id": "4",
+    "code": "106",
+    "name": "检验包装",
+    "content": "成品检验包装",
+    "order": 4,
+    "plan_preparation_time": 20,
+    "plan_work_time": 30
+  },
+  "receive": {
+    "id": "1030",
+    "name": "周八",
+    "time": {
+      "$date": "2024-09-03T09:40:00Z"
+    }
+  },
+  "product": {
+    "id": "1005",
+    "code": "PROD005",
+    "name": "支架"
+  },
+  "schedule": {
+    "plan_start_time": {
+      "$date": "2024-12-03T17:00:00Z"
+    },
+    "plan_end_time": {
+      "$date": "2024-12-03T17:30:00Z"
+    },
+    "real_start_time": {
+      "$date": "2024-12-03T17:00:00Z"
+    },
+    "real_end_time": {
+      "$date": "2024-12-03T17:30:00Z"
+    }
+  },
+  "operator": {
+    "id": "106",
+    "no": "J006",
+    "name": "郑师傅"
+  },
+  "equipment": {
+    "ids": ["6", "12"],
+    "speed_range": "1-2",
+    "unit_process_energy": 1.0,
+    "unit_idle_energy": 0.5
+  },
+  "work_center": {
+    "id": "1006",
+    "code": "WC06",
+    "name": "检验包装中心"
+  },
+  "production_line": {
+    "id": "2002",
+    "code": "LINE02",
+    "name": "生产线2"
+  },
+  "remark": "",
+  "del_flag": 0,
+  "create": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "update": {
+    "id": "1",
+    "name": "admin",
+    "time": {
+      "$date": "2024-09-03T08:00:00Z"
+    }
+  },
+  "importedAt": {
+    "$date": "2024-03-13T08:00:00Z"
+  },
+  "source": "dm_topic0401_input_task.csv",
+  "description": "生产任务数据 - 包含任务、工序、设备、人员等信息",
+  "dataType": "task",
+  "version": "1.0"
+}]
