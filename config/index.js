@@ -11,6 +11,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+      // 维修记录API专用代理 - 必须放在 /api 之前，因为webpack按顺序匹配
+      '/api/maintenance': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        logLevel: 'debug'
+      },
+      // 其他API的默认代理
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,

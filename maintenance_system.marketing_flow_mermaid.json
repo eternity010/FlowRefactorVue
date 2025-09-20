@@ -430,4 +430,144 @@
   "description": "营销流程 Mermaid 图表数据 - 包含节点、边和流程图定义",
   "flowType": "marketing",
   "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd7e"
+  },
+  "nodeId": "MK1",
+  "description": "获取市场需求信息",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK1 [获取市场需求信息] - 主子流程 （系统化市场调研）\n\n    %% 所有节点定义\n    MK1_M1[确定调研目标]\n    MK1_M2[设计调研问卷]\n    MK1_M3[选择调研样本]\n    MK1_M4[执行数据采集]\n    MK1_M5[数据整理分析]\n\n    %% 所有边的定义\n    MK1_M1 --> MK1_M2\n    MK1_M2 --> MK1_M3\n    MK1_M3 --> MK1_M4\n    MK1_M4 --> MK1_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK1 [获取市场需求信息] - 备用子流程 （快速市场信息收集）\n\n    %% 所有节点定义\n    MK1_A1[明确信息需求]\n    MK1_A2[利用现有渠道]\n    MK1_A3[快速数据收集]\n    MK1_A4[信息初步整理]\n    MK1_A5[形成情报报告]\n\n    %% 所有边的定义\n    MK1_A1 --> MK1_A2\n    MK1_A2 --> MK1_A3\n    MK1_A3 --> MK1_A4\n    MK1_A4 --> MK1_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd7f"
+  },
+  "nodeId": "MK2",
+  "description": "分析市场机会",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK2 [分析市场机会] - 主子流程 （全面市场分析）\n\n    %% 所有节点定义\n    MK2_M1[市场数据收集]\n    MK2_M2[竞争对手分析]\n    MK2_M3[市场趋势判断]\n    MK2_M4[机会评估量化]\n    MK2_M5[机会报告编制]\n\n    %% 所有边的定义\n    MK2_M1 --> MK2_M2\n    MK2_M2 --> MK2_M3\n    MK2_M3 --> MK2_M4\n    MK2_M4 --> MK2_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK2 [分析市场机会] - 备用子流程 （快速机会识别）\n\n    %% 所有节点定义\n    MK2_A1[市场信息汇总]\n    MK2_A2[关键指标筛选]\n    MK2_A3[机会点快速判断]\n    MK2_A4[风险评估简析]\n    MK2_A5[机会初步报告]\n\n    %% 所有边的定义\n    MK2_A1 --> MK2_A2\n    MK2_A2 --> MK2_A3\n    MK2_A3 --> MK2_A4\n    MK2_A4 --> MK2_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd80"
+  },
+  "nodeId": "MK3",
+  "description": "定位目标市场",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK3 [定位目标市场] - 主子流程 （科学市场定位）\n\n    %% 所有节点定义\n    MK3_M1[市场细分分析]\n    MK3_M2[目标群体筛选]\n    MK3_M3[定位策略制定]\n    MK3_M4[定位效果评估]\n    MK3_M5[定位方案确定]\n\n    %% 所有边的定义\n    MK3_M1 --> MK3_M2\n    MK3_M2 --> MK3_M3\n    MK3_M3 --> MK3_M4\n    MK3_M4 --> MK3_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK3 [定位目标市场] - 备用子流程 （快速市场定位）\n\n    %% 所有节点定义\n    MK3_A1[市场概况评估]\n    MK3_A2[重点客户识别]\n    MK3_A3[定位策略初定]\n    MK3_A4[快速验证测试]\n    MK3_A5[定位方案确认]\n\n    %% 所有边的定义\n    MK3_A1 --> MK3_A2\n    MK3_A2 --> MK3_A3\n    MK3_A3 --> MK3_A4\n    MK3_A4 --> MK3_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd81"
+  },
+  "nodeId": "MK4",
+  "description": "确定潜在客户",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK4 [确定潜在客户] - 主子流程 （系统化客户筛选）\n\n    %% 所有节点定义\n    MK4_M1[客户数据库建设]\n    MK4_M2[客户画像分析]\n    MK4_M3[购买意愿评估]\n    MK4_M4[客户优先级排序]\n    MK4_M5[潜在客户名单]\n\n    %% 所有边的定义\n    MK4_M1 --> MK4_M2\n    MK4_M2 --> MK4_M3\n    MK4_M3 --> MK4_M4\n    MK4_M4 --> MK4_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK4 [确定潜在客户] - 备用子流程 （快速客户识别）\n\n    %% 所有节点定义\n    MK4_A1[现有客户梳理]\n    MK4_A2[行业关联分析]\n    MK4_A3[需求匹配筛选]\n    MK4_A4[联系方式获取]\n    MK4_A5[客户名单整理]\n\n    %% 所有边的定义\n    MK4_A1 --> MK4_A2\n    MK4_A2 --> MK4_A3\n    MK4_A3 --> MK4_A4\n    MK4_A4 --> MK4_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd82"
+  },
+  "nodeId": "MK5",
+  "description": "发掘客户需求",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK5 [发掘客户需求] - 主子流程 （深度需求挖掘）\n\n    %% 所有节点定义\n    MK5_M1[客户访谈安排]\n    MK5_M2[需求调研实施]\n    MK5_M3[需求数据分析]\n    MK5_M4[需求优先级排序]\n    MK5_M5[需求报告编制]\n\n    %% 所有边的定义\n    MK5_M1 --> MK5_M2\n    MK5_M2 --> MK5_M3\n    MK5_M3 --> MK5_M4\n    MK5_M4 --> MK5_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK5 [发掘客户需求] - 备用子流程 （快速需求收集）\n\n    %% 所有节点定义\n    MK5_A1[客户初步接触]\n    MK5_A2[需求要点询问]\n    MK5_A3[需求信息整理]\n    MK5_A4[需求验证确认]\n    MK5_A5[需求简报输出]\n\n    %% 所有边的定义\n    MK5_A1 --> MK5_A2\n    MK5_A2 --> MK5_A3\n    MK5_A3 --> MK5_A4\n    MK5_A4 --> MK5_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd83"
+  },
+  "nodeId": "MK6",
+  "description": "编制技术方案",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK6 [编制技术方案] - 主子流程 （系统化方案设计）\n\n    %% 所有节点定义\n    MK6_M1[需求分析评估]\n    MK6_M2[技术方案设计]\n    MK6_M3[方案可行性验证]\n    MK6_M4[成本效益分析]\n    MK6_M5[技术方案定稿]\n\n    %% 所有边的定义\n    MK6_M1 --> MK6_M2\n    MK6_M2 --> MK6_M3\n    MK6_M3 --> MK6_M4\n    MK6_M4 --> MK6_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK6 [编制技术方案] - 备用子流程 （快速方案制定）\n\n    %% 所有节点定义\n    MK6_A1[需求要点梳理]\n    MK6_A2[标准方案匹配]\n    MK6_A3[方案快速调整]\n    MK6_A4[关键点验证]\n    MK6_A5[方案初步确定]\n\n    %% 所有边的定义\n    MK6_A1 --> MK6_A2\n    MK6_A2 --> MK6_A3\n    MK6_A3 --> MK6_A4\n    MK6_A4 --> MK6_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd84"
+  },
+  "nodeId": "MK7",
+  "description": "沟通客户需求",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK7 [沟通客户需求] - 主子流程 （专业需求沟通）\n\n    %% 所有节点定义\n    MK7_M1[沟通计划制定]\n    MK7_M2[需求确认会议]\n    MK7_M3[技术方案讲解]\n    MK7_M4[客户反馈收集]\n    MK7_M5[需求确认文件]\n\n    %% 所有边的定义\n    MK7_M1 --> MK7_M2\n    MK7_M2 --> MK7_M3\n    MK7_M3 --> MK7_M4\n    MK7_M4 --> MK7_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK7 [沟通客户需求] - 备用子流程 （快速需求沟通）\n\n    %% 所有节点定义\n    MK7_A1[需求要点整理]\n    MK7_A2[电话邮件沟通]\n    MK7_A3[方案概要介绍]\n    MK7_A4[反馈信息记录]\n    MK7_A5[需求确认函]\n\n    %% 所有边的定义\n    MK7_A1 --> MK7_A2\n    MK7_A2 --> MK7_A3\n    MK7_A3 --> MK7_A4\n    MK7_A4 --> MK7_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd85"
+  },
+  "nodeId": "MK8",
+  "description": "提供技术支持提供人员支持",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK8 [提供技术支持提供人员支持] - 主子流程 （全面技术支持）\n\n    %% 所有节点定义\n    MK8_M1[技术需求评估]\n    MK8_M2[专家团队组建]\n    MK8_M3[技术方案优化]\n    MK8_M4[技术培训指导]\n    MK8_M5[技术支持报告]\n\n    %% 所有边的定义\n    MK8_M1 --> MK8_M2\n    MK8_M2 --> MK8_M3\n    MK8_M3 --> MK8_M4\n    MK8_M4 --> MK8_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK8 [提供技术支持提供人员支持] - 备用子流程 （快速技术支持）\n\n    %% 所有节点定义\n    MK8_A1[技术问题识别]\n    MK8_A2[技术专家调配]\n    MK8_A3[远程技术指导]\n    MK8_A4[问题快速解决]\n    MK8_A5[技术支持记录]\n\n    %% 所有边的定义\n    MK8_A1 --> MK8_A2\n    MK8_A2 --> MK8_A3\n    MK8_A3 --> MK8_A4\n    MK8_A4 --> MK8_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd86"
+  },
+  "nodeId": "MK9",
+  "description": "提供LCC支持",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK9 [提供LCC支持] - 主子流程 （全面生命周期成本分析）\n\n    %% 所有节点定义\n    MK9_M1[LCC模型建立]\n    MK9_M2[成本数据收集]\n    MK9_M3[成本效益计算]\n    MK9_M4[敏感性分析]\n    MK9_M5[LCC分析报告]\n\n    %% 所有边的定义\n    MK9_M1 --> MK9_M2\n    MK9_M2 --> MK9_M3\n    MK9_M3 --> MK9_M4\n    MK9_M4 --> MK9_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK9 [提供LCC支持] - 备用子流程 （快速成本估算）\n\n    %% 所有节点定义\n    MK9_A1[成本要素识别]\n    MK9_A2[历史数据参考]\n    MK9_A3[成本快速估算]\n    MK9_A4[关键成本验证]\n    MK9_A5[成本估算报告]\n\n    %% 所有边的定义\n    MK9_A1 --> MK9_A2\n    MK9_A2 --> MK9_A3\n    MK9_A3 --> MK9_A4\n    MK9_A4 --> MK9_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b48012d62af6615abbd87"
+  },
+  "nodeId": "MK10",
+  "description": "提供原材料采购成本及询价支持",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: MK10 [提供原材料采购成本及询价支持] - 主子流程 （系统化采购成本分析）\n\n    %% 所有节点定义\n    MK10_M1[原材料清单编制]\n    MK10_M2[供应商市场调研]\n    MK10_M3[询价方案制定]\n    MK10_M4[成本对比分析]\n    MK10_M5[采购成本报告]\n\n    %% 所有边的定义\n    MK10_M1 --> MK10_M2\n    MK10_M2 --> MK10_M3\n    MK10_M3 --> MK10_M4\n    MK10_M4 --> MK10_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: MK10 [提供原材料采购成本及询价支持] - 备用子流程 （快速采购成本评估）\n\n    %% 所有节点定义\n    MK10_A1[关键材料识别]\n    MK10_A2[供应商快速询价]\n    MK10_A3[成本数据汇总]\n    MK10_A4[价格趋势分析]\n    MK10_A5[成本评估报告]\n\n    %% 所有边的定义\n    MK10_A1 --> MK10_A2\n    MK10_A2 --> MK10_A3\n    MK10_A3 --> MK10_A4\n    MK10_A4 --> MK10_A5",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:23:45.568Z"
+  }
 }]

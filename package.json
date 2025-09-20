@@ -36,7 +36,11 @@
     "demo-risk-api": "node scripts/demo-risk-structure-api.js",
     "import-procurement-data": "node scripts/import-procurement-data-to-mongodb.js",
     "test-procurement-data": "node scripts/test-procurement-data-queries.js",
-    "test-mysql": "node scripts/test-mysql-service.js"
+    "test-mysql": "node scripts/test-mysql-service.js",
+    "import-risk-mysql": "node scripts/import-risk-data-to-mysql.js",
+    "test-all-risk": "node scripts/test-all-risk-data.js",
+    "test-node-optimization": "node scripts/test-node-optimization.js",
+    "test-maintenance-api": "node scripts/test-maintenance-records-api.js"
   },
   "dependencies": {
     "@antv/g6": "^5.0.45",

@@ -233,7 +233,7 @@ export default {
         node.addEventListener('click', (event) => {
           // 获取节点ID
           const nodeId = node.id || '';
-          const flowNode = this.flowData.nodes.find(n => nodeId.includes(n.id));
+          const flowNode = this.resolveClickedFlowNode(nodeId);
           
           if (flowNode) {
             console.log('ProductionFlow组件节点被点击:', flowNode);
@@ -259,6 +259,32 @@ export default {
           node.style.opacity = '1';
         });
       });
+    },
+
+    // 解析点击到的Mermaid节点对应的业务节点，避免PD23误识别为PD2
+    resolveClickedFlowNode(nodeDomId) {
+      const candidates = (this.flowData && Array.isArray(this.flowData.nodes)) ? this.flowData.nodes : [];
+      if (!nodeDomId || candidates.length === 0) return null;
+
+      // 1) 精确匹配
+      const exact = candidates.find(n => String(n.id) === nodeDomId);
+      if (exact) return exact;
+
+      // 2) 按边界匹配（优先更长的ID，避免PD23匹配到PD2）
+      const matched = candidates
+        .filter(n => {
+          const id = String(n.id);
+          // 常见的Mermaid节点ID模式以分隔符连接
+          if (nodeDomId.endsWith(`-${id}`) || nodeDomId.endsWith(`_${id}`) || nodeDomId === id) return true;
+          // 宽松的结尾匹配（仍然会被长度排序保护）
+          if (nodeDomId.endsWith(id)) return true;
+          // 边界正则匹配
+          const boundary = new RegExp(`(^|[-_])${id}($|[-_])`);
+          return boundary.test(nodeDomId);
+        })
+        .sort((a, b) => String(b.id).length - String(a.id).length)[0];
+
+      return matched || null;
     },
     
     /**

@@ -3,7 +3,7 @@ import axios from 'axios';
 // 获取API基础URL
 const API_BASE_URL = process.env.VUE_APP_API_URL || '';
 
-class Topic01Api {
+class Topic02Api {
   constructor() {
     this.baseURL = API_BASE_URL;
     this.timeout = 10000; // 10秒超时
@@ -38,7 +38,7 @@ class Topic01Api {
       const response = await axios(config);
       return response.data;
     } catch (error) {
-      console.error(`Topic01 API请求失败 [${method} ${endpoint}]:`, error);
+      console.error(`Topic02 API请求失败 [${method} ${endpoint}]:`, error);
       
       if (error.code === 'ECONNABORTED') {
         throw new Error('请求超时，请稍后重试');
@@ -49,7 +49,7 @@ class Topic01Api {
         throw new Error((data && data.error) || `HTTP ${status} 错误`);
       }
       
-      throw new Error(error.message || 'Topic01 请求失败');
+      throw new Error(error.message || 'Topic02 请求失败');
     }
   }
 
@@ -87,7 +87,7 @@ class Topic01Api {
    * @returns {Promise<Object>} 数据结果
    */
   async getData(params = {}) {
-    return await this.get('/api/topic01/data', params);
+    return await this.get('/api/topic02/data', params);
   }
 
   /**
@@ -96,7 +96,7 @@ class Topic01Api {
    * @returns {Promise<Object>} 保存结果
    */
   async saveData(data) {
-    return await this.post('/api/topic01/data', data);
+    return await this.post('/api/topic02/data', data);
   }
 
   /**
@@ -106,7 +106,7 @@ class Topic01Api {
    * @returns {Promise<Object>} 更新结果
    */
   async updateData(id, data) {
-    return await this.put(`/api/topic01/data/${id}`, data);
+    return await this.put(`/api/topic02/data/${id}`, data);
   }
 
   /**
@@ -115,7 +115,7 @@ class Topic01Api {
    * @returns {Promise<Object>} 删除结果
    */
   async deleteData(id) {
-    return await this.delete(`/api/topic01/data/${id}`);
+    return await this.delete(`/api/topic02/data/${id}`);
   }
 
   /**
@@ -124,7 +124,7 @@ class Topic01Api {
    * @returns {Promise<Object>} 处理结果
    */
   async processData(input) {
-    return await this.post('/api/topic01/process', input);
+    return await this.post('/api/topic02/process', input);
   }
 
   /**
@@ -132,42 +132,12 @@ class Topic01Api {
    * @returns {Promise<Object>} 状态信息
    */
   async getStatus() {
-    return await this.get('/api/topic01/status');
-  }
-
-  /**
-   * 获取风险数据统计
-   * @param {string} processType - 流程类型 (purchase, production, marketing, operation)
-   * @returns {Promise<Object>} 风险统计数据
-   */
-  async getRiskStatistics(processType = '') {
-    const params = processType ? { processType } : {};
-    return await this.get('/api/topic01/risk-statistics', params);
-  }
-
-  /**
-   * 获取所有流程的风险统计
-   * @returns {Promise<Object>} 所有流程的风险统计数据
-   */
-  async getAllRiskStatistics() {
-    return await this.get('/api/topic01/risk-statistics');
-  }
-
-  /**
-   * 获取单个节点的风险信息
-   * @param {string} nodeId - 节点ID
-   * @returns {Promise<Object>} 节点风险信息
-   */
-  async getNodeRiskInfo(nodeId) {
-    if (!nodeId) {
-      throw new Error('节点ID不能为空');
-    }
-    return await this.get(`/api/topic01/node-risk/${nodeId}`);
+    return await this.get('/api/topic02/status');
   }
 }
 
 // 创建并导出API实例
-const topic01Api = new Topic01Api();
+const topic02Api = new Topic02Api();
 
-export { Topic01Api, topic01Api };
-export default topic01Api;
+export { Topic02Api, topic02Api };
+export default topic02Api;

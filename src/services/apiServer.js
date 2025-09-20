@@ -8,6 +8,9 @@ const LLMApiServer = require('./llmApiServer');
 const RiskDataService = require('./riskDataService');
 const MySQLService = require('./mysqlService');
 const Topic01Service = require('./topic01Service');
+const Topic02Service = require('./topic02Service');
+const Topic03Service = require('./topic03Service');
+const Topic04Service = require('./topic04Service');
 
 const app = express();
 const PORT = 3001;
@@ -24,6 +27,9 @@ const processOptimizationService = new ProcessOptimizationService();
 const riskDataService = new RiskDataService();
 const mysqlService = new MySQLService();
 const topic01Service = new Topic01Service();
+const topic02Service = new Topic02Service();
+const topic03Service = new Topic03Service();
+const topic04Service = new Topic04Service();
 const llmApiServer = new LLMApiServer({
   flowDataService: flowDataService,
   riskDataService: riskDataService
@@ -38,8 +44,11 @@ async function initializeService() {
     await riskDataService.connect();
     await mysqlService.connect();
     await topic01Service.initialize();
+    await topic02Service.initialize();
+    await topic03Service.initialize();
+    await topic04Service.initialize();
     await llmApiServer.initialize();
-    console.log('✅ API服务已连接到MongoDB和MySQL，Topic01服务已启动');
+    console.log('✅ API服务已连接到MongoDB和MySQL，Topic01、Topic02、Topic03和Topic04服务已启动');
   } catch (error) {
     console.error('❌ 数据库连接失败:', error);
   }
@@ -1878,6 +1887,710 @@ app.get('/api/topic01/status', async (req, res) => {
   }
 });
 
+// 获取风险数据统计
+app.get('/api/topic01/risk-statistics', async (req, res) => {
+  try {
+    const { processType } = req.query;
+    const result = await topic01Service.getRiskStatistics(processType);
+    sendResponse(res, result, '获取风险统计数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// Topic01 单个节点风险信息路由
+app.get('/api/topic01/node-risk/:nodeId', async (req, res) => {
+  try {
+    const { nodeId } = req.params;
+    console.log(`📥 收到获取节点风险信息请求: nodeId=${nodeId}`);
+    
+    const result = await topic01Service.getNodeRiskInfo(nodeId);
+    
+    if (result.success) {
+      console.log(`✅ 节点风险信息获取成功: ${JSON.stringify({
+        nodeId: result.data.nodeId,
+        riskLevel: result.data.riskLevel,
+        processType: result.data.processType
+      })}`);
+    }
+    
+    sendResponse(res, result, `获取节点 ${nodeId} 风险信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// Topic02 API 路由
+// ================================
+
+// 获取数据
+app.get('/api/topic02/data', async (req, res) => {
+  try {
+    const result = await topic02Service.getData(req.query);
+    sendResponse(res, result, '获取Topic02数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 保存数据
+app.post('/api/topic02/data', async (req, res) => {
+  try {
+    const result = await topic02Service.saveData(req.body);
+    sendResponse(res, result, '保存Topic02数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 更新数据
+app.put('/api/topic02/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await topic02Service.updateData(id, req.body);
+    sendResponse(res, result, `更新Topic02数据${id}失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 删除数据
+app.delete('/api/topic02/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await topic02Service.deleteData(id);
+    sendResponse(res, result, `删除Topic02数据${id}失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 处理业务逻辑
+app.post('/api/topic02/process', async (req, res) => {
+  try {
+    const result = await topic02Service.processData(req.body);
+    sendResponse(res, result, 'Topic02业务处理失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取状态信息
+app.get('/api/topic02/status', async (req, res) => {
+  try {
+    const result = await topic02Service.getStatus();
+    sendResponse(res, result, '获取Topic02状态失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// Topic04 API 路由 - 高铁运维订单数据
+// ================================
+
+// 获取所有状态为"进行中"的运维订单数据
+app.get('/api/topic04/maintenance/ongoing', async (req, res) => {
+  try {
+    console.log('📥 收到获取进行中运维订单的请求');
+    const result = await topic04Service.getOngoingMaintenanceOrders();
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条进行中的运维订单数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取进行中运维订单数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取进行中运维订单数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取进行中运维订单数据异常:', error);
+    sendError(res, error);
+  }
+});
+
+// 根据系统模块获取运维订单
+app.get('/api/topic04/maintenance/system/:systemModule', async (req, res) => {
+  try {
+    const { systemModule } = req.params;
+    console.log(`📥 收到获取系统 "${systemModule}" 运维订单的请求`);
+    
+    const result = await topic04Service.getMaintenanceOrdersBySystem(systemModule);
+    sendResponse(res, result, `获取系统 ${systemModule} 运维订单失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+
+// 获取运维订单统计数据
+app.get('/api/topic04/maintenance/statistics', async (req, res) => {
+  try {
+    console.log('📥 收到获取运维订单统计数据的请求');
+    const result = await topic04Service.getMaintenanceStatistics();
+    sendResponse(res, result, '获取运维订单统计数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据车站位置获取运维订单
+app.get('/api/topic04/maintenance/station/:stationLocation', async (req, res) => {
+  try {
+    const { stationLocation } = req.params;
+    console.log(`📥 收到获取车站 "${stationLocation}" 运维订单的请求`);
+    
+    // 使用与系统模块类似的逻辑，但这里我们需要自定义查询
+    const sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE maintenance_status = '进行中' 
+        AND station_location = ?
+        AND del_flag = 0
+      ORDER BY report_date DESC
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [stationLocation]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: {
+          stationLocation: stationLocation,
+          total: processedData.length,
+          records: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取车站 ${stationLocation} 运维订单失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据列车编号获取运维订单
+app.get('/api/topic04/maintenance/train/:trainId', async (req, res) => {
+  try {
+    const { trainId } = req.params;
+    console.log(`📥 收到获取列车 "${trainId}" 运维订单的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE maintenance_status = '进行中' 
+        AND train_id = ?
+        AND del_flag = 0
+      ORDER BY report_date DESC
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [trainId]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: {
+          trainId: trainId,
+          total: processedData.length,
+          records: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取列车 ${trainId} 运维订单失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据维修类型获取运维订单
+app.get('/api/topic04/maintenance/type/:maintenanceType', async (req, res) => {
+  try {
+    const { maintenanceType } = req.params;
+    console.log(`📥 收到获取维修类型 "${maintenanceType}" 运维订单的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE maintenance_status = '进行中' 
+        AND maintenance_type = ?
+        AND del_flag = 0
+      ORDER BY report_date DESC
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [maintenanceType]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: {
+          maintenanceType: maintenanceType,
+          total: processedData.length,
+          records: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取维修类型 ${maintenanceType} 运维订单失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据责任班组获取运维订单
+app.get('/api/topic04/maintenance/team/:responsibleTeam', async (req, res) => {
+  try {
+    const { responsibleTeam } = req.params;
+    console.log(`📥 收到获取责任班组 "${responsibleTeam}" 运维订单的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE maintenance_status = '进行中' 
+        AND responsible_team = ?
+        AND del_flag = 0
+      ORDER BY report_date DESC
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [responsibleTeam]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: {
+          responsibleTeam: responsibleTeam,
+          total: processedData.length,
+          records: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取责任班组 ${responsibleTeam} 运维订单失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取运维订单详情
+app.get('/api/topic04/maintenance/detail/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    console.log(`📥 收到获取运维订单详情的请求: ${orderId}`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE id = ? AND del_flag = 0
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [orderId]);
+    
+    if (result.success && result.data.length > 0) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: processedData[0],
+        message: '获取运维订单详情成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: `未找到ID为 ${orderId} 的运维订单`
+      });
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 搜索运维订单
+app.get('/api/topic04/maintenance/search', async (req, res) => {
+  try {
+    const { keyword, system, type, status, dateFrom, dateTo } = req.query;
+    console.log('📥 收到搜索运维订单的请求:', req.query);
+    
+    let sql = `
+      SELECT * FROM dm_topic0402_input_train_maintenance 
+      WHERE del_flag = 0
+    `;
+    const params = [];
+    
+    if (keyword) {
+      sql += ` AND (train_id LIKE ? OR fault_description LIKE ? OR repair_code LIKE ?)`;
+      params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+    
+    if (system) {
+      sql += ` AND system_module = ?`;
+      params.push(system);
+    }
+    
+    if (type) {
+      sql += ` AND maintenance_type = ?`;
+      params.push(type);
+    }
+    
+    if (status) {
+      sql += ` AND maintenance_status = ?`;
+      params.push(status);
+    }
+    
+    if (dateFrom) {
+      sql += ` AND report_date >= ?`;
+      params.push(dateFrom);
+    }
+    
+    if (dateTo) {
+      sql += ` AND report_date <= ?`;
+      params.push(dateTo);
+    }
+    
+    sql += ` ORDER BY report_date DESC LIMIT 100`;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, params);
+    
+    if (result.success) {
+      const processedData = topic04Service.processMaintenanceData(result.data);
+      res.json({
+        success: true,
+        data: {
+          searchParams: req.query,
+          total: processedData.length,
+          records: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, '搜索运维订单失败');
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取Topic04状态信息
+app.get('/api/topic04/status', async (req, res) => {
+  try {
+    const result = await topic04Service.getStatus();
+    sendResponse(res, result, '获取Topic04状态失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// Topic03 API路由 - 车辆和人员匹配度管理
+// ================================
+
+// 根据人员ID获取其对所有车辆的匹配度
+app.get('/api/topic03/person-train-matches', async (req, res) => {
+  try {
+    const { person_id, sort_by, sort_order, page, page_size, min_match_score } = req.query;
+    
+    if (!person_id) {
+      return res.status(400).json({
+        success: false,
+        error: '人员ID不能为空'
+      });
+    }
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 20
+    };
+
+    if (min_match_score !== undefined) {
+      options.minMatchScore = parseFloat(min_match_score);
+    }
+
+    const result = await topic03Service.getPersonTrainMatches(person_id, options);
+    sendResponse(res, result, `获取人员 ${person_id} 的车辆匹配度失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据车辆ID获取所有人员对该车辆的匹配度
+app.get('/api/topic03/train-person-matches', async (req, res) => {
+  try {
+    const { train_id, sort_by, sort_order, page, page_size, min_match_score } = req.query;
+    
+    if (!train_id) {
+      return res.status(400).json({
+        success: false,
+        error: '车辆ID不能为空'
+      });
+    }
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 20
+    };
+
+    if (min_match_score !== undefined) {
+      options.minMatchScore = parseFloat(min_match_score);
+    }
+
+    const result = await topic03Service.getTrainPersonMatches(train_id, options);
+    sendResponse(res, result, `获取车辆 ${train_id} 的人员匹配度失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取所有人员列表及其匹配度统计
+app.get('/api/topic03/person-list', async (req, res) => {
+  try {
+    const { sort_by, sort_order, page, page_size } = req.query;
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 50
+    };
+
+    const result = await topic03Service.getPersonList(options);
+    sendResponse(res, result, '获取人员列表失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取所有车辆列表及其匹配度统计
+app.get('/api/topic03/train-list', async (req, res) => {
+  try {
+    const { sort_by, sort_order, page, page_size } = req.query;
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 50
+    };
+
+    const result = await topic03Service.getTrainList(options);
+    sendResponse(res, result, '获取车辆列表失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取人员详细信息及匹配度数据
+app.get('/api/topic03/person-detail/:personId', async (req, res) => {
+  try {
+    const { personId } = req.params;
+    const result = await topic03Service.getPersonDetail(decodeURIComponent(personId));
+    sendResponse(res, result, `获取人员 ${personId} 详细信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取车辆详细信息及匹配度数据
+app.get('/api/topic03/train-detail/:trainId', async (req, res) => {
+  try {
+    const { trainId } = req.params;
+    const result = await topic03Service.getTrainDetail(decodeURIComponent(trainId));
+    sendResponse(res, result, `获取车辆 ${trainId} 详细信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 搜索匹配记录
+app.get('/api/topic03/search-matches', async (req, res) => {
+  try {
+    const {
+      personId,
+      trainId,
+      minScore,
+      maxScore,
+      dateFrom,
+      dateTo,
+      sort_by,
+      sort_order,
+      page,
+      page_size
+    } = req.query;
+
+    const searchParams = {
+      personId,
+      trainId,
+      minScore: minScore ? parseFloat(minScore) : undefined,
+      maxScore: maxScore ? parseFloat(maxScore) : undefined,
+      dateFrom,
+      dateTo
+    };
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 20
+    };
+
+    const result = await topic03Service.searchMatches(searchParams, options);
+    sendResponse(res, result, '搜索匹配记录失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取匹配度统计信息
+app.get('/api/topic03/match-statistics', async (req, res) => {
+  try {
+    const { group_by } = req.query;
+    
+    const options = {
+      groupBy: group_by
+    };
+
+    const result = await topic03Service.getMatchStatistics(options);
+    sendResponse(res, result, '获取匹配度统计失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取推荐匹配
+app.get('/api/topic03/recommendations', async (req, res) => {
+  try {
+    const { type, id, top_n, min_score } = req.query;
+
+    if (!type || !id) {
+      return res.status(400).json({
+        success: false,
+        error: '推荐类型和ID不能为空'
+      });
+    }
+
+    if (!['person', 'train'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        error: '推荐类型必须是 person 或 train'
+      });
+    }
+
+    const params = {
+      type,
+      id,
+      topN: parseInt(top_n) || 10,
+      minScore: parseFloat(min_score) || 0.6
+    };
+
+    const result = await topic03Service.getRecommendations(params);
+    sendResponse(res, result, '获取推荐匹配失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 批量获取匹配度数据
+app.post('/api/topic03/batch-matches', async (req, res) => {
+  try {
+    const { personIds, trainIds } = req.body;
+
+    if (!personIds && !trainIds) {
+      return res.status(400).json({
+        success: false,
+        error: '至少需要提供人员ID或车辆ID列表'
+      });
+    }
+
+    const params = {
+      personIds,
+      trainIds
+    };
+
+    const result = await topic03Service.getBatchMatches(params);
+    sendResponse(res, result, '批量获取匹配度数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取所有匹配数据
+app.get('/api/topic03/matches', async (req, res) => {
+  try {
+    const { sort_by, sort_order, page, page_size } = req.query;
+
+    const options = {
+      sortBy: sort_by,
+      sortOrder: sort_order,
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 100
+    };
+
+    const result = await topic03Service.getAllMatches(options);
+    sendResponse(res, result, '获取所有匹配数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+
+// 检查Topic03数据库连接状态
+app.get('/api/topic03/connection', async (req, res) => {
+  try {
+    const result = await topic03Service.checkConnection();
+    sendResponse(res, result, 'Topic03数据库连接检查失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取Topic03状态信息
+app.get('/api/topic03/status', async (req, res) => {
+  try {
+    const result = {
+      success: true,
+      data: {
+        service: 'Topic03Service',
+        description: '车辆和人员匹配度管理服务',
+        version: '1.0.0',
+        status: 'running',
+        features: [
+          '人员车辆匹配度查询',
+          '车辆人员匹配度查询',
+          '匹配度统计分析',
+          '推荐算法',
+          '批量数据操作',
+          '搜索功能',
+          '数据管理'
+        ],
+        timestamp: new Date().toISOString()
+      }
+    };
+    sendResponse(res, result, '获取Topic03状态失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取表结构信息
+app.get('/api/topic03/table-structure', async (req, res) => {
+  try {
+    const result = await topic03Service.getTableStructure();
+    sendResponse(res, result, '获取表结构信息失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // ================================
 // LLM API服务初始化
 // ================================
@@ -2008,6 +2721,9 @@ process.on('SIGINT', async () => {
   await riskDataService.disconnect();
   await mysqlService.disconnect();
   await topic01Service.cleanup();
+  await topic02Service.cleanup();
+  await topic03Service.cleanup();
+  await topic04Service.cleanup();
   process.exit(0);
 });
 

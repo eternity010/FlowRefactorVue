@@ -43,13 +43,6 @@
               <span class="value">{{ nodeDetails.cycleTime }}</span>
             </div>
             
-            <div class="info-item">
-              <span class="label">风险等级：</span>
-              <span class="value" :class="getRiskLevelClass(nodeDetails.riskLevel)">
-                {{ nodeDetails.riskLevel }}
-              </span>
-            </div>
-            
             <!-- 如果有步骤信息，则显示步骤列表 -->
             <div class="info-item steps-container" v-if="nodeDetails.steps && nodeDetails.steps.length">
               <span class="label">执行步骤：</span>
@@ -59,6 +52,72 @@
                   <div class="step-text">{{ step }}</div>
                 </div>
               </div>
+            </div>
+          </template>
+
+          <!-- 显示来自数据库的风险信息 -->
+          <template v-if="riskInfo">
+            <el-divider content-position="left">风险评估信息</el-divider>
+            
+            <div class="risk-info-section">
+              <!-- 风险等级突出显示 -->
+              <div class="risk-level-header">
+                <div class="risk-level-indicator" :class="riskInfo.riskLevelClass">
+                  <div class="risk-circle">
+                    <div class="risk-dot"></div>
+                  </div>
+                  <div class="risk-level-text">
+                    <div class="risk-level-title">{{ riskInfo.riskLevel }}风险</div>
+                    <div class="risk-level-subtitle">{{ riskInfo.nodeName }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 详细信息 -->
+              <div class="risk-details">
+                <div class="info-item">
+                  <span class="label">
+                    <i class="el-icon-document"></i>
+                    风险描述：
+                  </span>
+                  <span class="value risk-description">{{ riskInfo.riskDescription }}</span>
+                </div>
+                
+                <div class="info-item">
+                  <span class="label">
+                    <i class="el-icon-s-operation"></i>
+                    所属流程：
+                  </span>
+                  <span class="value">{{ getFlowTypeName(riskInfo.processType) }}</span>
+                </div>
+                
+                <div class="info-item" v-if="riskInfo.updateTime">
+                  <span class="label">
+                    <i class="el-icon-time"></i>
+                    更新时间：
+                  </span>
+                  <span class="value">{{ formatDate(riskInfo.updateTime) }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+          
+          <!-- 风险信息加载中 -->
+          <template v-else-if="riskLoading">
+            <el-divider content-position="left">风险评估信息</el-divider>
+            <div class="risk-loading">
+              <i class="el-icon-loading"></i>
+              <span>正在加载风险信息...</span>
+            </div>
+          </template>
+          
+          <!-- 风险信息加载失败 -->
+          <template v-else-if="riskError">
+            <el-divider content-position="left">风险评估信息</el-divider>
+            <div class="risk-error">
+              <i class="el-icon-warning"></i>
+              <span>{{ riskError }}</span>
+              <el-button type="text" size="mini" @click="loadRiskInfo">重新加载</el-button>
             </div>
           </template>
           
@@ -129,45 +188,52 @@
       </el-empty>
     </div>
     
-    <!-- 添加甘特图区域 -->
-    <el-divider content-position="left">项目计划时间图</el-divider>
-    <div v-if="ganttData" class="gantt-section">
-      <gantt-chart :ganttData="ganttData" />
-    </div>
-    <div v-else class="empty-gantt-section">
-      <el-empty description="该节点暂无甘特图数据"></el-empty>
+    <!-- 重构操作区域 -->
+    <el-divider content-position="left">节点重构</el-divider>
+    <div class="refactor-section">
+      <el-card class="refactor-card" shadow="hover">
+        <div class="refactor-content">
+          <div class="refactor-info">
+            <div class="refactor-icon">
+              <i class="el-icon-setting"></i>
+            </div>
+            <div class="refactor-details">
+              <h4>启动节点重构</h4>
+              <p>基于风险评估结果和流程分析，重构当前节点以提升效率和降低风险</p>
+              <div class="refactor-benefits">
+                <el-tag size="small" type="success">效率提升</el-tag>
+                <el-tag size="small" type="warning">风险降低</el-tag>
+                <el-tag size="small" type="info">流程优化</el-tag>
+              </div>
+            </div>
+          </div>
+          
+          <div class="refactor-actions">
+            <el-button 
+              type="primary" 
+              size="large"
+              icon="el-icon-cpu"
+              :loading="refactorLoading"
+              @click="startRefactor">
+              {{ refactorLoading ? '正在启动重构...' : '启动重构' }}
+            </el-button>
+          </div>
+        </div>
+      </el-card>
     </div>
     
-    <!-- 添加节点资源区域 -->
-    <el-divider content-position="left">节点资源</el-divider>
-    <div class="resource-section">
-      <node-resources :type="nodeType" :nodeId="nodeId"></node-resources>
-      
-      <div class="view-more-resources">
-        <el-button 
-          type="primary" 
-          size="small" 
-          icon="el-icon-view" 
-          @click="viewDetailedResources">
-          查看详细资源信息
-        </el-button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import { nodeDetailApi } from '@/api/nodeDetailApi';
+import { topic01Api } from '@/api/topic01Api';
 import MermaidChart from '@/components/MermaidChart.vue';
-import NodeResources from '@/components/NodeResources.vue';
-import GanttChart from '@/components/GanttChart.vue';
 
 export default {
   name: 'NodeDetailView',
   components: {
-    MermaidChart,
-    NodeResources,
-    GanttChart
+    MermaidChart
   },
   data() {
     return {
@@ -175,11 +241,14 @@ export default {
       nodeTitle: '',
       nodeType: '',
       nodeDetails: null,
+      riskInfo: null,          // 节点风险信息
+      riskLoading: false,      // 风险信息加载状态
+      riskError: null,         // 风险信息加载错误
       currentFlowData: null,
-      ganttData: null,
       loading: false,
       dataLoaded: false,  // 标记数据是否加载完成
-      hasError: false     // 标记是否有加载错误
+      hasError: false,    // 标记是否有加载错误
+      refactorLoading: false   // 重构操作加载状态
     }
   },
 
@@ -189,22 +258,26 @@ export default {
     this.nodeTitle = this.$route.query.title || '节点详情';
     this.nodeType = this.$route.query.type || '';
     
-    // 加载节点数据
-    await this.loadNodeData();
+    // 并行加载节点数据和风险信息
+    await Promise.all([
+      this.loadNodeData(),
+      this.loadRiskInfo()
+    ]);
   },
   methods: {
     goBack() {
       this.$router.go(-1);
     },
-    getFlowTypeName() {
-      // 将流程类型转换为中文名称
+    getFlowTypeName(type) {
+      // 将流程类型转换为中文名称，支持传入参数或使用当前组件的nodeType
+      const flowType = type || this.nodeType;
       const typeMap = {
         'operation': '运维环节',
         'purchase': '采购环节',
         'production': '生产环节',
         'marketing': '营销环节'
       };
-      return typeMap[this.nodeType] || '未知环节';
+      return typeMap[flowType] || '未知环节';
     },
     getRiskLevelClass(level) {
       // 根据风险等级返回对应的CSS类名
@@ -214,18 +287,6 @@ export default {
         '低': 'risk-low'
       };
       return classMap[level] || '';
-    },
-
-    viewDetailedResources() {
-      // 跳转到资源详情页面
-      this.$router.push({
-        path: '/home/resource',
-        query: {
-          type: this.nodeType,
-          id: this.nodeId,
-          title: this.nodeTitle
-        }
-      });
     },
     
     // 加载节点数据
@@ -315,6 +376,187 @@ export default {
         console.error('❌ 加载流程数据失败:', error);
         // 不在这里直接抛出错误，让上层方法处理
         throw error;
+      }
+    },
+
+    // 加载节点风险信息
+    async loadRiskInfo() {
+      if (!this.nodeId) {
+        console.warn('⚠️ 节点ID为空，跳过风险信息加载');
+        return;
+      }
+
+      this.riskLoading = true;
+      this.riskError = null;
+
+      try {
+        console.log('🔄 开始加载节点风险信息:', { nodeId: this.nodeId });
+        
+        const response = await topic01Api.getNodeRiskInfo(this.nodeId);
+        console.log('📥 节点风险信息API响应:', response);
+        
+        if (response.success && response.data) {
+          this.riskInfo = response.data;
+          console.log('✅ 节点风险信息加载成功:', {
+            nodeId: response.data.nodeId,
+            riskLevel: response.data.riskLevel,
+            processType: response.data.processType
+          });
+        } else {
+          const errorMsg = response.error || '获取风险信息失败';
+          console.warn('⚠️ 获取节点风险信息失败:', errorMsg);
+          this.riskError = errorMsg;
+          
+          // 显示警告信息但不阻止页面运行
+          this.$message({
+            type: 'warning',
+            message: `节点 ${this.nodeId} 风险信息加载失败: ${errorMsg}`,
+            duration: 3000
+          });
+        }
+      } catch (error) {
+        console.error('❌ 加载节点风险信息失败:', error);
+        this.riskError = error.message;
+        
+        this.$message({
+          type: 'warning',
+          message: `节点风险信息加载失败: ${error.message}`,
+          duration: 3000
+        });
+      } finally {
+        this.riskLoading = false;
+      }
+    },
+
+    // 获取风险等级的CSS类名（支持两种数据源）
+    getRiskLevelClass(level) {
+      // 如果有风险信息数据，优先使用其中的riskLevelClass
+      if (this.riskInfo && this.riskInfo.riskLevelClass) {
+        return this.riskInfo.riskLevelClass;
+      }
+      
+      // 根据风险等级返回对应的CSS类名（兼容原有逻辑）
+      const classMap = {
+        '高': 'risk-high',
+        '中': 'risk-medium', 
+        '低': 'risk-low'
+      };
+      return classMap[level] || 'risk-unknown';
+    },
+
+    // 格式化日期显示
+    formatDate(dateString) {
+      if (!dateString) return '未知';
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          return dateString; // 如果无法解析，返回原字符串
+        }
+        
+        // 格式化为 YYYY-MM-DD HH:mm:ss
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      } catch (error) {
+        console.warn('日期格式化失败:', error);
+        return dateString;
+      }
+    },
+
+    // 启动节点重构
+    async startRefactor() {
+      console.log('🔧 启动节点重构:', { nodeId: this.nodeId, nodeType: this.nodeType });
+      
+      // 先进行重构前确认
+      const confirmResult = await this.$confirm(
+        `确定要启动节点 ${this.nodeId} 的重构吗？\n\n重构将基于当前的风险评估和流程分析进行优化。`,
+        '确认重构操作',
+        {
+          confirmButtonText: '开始重构',
+          cancelButtonText: '取消',
+          type: 'warning',
+          dangerouslyUseHTMLString: false
+        }
+      ).catch(() => false);
+
+      if (!confirmResult) {
+        console.log('ℹ️ 用户取消重构操作');
+        return;
+      }
+
+      this.refactorLoading = true;
+
+      try {
+        // 显示开始重构的提示
+        this.$message({
+          type: 'info',
+          message: '正在启动重构流程，请稍候...',
+          duration: 2000
+        });
+
+        // 模拟重构API调用
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // 重构成功提示
+        this.$notify({
+          title: '重构启动成功',
+          message: `节点 ${this.nodeId} 的重构流程已成功启动，系统将在后台进行优化分析。`,
+          type: 'success',
+          duration: 5000
+        });
+
+        console.log('✅ 节点重构启动成功');
+
+        // 根据节点类型跳转到对应的重构页面
+        this.navigateToRefactorPage();
+
+      } catch (error) {
+        console.error('❌ 启动重构失败:', error);
+        this.$message({
+          type: 'error',
+          message: `重构启动失败: ${error.message}`,
+          duration: 5000
+        });
+      } finally {
+        this.refactorLoading = false;
+      }
+    },
+
+    // 根据节点类型导航到对应的重构页面
+    navigateToRefactorPage() {
+      const routeMap = {
+        'marketing': 'MarketingRefactor',
+        'purchase': 'PurchaseRefactor',
+        'production': 'ProductionRefactor',
+        'operation': 'OperationRefactor'
+      };
+
+      const routeName = routeMap[this.nodeType];
+      
+      if (routeName) {
+        console.log(`🔀 跳转到${this.nodeType}环节重构页面:`, routeName);
+        
+        this.$router.push({
+          name: routeName,
+          query: {
+            nodeId: this.nodeId,
+            nodeTitle: this.nodeTitle,
+            nodeType: this.nodeType
+          }
+        });
+      } else {
+        console.warn('⚠️ 未找到对应的重构页面，节点类型:', this.nodeType);
+        this.$message({
+          type: 'warning',
+          message: `暂不支持${this.nodeType}类型节点的重构页面`,
+          duration: 3000
+        });
       }
     }
   }
@@ -429,18 +671,6 @@ export default {
   justify-content: center;
 }
 
-
-
-.resource-section {
-  position: relative;
-}
-
-.view-more-resources {
-  margin-top: 15px;
-  display: flex;
-  justify-content: center;
-}
-
 /* 流程图切换动画 */
 .flow-fade-enter-active,
 .flow-fade-leave-active {
@@ -455,16 +685,6 @@ export default {
 .flow-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
-}
-
-.gantt-section {
-  margin-top: 20px;
-}
-
-.empty-gantt-section {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
 }
 
 /* 加载状态样式 */
@@ -574,6 +794,249 @@ export default {
   height: auto;
 }
 
+/* 风险信息样式 */
+.risk-info-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* 风险等级头部区域 */
+.risk-level-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.risk-level-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 风险圆形指示器 */
+.risk-circle {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.risk-circle::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: pulse 2s infinite;
+}
+
+.risk-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+  position: relative;
+}
+
+.risk-dot::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+}
+
+/* 高风险 - 红色 */
+.risk-level-indicator.risk-high .risk-circle {
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+}
+
+.risk-level-indicator.risk-high .risk-circle::before {
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+}
+
+.risk-level-indicator.risk-high .risk-level-title {
+  color: #ff4757;
+}
+
+/* 中风险 - 黄色 */
+.risk-level-indicator.risk-medium .risk-circle {
+  background: linear-gradient(135deg, #ffa502 0%, #ff9500 100%);
+}
+
+.risk-level-indicator.risk-medium .risk-circle::before {
+  background: linear-gradient(135deg, #ffa502 0%, #ff9500 100%);
+}
+
+.risk-level-indicator.risk-medium .risk-level-title {
+  color: #ffa502;
+}
+
+/* 低风险 - 绿色 */
+.risk-level-indicator.risk-low .risk-circle {
+  background: linear-gradient(135deg, #2ed573 0%, #1dd1a1 100%);
+}
+
+.risk-level-indicator.risk-low .risk-circle::before {
+  background: linear-gradient(135deg, #2ed573 0%, #1dd1a1 100%);
+}
+
+.risk-level-indicator.risk-low .risk-level-title {
+  color: #2ed573;
+}
+
+/* 未知风险 - 灰色 */
+.risk-level-indicator.risk-unknown .risk-circle {
+  background: linear-gradient(135deg, #747d8c 0%, #57606f 100%);
+}
+
+.risk-level-indicator.risk-unknown .risk-circle::before {
+  background: linear-gradient(135deg, #747d8c 0%, #57606f 100%);
+}
+
+.risk-level-indicator.risk-unknown .risk-level-title {
+  color: #747d8c;
+}
+
+/* 风险等级文字 */
+.risk-level-text {
+  flex: 1;
+}
+
+.risk-level-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.risk-level-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 风险详细信息区域 */
+.risk-details {
+  padding: 20px 24px;
+}
+
+.risk-details .info-item {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.risk-details .info-item:last-child {
+  margin-bottom: 0;
+}
+
+.risk-details .label {
+  font-weight: 600;
+  color: #374151;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.risk-details .label i {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.risk-details .value {
+  flex: 1;
+  color: #1f2937;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.risk-description {
+  background-color: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+  font-style: italic;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+/* 悬停效果 */
+.risk-level-indicator:hover .risk-circle {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.risk-loading, .risk-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.risk-loading {
+  color: #1890ff;
+  border-left: 4px solid #1890ff;
+}
+
+.risk-loading i {
+  font-size: 20px;
+  animation: spin 1s linear infinite;
+}
+
+.risk-error {
+  color: #ff4757;
+  background: linear-gradient(135deg, #fff2f0 0%, #ffffff 100%);
+  border-left: 4px solid #ff4757;
+}
+
+.risk-error i {
+  font-size: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .mermaid-container {
@@ -595,6 +1058,236 @@ export default {
   .flow-info .el-tag {
     margin: 2px;
     font-size: 11px;
+  }
+  
+  .risk-level-header {
+    padding: 16px 20px;
+  }
+  
+  .risk-circle {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .risk-dot {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .risk-level-title {
+    font-size: 18px;
+  }
+  
+  .risk-level-subtitle {
+    font-size: 13px;
+  }
+  
+  .risk-details {
+    padding: 16px 20px;
+  }
+  
+  .risk-details .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  
+  .risk-details .label {
+    min-width: auto;
+    font-size: 13px;
+  }
+  
+  .risk-details .value {
+    font-size: 13px;
+  }
+  
+  .risk-loading, .risk-error {
+    padding: 16px 20px;
+    gap: 10px;
+  }
+}
+
+/* ==================== 重构操作区域样式 ==================== */
+
+.refactor-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.refactor-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.refactor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: #6366f1;
+}
+
+.refactor-card /deep/ .el-card__body {
+  padding: 32px;
+}
+
+.refactor-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+/* 重构信息区域 */
+.refactor-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.refactor-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.refactor-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer 3s infinite;
+}
+
+.refactor-icon i {
+  font-size: 36px;
+  color: white;
+  z-index: 1;
+}
+
+.refactor-details {
+  flex: 1;
+}
+
+.refactor-details h4 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.refactor-details p {
+  font-size: 16px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.refactor-benefits {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.refactor-benefits .el-tag {
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+/* 重构操作按钮区域 */
+.refactor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refactor-actions .el-button {
+  min-width: 160px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.refactor-actions .el-button--primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  font-size: 16px;
+  padding: 14px 28px;
+}
+
+.refactor-actions .el-button--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.refactor-actions .el-button--primary:active {
+  transform: translateY(0);
+}
+
+/* 动画效果 */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .refactor-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+  
+  .refactor-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .refactor-icon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .refactor-icon i {
+    font-size: 28px;
+  }
+  
+  .refactor-details h4 {
+    font-size: 20px;
+  }
+  
+  .refactor-details p {
+    font-size: 14px;
+  }
+  
+  .refactor-actions .el-button {
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .refactor-card /deep/ .el-card__body {
+    padding: 24px;
   }
 }
 </style> 

@@ -7,6 +7,8 @@ export { subProcessDataApi } from '../api/subProcessDataApi';
 export { llmApi } from '../api/llmApi';
 export { mysqlApi } from '../api/mysqlApi';
 export { topic01Api } from '../api/topic01Api';
+export { topic02Api } from '../api/topic02Api';
+export { topic04Api } from '../api/topic04Api';
 
 // 服务层说明
 /**

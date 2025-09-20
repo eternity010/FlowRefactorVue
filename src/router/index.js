@@ -16,6 +16,12 @@ import LLMChatView from '@/views/LLMChatView'
 import TaskAssignmentView from '@/views/TaskAssignmentView'
 import ProductionRefactor from '@/views/ProductionRefactor'
 import MaintenancePlanView from '@/views/MaintenancePlanView'
+import MarketingRefactor from '@/views/MarketingRefactor'
+import PurchaseRefactor from '@/views/PurchaseRefactor'
+import ProductionRefactorSimple from '@/views/ProductionRefactorSimple'
+import OperationRefactor from '@/views/OperationRefactor'
+import OperationRefactor2 from '@/views/OperationRefactor2'
+import OperationRefactor3 from '@/views/OperationRefactor3'
 
 Vue.use(Router)
 
@@ -91,11 +97,6 @@ export default new Router({
           component: TaskAssignmentView
         },
         {
-          path: 'production-refactor',
-          name: 'ProductionRefactor',
-          component: ProductionRefactor
-        },
-        {
           path: 'maintenance-plan',
           name: 'MaintenancePlanView',
           component: MaintenancePlanView
@@ -111,6 +112,41 @@ export default new Router({
       path: '/resource-management',
       name: 'ResourceManagementPage',
       component: ResourceManagement
+    },
+    {
+      path: '/refactor-marketing',
+      name: 'MarketingRefactor',
+      component: MarketingRefactor
+    },
+    {
+      path: '/refactor-purchase',
+      name: 'PurchaseRefactor',
+      component: PurchaseRefactor
+    },
+    {
+      path: '/refactor-production',
+      name: 'ProductionRefactorSimple',
+      component: ProductionRefactorSimple
+    },
+    {
+      path: '/production-refactor',
+      name: 'ProductionRefactor',
+      component: ProductionRefactor
+    },
+    {
+      path: '/refactor-operation',
+      name: 'OperationRefactor',
+      component: OperationRefactor
+    },
+    {
+      path: '/refactor-operation2',
+      name: 'OperationRefactor2',
+      component: OperationRefactor2
+    },
+    {
+      path: '/refactor-operation3',
+      name: 'OperationRefactor3',
+      component: OperationRefactor3
     }
   ]
 })

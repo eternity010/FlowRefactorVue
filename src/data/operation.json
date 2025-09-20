@@ -1,0 +1,1923 @@
+{
+    "data": [
+        {
+            "date": "2025-06-01",
+            "records": [
+                {
+                    "carriage_no": "15车",
+                    "fault_description": "车载网络出现异常：代码F-7663。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000028",
+                            "assigned_person": "刘工",
+                            "assigned_team": "牵引系统班",
+                            "dependency_order_id": 900793,
+                            "plan_code": "MP-20250601-RM-2025-900793",
+                            "plan_end_time": "2025-06-01 01:35:00",
+                            "plan_start_time": "2025-06-01 01:35:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "2.19",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 2.19",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-01 01:35:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "刘工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 2.1887999999999996
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "刘工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 2.1887999999999996
+                    },
+                    "repair_code": "RM-2025-900793",
+                    "repair_order_id": 900793,
+                    "report_date": "2025-06-01",
+                    "station_location": "线路应急库",
+                    "system_module": "车载网络",
+                    "train_id": "CRH6A-2025"
+                },
+                {
+                    "carriage_no": "01车",
+                    "fault_description": "车门系统出现异常：代码F-2764。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "赵工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900070,
+                            "plan_code": "MP-20250601-RM-2025-900070",
+                            "plan_end_time": "2025-06-01 05:32:00",
+                            "plan_start_time": "2025-06-01 05:32:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.63",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.63",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-01 05:32:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "赵工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.6260000000000001
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "周工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.8427999999999998
+                    },
+                    "repair_code": "RM-2025-900070",
+                    "repair_order_id": 900070,
+                    "report_date": "2025-06-01",
+                    "station_location": "成都检修库",
+                    "system_module": "车门系统",
+                    "train_id": "CR400AF-2093"
+                },
+                {
+                    "carriage_no": "11车",
+                    "fault_description": "车门系统出现异常：代码F-7204。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000028",
+                            "assigned_person": "王工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900886,
+                            "plan_code": "MP-20250601-RM-2025-900886",
+                            "plan_end_time": "2025-06-01 07:06:00",
+                            "plan_start_time": "2025-06-01 07:06:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.38",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.38",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-01 07:06:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "王工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3823999999999999
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "李工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3823999999999999
+                    },
+                    "repair_code": "RM-2025-900886",
+                    "repair_order_id": 900886,
+                    "report_date": "2025-06-01",
+                    "station_location": "唐山检修库A",
+                    "system_module": "车门系统",
+                    "train_id": "CRH380A-2036"
+                },
+                {
+                    "carriage_no": "11车",
+                    "fault_description": "空调系统出现异常：代码F-2662。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000024",
+                            "assigned_person": "郝工",
+                            "assigned_team": "受电弓一班",
+                            "dependency_order_id": 900666,
+                            "plan_code": "MP-20250601-RM-2025-900666",
+                            "plan_end_time": "2025-06-01 08:20:00",
+                            "plan_start_time": "2025-06-01 08:20:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.38",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.38",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-01 08:20:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "郝工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3759999999999997
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "郝工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3759999999999997
+                    },
+                    "repair_code": "RM-2025-900666",
+                    "repair_order_id": 900666,
+                    "report_date": "2025-06-01",
+                    "station_location": "成都检修库",
+                    "system_module": "空调系统",
+                    "train_id": "CRH6A-2042"
+                }
+            ]
+        },
+        {
+            "date": "2025-06-02",
+            "records": [
+                {
+                    "carriage_no": "10车",
+                    "fault_description": "车载网络出现异常：代码F-5542。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000028",
+                            "assigned_person": "赵工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900350,
+                            "plan_code": "MP-20250602-RM-2025-900350",
+                            "plan_end_time": "2025-06-02 00:12:00",
+                            "plan_start_time": "2025-06-02 00:12:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.05",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.05",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 00:12:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "赵工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.0500000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "赵工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.0500000000000003
+                    },
+                    "repair_code": "RM-2025-900350",
+                    "repair_order_id": 900350,
+                    "report_date": "2025-06-02",
+                    "station_location": "唐山检修库A",
+                    "system_module": "车载网络",
+                    "train_id": "CRH6A-2096"
+                },
+                {
+                    "carriage_no": "05车",
+                    "fault_description": "信号通信出现异常：代码F-2912。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "郝工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900909,
+                            "plan_code": "MP-20250602-RM-2025-900909",
+                            "plan_end_time": "2025-06-02 01:12:00",
+                            "plan_start_time": "2025-06-02 01:12:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.57",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.57",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 01:12:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "郝工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.5748000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "钱工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.6764
+                    },
+                    "repair_code": "RM-2025-900909",
+                    "repair_order_id": 900909,
+                    "report_date": "2025-06-02",
+                    "station_location": "广州检修库B",
+                    "system_module": "信号通信",
+                    "train_id": "CRH6A-2090"
+                },
+                {
+                    "carriage_no": "04车",
+                    "fault_description": "转向架系统出现异常：代码F-8929。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000028",
+                            "assigned_person": "李工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900296,
+                            "plan_code": "MP-20250602-RM-2025-900296",
+                            "plan_end_time": "2025-06-02 01:36:00",
+                            "plan_start_time": "2025-06-02 01:36:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.53",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.53",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 01:36:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "李工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.5327999999999997
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "刘工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.6285999999999998
+                    },
+                    "repair_code": "RM-2025-900296",
+                    "repair_order_id": 900296,
+                    "report_date": "2025-06-02",
+                    "station_location": "唐山检修库A",
+                    "system_module": "转向架系统",
+                    "train_id": "CR400AF-2098"
+                },
+                {
+                    "carriage_no": "05车",
+                    "fault_description": "信号通信出现异常：代码F-3320。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "何工",
+                            "assigned_team": "牵引系统班",
+                            "dependency_order_id": 900818,
+                            "plan_code": "MP-20250602-RM-2025-900818",
+                            "plan_end_time": "2025-06-02 03:02:00",
+                            "plan_start_time": "2025-06-02 03:02:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.30",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.30",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 03:02:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "何工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.3034999999999999
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "李工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.64,
+                        "predicted_next_failure_time_hour": 153.6,
+                        "predicted_repair_time_hour": 1.422
+                    },
+                    "repair_code": "RM-2025-900818",
+                    "repair_order_id": 900818,
+                    "report_date": "2025-06-02",
+                    "station_location": "广州检修库B",
+                    "system_module": "信号通信",
+                    "train_id": "CR200J-2066"
+                },
+                {
+                    "carriage_no": "07车",
+                    "fault_description": "制动系统出现异常：代码F-9215。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000021",
+                            "assigned_person": "周工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900766,
+                            "plan_code": "MP-20250602-RM-2025-900766",
+                            "plan_end_time": "2025-06-02 03:41:00",
+                            "plan_start_time": "2025-06-02 03:41:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.34",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.34",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 03:41:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "周工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3408
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "郝工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.3408
+                    },
+                    "repair_code": "RM-2025-900766",
+                    "repair_order_id": 900766,
+                    "report_date": "2025-06-02",
+                    "station_location": "上海检修库",
+                    "system_module": "制动系统",
+                    "train_id": "CR400AF-2073"
+                },
+                {
+                    "carriage_no": "01车",
+                    "fault_description": "受电弓系统出现异常：代码F-7126。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "钱工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900391,
+                            "plan_code": "MP-20250602-RM-2025-900391",
+                            "plan_end_time": "2025-06-02 04:30:00",
+                            "plan_start_time": "2025-06-02 04:30:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.31",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.31",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 04:30:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "钱工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.3134
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "李工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.3532
+                    },
+                    "repair_code": "RM-2025-900391",
+                    "repair_order_id": 900391,
+                    "report_date": "2025-06-02",
+                    "station_location": "唐山检修库A",
+                    "system_module": "受电弓系统",
+                    "train_id": "CR400BF-2010"
+                },
+                {
+                    "carriage_no": "01车",
+                    "fault_description": "转向架系统出现异常：代码F-2370。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "王工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900714,
+                            "plan_code": "MP-20250602-RM-2025-900714",
+                            "plan_end_time": "2025-06-02 04:31:00",
+                            "plan_start_time": "2025-06-02 04:31:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.53",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.53",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 04:31:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "王工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.5330000000000004
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "董工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.7885
+                    },
+                    "repair_code": "RM-2025-900714",
+                    "repair_order_id": 900714,
+                    "report_date": "2025-06-02",
+                    "station_location": "成都检修库",
+                    "system_module": "转向架系统",
+                    "train_id": "CRH380A-2013"
+                },
+                {
+                    "carriage_no": "13车",
+                    "fault_description": "车门系统出现异常：代码F-6518。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000024",
+                            "assigned_person": "刘工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900117,
+                            "plan_code": "MP-20250602-RM-2025-900117",
+                            "plan_end_time": "2025-06-02 04:57:00",
+                            "plan_start_time": "2025-06-02 04:57:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.62",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.62",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 04:57:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "刘工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.6170000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "周工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.8864999999999998
+                    },
+                    "repair_code": "RM-2025-900117",
+                    "repair_order_id": 900117,
+                    "report_date": "2025-06-02",
+                    "station_location": "广州检修库B",
+                    "system_module": "车门系统",
+                    "train_id": "CRH6A-2071"
+                },
+                {
+                    "carriage_no": "02车",
+                    "fault_description": "制动管路出现异常：代码F-2528。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "董工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900901,
+                            "plan_code": "MP-20250602-RM-2025-900901",
+                            "plan_end_time": "2025-06-02 05:17:00",
+                            "plan_start_time": "2025-06-02 05:17:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.10",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.10",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-02 05:17:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "董工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.0950000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "何工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.2045
+                    },
+                    "repair_code": "RM-2025-900901",
+                    "repair_order_id": 900901,
+                    "report_date": "2025-06-02",
+                    "station_location": "唐山检修库B",
+                    "system_module": "制动管路",
+                    "train_id": "CRH380A-2061"
+                }
+            ]
+        },
+        {
+            "date": "2025-06-03",
+            "records": [
+                {
+                    "carriage_no": "04车",
+                    "fault_description": "受电弓系统出现异常：代码F-7959。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "刘工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900673,
+                            "plan_code": "MP-20250603-RM-2025-900673",
+                            "plan_end_time": "2025-06-03 00:42:00",
+                            "plan_start_time": "2025-06-03 00:42:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.89",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.89",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 00:42:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "刘工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 0.8940000000000001
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "周工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.043
+                    },
+                    "repair_code": "RM-2025-900673",
+                    "repair_order_id": 900673,
+                    "report_date": "2025-06-03",
+                    "station_location": "唐山检修库B",
+                    "system_module": "受电弓系统",
+                    "train_id": "CRH6A-2047"
+                },
+                {
+                    "carriage_no": "06车",
+                    "fault_description": "制动管路出现异常：代码F-1607。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000026",
+                            "assigned_person": "何工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900042,
+                            "plan_code": "MP-20250603-RM-2025-900042",
+                            "plan_end_time": "2025-06-03 02:30:00",
+                            "plan_start_time": "2025-06-03 02:30:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.93",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.93",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 02:30:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "何工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 0.9339
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "董工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 0.9621999999999999
+                    },
+                    "repair_code": "RM-2025-900042",
+                    "repair_order_id": 900042,
+                    "report_date": "2025-06-03",
+                    "station_location": "上海检修库",
+                    "system_module": "制动管路",
+                    "train_id": "CRH380A-2001"
+                },
+                {
+                    "carriage_no": "16车",
+                    "fault_description": "制动系统出现异常：代码F-3101。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000023",
+                            "assigned_person": "郝工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900712,
+                            "plan_code": "MP-20250603-RM-2025-900712",
+                            "plan_end_time": "2025-06-03 02:52:00",
+                            "plan_start_time": "2025-06-03 02:52:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.13",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.13",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 02:52:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000023",
+                        "assigned_person": "郝工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.1346000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000023",
+                        "assigned_person": "赵工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.2444
+                    },
+                    "repair_code": "RM-2025-900712",
+                    "repair_order_id": 900712,
+                    "report_date": "2025-06-03",
+                    "station_location": "沈阳检修库",
+                    "system_module": "制动系统",
+                    "train_id": "CR400AF-2048"
+                },
+                {
+                    "carriage_no": "04车",
+                    "fault_description": "牵引系统出现异常：代码F-4752。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000024",
+                            "assigned_person": "周工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900624,
+                            "plan_code": "MP-20250603-RM-2025-900624",
+                            "plan_end_time": "2025-06-03 03:08:00",
+                            "plan_start_time": "2025-06-03 03:08:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.12",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.12",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 03:08:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "周工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.1185999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "刘工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.1185999999999998
+                    },
+                    "repair_code": "RM-2025-900624",
+                    "repair_order_id": 900624,
+                    "report_date": "2025-06-03",
+                    "station_location": "唐山检修库A",
+                    "system_module": "牵引系统",
+                    "train_id": "CR400BF-2079"
+                },
+                {
+                    "carriage_no": "05车",
+                    "fault_description": "制动管路出现异常：代码F-2888。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000029",
+                            "assigned_person": "赵工",
+                            "assigned_team": "牵引系统班",
+                            "dependency_order_id": 900002,
+                            "plan_code": "MP-20250603-RM-2025-900002",
+                            "plan_end_time": "2025-06-03 05:02:00",
+                            "plan_start_time": "2025-06-03 05:02:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.93",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.93",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 05:02:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "赵工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 0.9339
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "李工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 0.9904999999999999
+                    },
+                    "repair_code": "RM-2025-900002",
+                    "repair_order_id": 900002,
+                    "report_date": "2025-06-03",
+                    "station_location": "唐山检修库A",
+                    "system_module": "制动管路",
+                    "train_id": "CRH380A-2014"
+                },
+                {
+                    "carriage_no": "14车",
+                    "fault_description": "制动管路出现异常：代码F-2183。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "李工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900758,
+                            "plan_code": "MP-20250603-RM-2025-900758",
+                            "plan_end_time": "2025-06-03 05:16:00",
+                            "plan_start_time": "2025-06-03 05:16:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.98",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.98",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 05:16:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "李工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 0.9810000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "周工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.1444999999999999
+                    },
+                    "repair_code": "RM-2025-900758",
+                    "repair_order_id": 900758,
+                    "report_date": "2025-06-03",
+                    "station_location": "广州检修库B",
+                    "system_module": "制动管路",
+                    "train_id": "CR400BF-2005"
+                },
+                {
+                    "carriage_no": "12车",
+                    "fault_description": "车载网络出现异常：代码F-7230。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "王工",
+                            "assigned_team": "转向架二班",
+                            "dependency_order_id": 900969,
+                            "plan_code": "MP-20250603-RM-2025-900969",
+                            "plan_end_time": "2025-06-03 05:50:00",
+                            "plan_start_time": "2025-06-03 05:50:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.76",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.76",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 05:50:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "王工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.7610000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "赵工",
+                        "assigned_team": "转向架二班",
+                        "match_score": 0.64,
+                        "predicted_next_failure_time_hour": 153.6,
+                        "predicted_repair_time_hour": 2.1132
+                    },
+                    "repair_code": "RM-2025-900969",
+                    "repair_order_id": 900969,
+                    "report_date": "2025-06-03",
+                    "station_location": "广州检修库B",
+                    "system_module": "车载网络",
+                    "train_id": "CR400AF-2045"
+                },
+                {
+                    "carriage_no": "11车",
+                    "fault_description": "制动系统出现异常：代码F-8093。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000028",
+                            "assigned_person": "钱工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900668,
+                            "plan_code": "MP-20250603-RM-2025-900668",
+                            "plan_end_time": "2025-06-03 08:57:00",
+                            "plan_start_time": "2025-06-03 08:57:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.49",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.49",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 08:57:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "钱工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.4925999999999997
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000028",
+                        "assigned_person": "李工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.4047999999999996
+                    },
+                    "repair_code": "RM-2025-900668",
+                    "repair_order_id": 900668,
+                    "report_date": "2025-06-03",
+                    "station_location": "线路应急库",
+                    "system_module": "制动系统",
+                    "train_id": "CR200J-2086"
+                },
+                {
+                    "carriage_no": "12车",
+                    "fault_description": "信号通信出现异常：代码F-9046。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000022",
+                            "assigned_person": "董工",
+                            "assigned_team": "牵引系统班",
+                            "dependency_order_id": 900846,
+                            "plan_code": "MP-20250603-RM-2025-900846",
+                            "plan_end_time": "2025-06-03 09:16:00",
+                            "plan_start_time": "2025-06-03 09:16:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.70",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.70",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-03 09:16:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "董工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.7010000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000022",
+                        "assigned_person": "周工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.8143999999999998
+                    },
+                    "repair_code": "RM-2025-900846",
+                    "repair_order_id": 900846,
+                    "report_date": "2025-06-03",
+                    "station_location": "唐山检修库B",
+                    "system_module": "信号通信",
+                    "train_id": "CR200J-2004"
+                }
+            ]
+        },
+        {
+            "date": "2025-06-04",
+            "records": [
+                {
+                    "carriage_no": "16车",
+                    "fault_description": "制动管路出现异常：代码F-1269。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000025",
+                            "assigned_person": "郝工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900534,
+                            "plan_code": "MP-20250604-RM-2025-900534",
+                            "plan_end_time": "2025-06-04 02:38:00",
+                            "plan_start_time": "2025-06-04 02:38:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.40",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.40",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 02:38:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000025",
+                        "assigned_person": "郝工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.4012
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000025",
+                        "assigned_person": "钱工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.4915999999999996
+                    },
+                    "repair_code": "RM-2025-900534",
+                    "repair_order_id": 900534,
+                    "report_date": "2025-06-04",
+                    "station_location": "线路应急库",
+                    "system_module": "制动管路",
+                    "train_id": "CR200J-2063"
+                },
+                {
+                    "carriage_no": "14车",
+                    "fault_description": "牵引系统出现异常：代码F-6337。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000026",
+                            "assigned_person": "周工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900570,
+                            "plan_code": "MP-20250604-RM-2025-900570",
+                            "plan_end_time": "2025-06-04 02:40:00",
+                            "plan_start_time": "2025-06-04 02:40:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.27",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.27",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 02:40:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "周工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.2735999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "钱工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.3134
+                    },
+                    "repair_code": "RM-2025-900570",
+                    "repair_order_id": 900570,
+                    "report_date": "2025-06-04",
+                    "station_location": "沈阳检修库",
+                    "system_module": "牵引系统",
+                    "train_id": "CR400BF-2010"
+                },
+                {
+                    "carriage_no": "12车",
+                    "fault_description": "转向架系统出现异常：代码F-1817。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000029",
+                            "assigned_person": "董工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900697,
+                            "plan_code": "MP-20250604-RM-2025-900697",
+                            "plan_end_time": "2025-06-04 04:35:00",
+                            "plan_start_time": "2025-06-04 04:35:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.45",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.45",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 04:35:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "董工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.4520000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "周工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.5487999999999997
+                    },
+                    "repair_code": "RM-2025-900697",
+                    "repair_order_id": 900697,
+                    "report_date": "2025-06-04",
+                    "station_location": "广州检修库B",
+                    "system_module": "转向架系统",
+                    "train_id": "CRH380A-2023"
+                },
+                {
+                    "carriage_no": "14车",
+                    "fault_description": "牵引系统出现异常：代码F-4459。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000026",
+                            "assigned_person": "王工",
+                            "assigned_team": "牵引系统班",
+                            "dependency_order_id": 900050,
+                            "plan_code": "MP-20250604-RM-2025-900050",
+                            "plan_end_time": "2025-06-04 05:28:00",
+                            "plan_start_time": "2025-06-04 05:28:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.83",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.83",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 05:28:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "王工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 0.8280000000000001
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "李工",
+                        "assigned_team": "牵引系统班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 0.8831999999999998
+                    },
+                    "repair_code": "RM-2025-900050",
+                    "repair_order_id": 900050,
+                    "report_date": "2025-06-04",
+                    "station_location": "线路应急库",
+                    "system_module": "牵引系统",
+                    "train_id": "CR200J-2015"
+                },
+                {
+                    "carriage_no": "02车",
+                    "fault_description": "制动系统出现异常：代码F-2351。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000024",
+                            "assigned_person": "钱工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900267,
+                            "plan_code": "MP-20250604-RM-2025-900267",
+                            "plan_end_time": "2025-06-04 08:08:00",
+                            "plan_start_time": "2025-06-04 08:08:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.98",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.98",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 08:08:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "钱工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 0.9823999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000024",
+                        "assigned_person": "赵工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.0744999999999998
+                    },
+                    "repair_code": "RM-2025-900267",
+                    "repair_order_id": 900267,
+                    "report_date": "2025-06-04",
+                    "station_location": "上海检修库",
+                    "system_module": "制动系统",
+                    "train_id": "CR400BF-2041"
+                },
+                {
+                    "carriage_no": "15车",
+                    "fault_description": "受电弓系统出现异常：代码F-4672。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000029",
+                            "assigned_person": "刘工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900337,
+                            "plan_code": "MP-20250604-RM-2025-900337",
+                            "plan_end_time": "2025-06-04 09:04:00",
+                            "plan_start_time": "2025-06-04 09:04:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.29",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.29",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 09:04:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "刘工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.2930000000000001
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "周工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.5084999999999997
+                    },
+                    "repair_code": "RM-2025-900337",
+                    "repair_order_id": 900337,
+                    "report_date": "2025-06-04",
+                    "station_location": "成都检修库",
+                    "system_module": "受电弓系统",
+                    "train_id": "CR200J-2089"
+                },
+                {
+                    "carriage_no": "16车",
+                    "fault_description": "车门系统出现异常：代码F-1617。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000021",
+                            "assigned_person": "李工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900722,
+                            "plan_code": "MP-20250604-RM-2025-900722",
+                            "plan_end_time": "2025-06-04 09:34:00",
+                            "plan_start_time": "2025-06-04 09:34:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.19",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.19",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 09:34:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "李工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.1850000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "李工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.1850000000000003
+                    },
+                    "repair_code": "RM-2025-900722",
+                    "repair_order_id": 900722,
+                    "report_date": "2025-06-04",
+                    "station_location": "沈阳检修库",
+                    "system_module": "车门系统",
+                    "train_id": "CR400BF-2003"
+                },
+                {
+                    "carriage_no": "09车",
+                    "fault_description": "车门系统出现异常：代码F-8740。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000026",
+                            "assigned_person": "赵工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900559,
+                            "plan_code": "MP-20250604-RM-2025-900559",
+                            "plan_end_time": "2025-06-04 09:38:00",
+                            "plan_start_time": "2025-06-04 09:38:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.06",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.06",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 09:38:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "赵工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.0590000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000026",
+                        "assigned_person": "何工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.2002
+                    },
+                    "repair_code": "RM-2025-900559",
+                    "repair_order_id": 900559,
+                    "report_date": "2025-06-04",
+                    "station_location": "广州检修库B",
+                    "system_module": "车门系统",
+                    "train_id": "CRH6A-2044"
+                },
+                {
+                    "carriage_no": "05车",
+                    "fault_description": "转向架系统出现异常：代码F-6930。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000021",
+                            "assigned_person": "何工",
+                            "assigned_team": "受电弓一班",
+                            "dependency_order_id": 900803,
+                            "plan_code": "MP-20250604-RM-2025-900803",
+                            "plan_end_time": "2025-06-04 10:26:00",
+                            "plan_start_time": "2025-06-04 10:26:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.05",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.05",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-04 10:26:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "何工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.0460999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "王工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.0777999999999999
+                    },
+                    "repair_code": "RM-2025-900803",
+                    "repair_order_id": 900803,
+                    "report_date": "2025-06-04",
+                    "station_location": "线路应急库",
+                    "system_module": "转向架系统",
+                    "train_id": "CRH380A-2040"
+                }
+            ]
+        },
+        {
+            "date": "2025-06-05",
+            "records": [
+                {
+                    "carriage_no": "14车",
+                    "fault_description": "制动管路出现异常：代码F-8000。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "刘工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900140,
+                            "plan_code": "MP-20250605-RM-2025-900140",
+                            "plan_end_time": "2025-06-05 01:43:00",
+                            "plan_start_time": "2025-06-05 01:43:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.19",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.19",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 01:43:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "刘工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.1850000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "王工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.343
+                    },
+                    "repair_code": "RM-2025-900140",
+                    "repair_order_id": 900140,
+                    "report_date": "2025-06-05",
+                    "station_location": "唐山检修库A",
+                    "system_module": "制动管路",
+                    "train_id": "CR400BF-2003"
+                },
+                {
+                    "carriage_no": "11车",
+                    "fault_description": "信号通信出现异常：代码F-5953。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000021",
+                            "assigned_person": "钱工",
+                            "assigned_team": "空调保养班",
+                            "dependency_order_id": 900264,
+                            "plan_code": "MP-20250605-RM-2025-900264",
+                            "plan_end_time": "2025-06-05 04:06:00",
+                            "plan_start_time": "2025-06-05 04:06:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.86",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.86",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 04:06:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "钱工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.8569000000000004
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "钱工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.8569000000000004
+                    },
+                    "repair_code": "RM-2025-900264",
+                    "repair_order_id": 900264,
+                    "report_date": "2025-06-05",
+                    "station_location": "线路应急库",
+                    "system_module": "信号通信",
+                    "train_id": "CR400BF-2032"
+                },
+                {
+                    "carriage_no": "09车",
+                    "fault_description": "牵引系统出现异常：代码F-3276。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000029",
+                            "assigned_person": "王工",
+                            "assigned_team": "受电弓一班",
+                            "dependency_order_id": 900819,
+                            "plan_code": "MP-20250605-RM-2025-900819",
+                            "plan_end_time": "2025-06-05 06:08:00",
+                            "plan_start_time": "2025-06-05 06:08:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.60",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.60",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 06:08:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "王工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.5990000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000029",
+                        "assigned_person": "郝工",
+                        "assigned_team": "受电弓一班",
+                        "match_score": 0.65,
+                        "predicted_next_failure_time_hour": 156.0,
+                        "predicted_repair_time_hour": 1.8655
+                    },
+                    "repair_code": "RM-2025-900819",
+                    "repair_order_id": 900819,
+                    "report_date": "2025-06-05",
+                    "station_location": "唐山检修库B",
+                    "system_module": "牵引系统",
+                    "train_id": "CR400AF-2022"
+                },
+                {
+                    "carriage_no": "12车",
+                    "fault_description": "制动管路出现异常：代码F-4507。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "何工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900962,
+                            "plan_code": "MP-20250605-RM-2025-900962",
+                            "plan_end_time": "2025-06-05 07:47:00",
+                            "plan_start_time": "2025-06-05 07:47:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.85",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.85",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 07:47:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "何工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 0.8513999999999999
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "钱工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 0.8513999999999999
+                    },
+                    "repair_code": "RM-2025-900962",
+                    "repair_order_id": 900962,
+                    "report_date": "2025-06-05",
+                    "station_location": "线路应急库",
+                    "system_module": "制动管路",
+                    "train_id": "CRH380A-2058"
+                },
+                {
+                    "carriage_no": "11车",
+                    "fault_description": "牵引系统出现异常：代码F-9763。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000023",
+                            "assigned_person": "周工",
+                            "assigned_team": "空调保养班",
+                            "dependency_order_id": 900019,
+                            "plan_code": "MP-20250605-RM-2025-900019",
+                            "plan_end_time": "2025-06-05 07:53:00",
+                            "plan_start_time": "2025-06-05 07:53:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.81",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.81",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 07:53:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000023",
+                        "assigned_person": "周工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.8143999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000023",
+                        "assigned_person": "钱工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.7577000000000003
+                    },
+                    "repair_code": "RM-2025-900019",
+                    "repair_order_id": 900019,
+                    "report_date": "2025-06-05",
+                    "station_location": "线路应急库",
+                    "system_module": "牵引系统",
+                    "train_id": "CR200J-2004"
+                },
+                {
+                    "carriage_no": "16车",
+                    "fault_description": "牵引系统出现异常：代码F-3787。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "赵工",
+                            "assigned_team": "空调保养班",
+                            "dependency_order_id": 900025,
+                            "plan_code": "MP-20250605-RM-2025-900025",
+                            "plan_end_time": "2025-06-05 08:11:00",
+                            "plan_start_time": "2025-06-05 08:11:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.26",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.26",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 08:11:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "赵工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.2639999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "何工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 1.3034999999999999
+                    },
+                    "repair_code": "RM-2025-900025",
+                    "repair_order_id": 900025,
+                    "report_date": "2025-06-05",
+                    "station_location": "成都检修库",
+                    "system_module": "牵引系统",
+                    "train_id": "CR200J-2066"
+                },
+                {
+                    "carriage_no": "12车",
+                    "fault_description": "受电弓系统出现异常：代码F-8681。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "董工",
+                            "assigned_team": "制动一班",
+                            "dependency_order_id": 900609,
+                            "plan_code": "MP-20250605-RM-2025-900609",
+                            "plan_end_time": "2025-06-05 08:28:00",
+                            "plan_start_time": "2025-06-05 08:28:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.90",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.90",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 08:28:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "董工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 1.8990000000000002
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "刘工",
+                        "assigned_team": "制动一班",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 2.0256
+                    },
+                    "repair_code": "RM-2025-900609",
+                    "repair_order_id": 900609,
+                    "report_date": "2025-06-05",
+                    "station_location": "唐山检修库A",
+                    "system_module": "受电弓系统",
+                    "train_id": "CRH6A-2082"
+                },
+                {
+                    "carriage_no": "08车",
+                    "fault_description": "空调系统出现异常：代码F-7767。",
+                    "maintenance_type": "临修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000021",
+                            "assigned_person": "周工",
+                            "assigned_team": "信号维护组",
+                            "dependency_order_id": 900479,
+                            "plan_code": "MP-20250605-RM-2025-900479",
+                            "plan_end_time": "2025-06-05 08:50:00",
+                            "plan_start_time": "2025-06-05 08:50:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.81",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.81",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 08:50:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "周工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.8143999999999998
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000021",
+                        "assigned_person": "刘工",
+                        "assigned_team": "信号维护组",
+                        "match_score": 0.68,
+                        "predicted_next_failure_time_hour": 163.20000000000002,
+                        "predicted_repair_time_hour": 1.8143999999999998
+                    },
+                    "repair_code": "RM-2025-900479",
+                    "repair_order_id": 900479,
+                    "report_date": "2025-06-05",
+                    "station_location": "上海检修库",
+                    "system_module": "空调系统",
+                    "train_id": "CR200J-2004"
+                },
+                {
+                    "carriage_no": "09车",
+                    "fault_description": "牵引系统出现异常：代码F-7775。",
+                    "maintenance_type": "加改修",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000027",
+                            "assigned_person": "李工",
+                            "assigned_team": "车门检修班",
+                            "dependency_order_id": 900814,
+                            "plan_code": "MP-20250605-RM-2025-900814",
+                            "plan_end_time": "2025-06-05 09:27:00",
+                            "plan_start_time": "2025-06-05 09:27:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "0.89",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 0.89",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 09:27:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "李工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.7,
+                        "predicted_next_failure_time_hour": 168.0,
+                        "predicted_repair_time_hour": 0.8940000000000001
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000027",
+                        "assigned_person": "何工",
+                        "assigned_team": "车门检修班",
+                        "match_score": 0.67,
+                        "predicted_next_failure_time_hour": 160.8,
+                        "predicted_repair_time_hour": 0.9833999999999998
+                    },
+                    "repair_code": "RM-2025-900814",
+                    "repair_order_id": 900814,
+                    "report_date": "2025-06-05",
+                    "station_location": "唐山检修库B",
+                    "system_module": "牵引系统",
+                    "train_id": "CRH6A-2047"
+                },
+                {
+                    "carriage_no": "04车",
+                    "fault_description": "车载网络出现异常：代码F-3369。",
+                    "maintenance_type": "定检",
+                    "matching_plans": [
+                        {
+                            "assigned_contact": "13800000025",
+                            "assigned_person": "郝工",
+                            "assigned_team": "空调保养班",
+                            "dependency_order_id": 900866,
+                            "plan_code": "MP-20250605-RM-2025-900866",
+                            "plan_end_time": "2025-06-05 10:44:00",
+                            "plan_start_time": "2025-06-05 10:44:00",
+                            "plan_status": "待执行",
+                            "predicted_downtime_hours": "1.13",
+                            "priority": "中",
+                            "remark": "基于匈牙利算法优化分配，成本: 1.13",
+                            "required_parts": "",
+                            "required_skill": "",
+                            "risk_level": "中",
+                            "sla_deadline": "2025-06-05 10:44:00"
+                        }
+                    ],
+                    "new_repair_info": {
+                        "assigned_contact": "13800000025",
+                        "assigned_person": "郝工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.69,
+                        "predicted_next_failure_time_hour": 165.6,
+                        "predicted_repair_time_hour": 1.1346000000000003
+                    },
+                    "old_repair_info": {
+                        "assigned_contact": "13800000025",
+                        "assigned_person": "赵工",
+                        "assigned_team": "空调保养班",
+                        "match_score": 0.66,
+                        "predicted_next_failure_time_hour": 158.4,
+                        "predicted_repair_time_hour": 1.2444
+                    },
+                    "repair_code": "RM-2025-900866",
+                    "repair_order_id": 900866,
+                    "report_date": "2025-06-05",
+                    "station_location": "唐山检修库B",
+                    "system_module": "车载网络",
+                    "train_id": "CR400AF-2048"
+                }
+            ]
+        }
+    ],
+    "message": "成功查询到 5 天的数据",
+    "success": true,
+    "summary": {
+        "date_range": "2025-06-01 到 2025-06-05",
+        "total_days": 5,
+        "total_input_records": 52,
+        "total_output_plans": 41
+    }
+}

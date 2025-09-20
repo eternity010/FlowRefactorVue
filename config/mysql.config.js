@@ -10,9 +10,7 @@ const development = {
   password: process.env.MYSQL_PASSWORD || '666666',
   database: process.env.MYSQL_DATABASE || 'sys',
   connectionLimit: 10,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
+  queueLimit: 0,
   charset: 'utf8mb4',
   timezone: '+08:00'
 };
@@ -25,9 +23,7 @@ const production = {
   password: process.env.MYSQL_PASSWORD || '666666',
   database: process.env.MYSQL_DATABASE || 'sys',
   connectionLimit: 20,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
+  queueLimit: 0,
   charset: 'utf8mb4',
   timezone: '+08:00'
 };

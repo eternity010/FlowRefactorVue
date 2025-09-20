@@ -53,101 +53,6 @@
       "id": "PD10",
       "type": "rect",
       "text": "电气、电子件加工"
-    },
-    {
-      "id": "PD11",
-      "type": "rect",
-      "text": "非金属件加工"
-    },
-    {
-      "id": "PD12",
-      "type": "rect",
-      "text": "车体焊接"
-    },
-    {
-      "id": "PD13",
-      "type": "rect",
-      "text": "转向架焊接"
-    },
-    {
-      "id": "PD14",
-      "type": "rect",
-      "text": "辅助结构焊接"
-    },
-    {
-      "id": "PD15",
-      "type": "rect",
-      "text": "车体涂装处理"
-    },
-    {
-      "id": "PD16",
-      "type": "rect",
-      "text": "零部件涂装处理"
-    },
-    {
-      "id": "PD17",
-      "type": "rect",
-      "text": "车体总成"
-    },
-    {
-      "id": "PD18",
-      "type": "rect",
-      "text": "转向架总成"
-    },
-    {
-      "id": "PD19",
-      "type": "rect",
-      "text": "牵引系统总成"
-    },
-    {
-      "id": "PD20",
-      "type": "rect",
-      "text": "辅助系统总成"
-    },
-    {
-      "id": "PD21",
-      "type": "rect",
-      "text": "车体模块连接"
-    },
-    {
-      "id": "PD22",
-      "type": "rect",
-      "text": "电气系统布线"
-    },
-    {
-      "id": "PD23",
-      "type": "rect",
-      "text": "最终装配"
-    },
-    {
-      "id": "PD24",
-      "type": "rect",
-      "text": "功能测试"
-    },
-    {
-      "id": "PD25",
-      "type": "rect",
-      "text": "整机可靠性试验"
-    },
-    {
-      "id": "PD26",
-      "type": "rect",
-      "text": "生产完工"
-    },
-    {
-      "id": "PD27",
-      "type": "rect",
-      "text": "订单报工"
-    },
-    {
-      "id": "PD28",
-      "type": "rect",
-      "text": "生产交付"
-    },
-    {
-      "id": "PD29",
-      "type": "rect",
-      "text": "产品质量档案"
     }
   ],
   "edges": [
@@ -157,286 +62,6 @@
       "sourceNodeId": "PD1",
       "targetNodeId": "PD2",
       "text": "BOM信息"
-    },
-    {
-      "id": "pde2",
-      "type": "polyline",
-      "sourceNodeId": "PD2",
-      "targetNodeId": "PD3",
-      "text": "更新系统信息"
-    },
-    {
-      "id": "pde3",
-      "type": "polyline",
-      "sourceNodeId": "PD3",
-      "targetNodeId": "PD4",
-      "text": "阶段计划"
-    },
-    {
-      "id": "pde4",
-      "type": "polyline",
-      "sourceNodeId": "PD4",
-      "targetNodeId": "PD5",
-      "text": "工位计划"
-    },
-    {
-      "id": "pde5",
-      "type": "polyline",
-      "sourceNodeId": "PD5",
-      "targetNodeId": "PD6",
-      "text": "生产订单"
-    },
-    {
-      "id": "pde6",
-      "type": "polyline",
-      "sourceNodeId": "PD6",
-      "targetNodeId": "PD7",
-      "text": "生产物料"
-    },
-    {
-      "id": "pde7",
-      "type": "polyline",
-      "sourceNodeId": "PD7",
-      "targetNodeId": "PD8",
-      "text": "点检报告"
-    },
-    {
-      "id": "pde8",
-      "type": "polyline",
-      "sourceNodeId": "PD8",
-      "targetNodeId": "PD9",
-      "text": "原材料/零部件"
-    },
-    {
-      "id": "pde9",
-      "type": "polyline",
-      "sourceNodeId": "PD8",
-      "targetNodeId": "PD10",
-      "text": "原材料/零部件"
-    },
-    {
-      "id": "pde10",
-      "type": "polyline",
-      "sourceNodeId": "PD8",
-      "targetNodeId": "PD11",
-      "text": "原材料/零部件"
-    },
-    {
-      "id": "pde11",
-      "type": "polyline",
-      "sourceNodeId": "PD9",
-      "targetNodeId": "PD12",
-      "text": "加工件"
-    },
-    {
-      "id": "pde12",
-      "type": "polyline",
-      "sourceNodeId": "PD10",
-      "targetNodeId": "PD13",
-      "text": "加工件"
-    },
-    {
-      "id": "pde13",
-      "type": "polyline",
-      "sourceNodeId": "PD11",
-      "targetNodeId": "PD14",
-      "text": "加工件"
-    },
-    {
-      "id": "pde14",
-      "type": "polyline",
-      "sourceNodeId": "PD12",
-      "targetNodeId": "PD15",
-      "text": "过程件"
-    },
-    {
-      "id": "pde15",
-      "type": "polyline",
-      "sourceNodeId": "PD13",
-      "targetNodeId": "PD15",
-      "text": "过程件"
-    },
-    {
-      "id": "pde16",
-      "type": "polyline",
-      "sourceNodeId": "PD13",
-      "targetNodeId": "PD16",
-      "text": "过程件"
-    },
-    {
-      "id": "pde17",
-      "type": "polyline",
-      "sourceNodeId": "PD14",
-      "targetNodeId": "PD16",
-      "text": "过程件"
-    },
-    {
-      "id": "pde18",
-      "type": "polyline",
-      "sourceNodeId": "PD15",
-      "targetNodeId": "PD17",
-      "text": "过程件"
-    },
-    {
-      "id": "pde19",
-      "type": "polyline",
-      "sourceNodeId": "PD15",
-      "targetNodeId": "PD18",
-      "text": ""
-    },
-    {
-      "id": "pde20",
-      "type": "polyline",
-      "sourceNodeId": "PD15",
-      "targetNodeId": "PD19",
-      "text": ""
-    },
-    {
-      "id": "pde21",
-      "type": "polyline",
-      "sourceNodeId": "PD15",
-      "targetNodeId": "PD20",
-      "text": ""
-    },
-    {
-      "id": "pde22",
-      "type": "polyline",
-      "sourceNodeId": "PD16",
-      "targetNodeId": "PD17",
-      "text": ""
-    },
-    {
-      "id": "pde23",
-      "type": "polyline",
-      "sourceNodeId": "PD16",
-      "targetNodeId": "PD18",
-      "text": ""
-    },
-    {
-      "id": "pde24",
-      "type": "polyline",
-      "sourceNodeId": "PD16",
-      "targetNodeId": "PD19",
-      "text": ""
-    },
-    {
-      "id": "pde25",
-      "type": "polyline",
-      "sourceNodeId": "PD16",
-      "targetNodeId": "PD20",
-      "text": "过程件"
-    },
-    {
-      "id": "pde26",
-      "type": "polyline",
-      "sourceNodeId": "PD17",
-      "targetNodeId": "PD21",
-      "text": ""
-    },
-    {
-      "id": "pde27",
-      "type": "polyline",
-      "sourceNodeId": "PD18",
-      "targetNodeId": "PD21",
-      "text": ""
-    },
-    {
-      "id": "pde28",
-      "type": "polyline",
-      "sourceNodeId": "PD19",
-      "targetNodeId": "PD21",
-      "text": ""
-    },
-    {
-      "id": "pde29",
-      "type": "polyline",
-      "sourceNodeId": "PD20",
-      "targetNodeId": "PD21",
-      "text": ""
-    },
-    {
-      "id": "pde30",
-      "type": "polyline",
-      "sourceNodeId": "PD17",
-      "targetNodeId": "PD22",
-      "text": ""
-    },
-    {
-      "id": "pde31",
-      "type": "polyline",
-      "sourceNodeId": "PD18",
-      "targetNodeId": "PD22",
-      "text": ""
-    },
-    {
-      "id": "pde32",
-      "type": "polyline",
-      "sourceNodeId": "PD19",
-      "targetNodeId": "PD22",
-      "text": ""
-    },
-    {
-      "id": "pde33",
-      "type": "polyline",
-      "sourceNodeId": "PD20",
-      "targetNodeId": "PD22",
-      "text": ""
-    },
-    {
-      "id": "pde34",
-      "type": "polyline",
-      "sourceNodeId": "PD21",
-      "targetNodeId": "PD23",
-      "text": ""
-    },
-    {
-      "id": "pde35",
-      "type": "polyline",
-      "sourceNodeId": "PD22",
-      "targetNodeId": "PD23",
-      "text": ""
-    },
-    {
-      "id": "pde36",
-      "type": "polyline",
-      "sourceNodeId": "PD23",
-      "targetNodeId": "PD24",
-      "text": "整车"
-    },
-    {
-      "id": "pde37",
-      "type": "polyline",
-      "sourceNodeId": "PD24",
-      "targetNodeId": "PD25",
-      "text": "测试报告"
-    },
-    {
-      "id": "pde38",
-      "type": "polyline",
-      "sourceNodeId": "PD25",
-      "targetNodeId": "PD26",
-      "text": "试验报告"
-    },
-    {
-      "id": "pde39",
-      "type": "polyline",
-      "sourceNodeId": "PD26",
-      "targetNodeId": "PD27",
-      "text": "完工报告"
-    },
-    {
-      "id": "pde40",
-      "type": "polyline",
-      "sourceNodeId": "PD27",
-      "targetNodeId": "PD28",
-      "text": "订单信息"
-    },
-    {
-      "id": "pde41",
-      "type": "polyline",
-      "sourceNodeId": "PD28",
-      "targetNodeId": "PD29",
-      "text": "产品档案"
     }
   ],
   "importedAt": {
@@ -446,4 +71,410 @@
   "description": "生产流程 Mermaid 图表数据 - 包含物料清单、生产计划、加工装配、测试交付等完整生产流程",
   "flowType": "production",
   "version": "1.0"
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a896"
+  },
+  "nodeId": "PD1",
+  "description": "物料清单BOM",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD1 [物料清单BOM] - 主子流程 （系统化BOM管理）\n\n    %% 所有节点定义\n    PD1_M1[接收设计BOM]\n    PD1_M2[BOM结构分析]\n    PD1_M3[工艺评审]\n    PD1_M4[BOM标准化处理]\n    PD1_M5[系统导入与发布]\n\n    %% 所有边的定义\n    PD1_M1 --> PD1_M2\n    PD1_M2 --> PD1_M3\n    PD1_M3 --> PD1_M4\n    PD1_M4 --> PD1_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD1 [物料清单BOM] - 备用子流程 （简化BOM处理）\n\n    %% 所有节点定义\n    PD1_A1[Excel导入BOM]\n    PD1_A2[人工检查]\n    PD1_A3[简单修正]\n    PD1_A4[直接使用]\n\n    %% 所有边的定义\n    PD1_A1 --> PD1_A2\n    PD1_A2 --> PD1_A3\n    PD1_A3 --> PD1_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a897"
+  },
+  "nodeId": "PD2",
+  "description": "录入生产信息",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD2 [录入生产信息] - 主子流程 （MES系统录入）\n\n    %% 所有节点定义\n    PD2_M1[创建生产批次]\n    PD2_M2[工艺路线确认]\n    PD2_M3[资源需求计算]\n    PD2_M4[生产参数设置]\n    PD2_M5[系统数据校验]\n\n    %% 所有边的定义\n    PD2_M1 --> PD2_M2\n    PD2_M2 --> PD2_M3\n    PD2_M3 --> PD2_M4\n    PD2_M4 --> PD2_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD2 [录入生产信息] - 备用子流程 （手动记录）\n\n    %% 所有节点定义\n    PD2_A1[纸质工单填写]\n    PD2_A2[人工核算需求]\n    PD2_A3[经验参数设定]\n    PD2_A4[主管确认]\n\n    %% 所有边的定义\n    PD2_A1 --> PD2_A2\n    PD2_A2 --> PD2_A3\n    PD2_A3 --> PD2_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a898"
+  },
+  "nodeId": "PD3",
+  "description": "编制阶段计划",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD3 [编制阶段计划] - 主子流程 （APS高级排产）\n\n    %% 所有节点定义\n    PD3_M1[产能评估]\n    PD3_M2[关键路径分析]\n    PD3_M3[资源平衡计算]\n    PD3_M4[计划优化]\n    PD3_M5[计划发布]\n\n    %% 所有边的定义\n    PD3_M1 --> PD3_M2\n    PD3_M2 --> PD3_M3\n    PD3_M3 --> PD3_M4\n    PD3_M4 --> PD3_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD3 [编制阶段计划] - 备用子流程 （人工排产）\n\n    %% 所有节点定义\n    PD3_A1[经验估算产能]\n    PD3_A2[粗略排程]\n    PD3_A3[人工调整]\n    PD3_A4[口头沟通确认]\n\n    %% 所有边的定义\n    PD3_A1 --> PD3_A2\n    PD3_A2 --> PD3_A3\n    PD3_A3 --> PD3_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a899"
+  },
+  "nodeId": "PD4",
+  "description": "编制工位计划",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD4 [编制工位计划] - 主子流程 （精细化工位管理）\n\n    %% 所有节点定义\n    PD4_M1[工位能力评估]\n    PD4_M2[人员技能匹配]\n    PD4_M3[工装夹具准备]\n    PD4_M4[计划时间分配]\n    PD4_M5[工位计划确认]\n\n    %% 所有边的定义\n    PD4_M1 --> PD4_M2\n    PD4_M2 --> PD4_M3\n    PD4_M3 --> PD4_M4\n    PD4_M4 --> PD4_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD4 [编制工位计划] - 备用子流程 （简化工位安排）\n\n    %% 所有节点定义\n    PD4_A1[工位可用性确认]\n    PD4_A2[人员简单分配]\n    PD4_A3[工具检查]\n    PD4_A4[班组长确认]\n\n    %% 所有边的定义\n    PD4_A1 --> PD4_A2\n    PD4_A2 --> PD4_A3\n    PD4_A3 --> PD4_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a900"
+  },
+  "nodeId": "PD5",
+  "description": "创建生产订单",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD5 [创建生产订单] - 主子流程 （MES系统工单管理）\n\n    %% 所有节点定义\n    PD5_M1[订单信息录入]\n    PD5_M2[工艺参数配置]\n    PD5_M3[物料需求核算]\n    PD5_M4[质量要求确认]\n    PD5_M5[工单生成与发布]\n\n    %% 所有边的定义\n    PD5_M1 --> PD5_M2\n    PD5_M2 --> PD5_M3\n    PD5_M3 --> PD5_M4\n    PD5_M4 --> PD5_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD5 [创建生产订单] - 备用子流程 （纸质工单）\n\n    %% 所有节点定义\n    PD5_A1[手写工单信息]\n    PD5_A2[工艺要求记录]\n    PD5_A3[物料清单附加]\n    PD5_A4[主管签字]\n\n    %% 所有边的定义\n    PD5_A1 --> PD5_A2\n    PD5_A2 --> PD5_A3\n    PD5_A3 --> PD5_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a901"
+  },
+  "nodeId": "PD6",
+  "description": "开工前发料",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD6 [开工前发料] - 主子流程 （WMS系统化发料）\n\n    %% 所有节点定义\n    PD6_M1[物料需求确认]\n    PD6_M2[库存状态检查]\n    PD6_M3[批次管理与追溯]\n    PD6_M4[系统发料单生成]\n    PD6_M5[物料配送与确认]\n\n    %% 所有边的定义\n    PD6_M1 --> PD6_M2\n    PD6_M2 --> PD6_M3\n    PD6_M3 --> PD6_M4\n    PD6_M4 --> PD6_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD6 [开工前发料] - 备用子流程 （人工领料）\n\n    %% 所有节点定义\n    PD6_A1[口头申请物料]\n    PD6_A2[仓库人工发料]\n    PD6_A3[签字确认]\n    PD6_A4[自行搬运]\n\n    %% 所有边的定义\n    PD6_A1 --> PD6_A2\n    PD6_A2 --> PD6_A3\n    PD6_A3 --> PD6_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a902"
+  },
+  "nodeId": "PD7",
+  "description": "生产设备点检",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD7 [生产设备点检] - 主子流程 （TPM全面设备管理）\n\n    %% 所有节点定义\n    PD7_M1[点检表单确认]\n    PD7_M2[关键参数检查]\n    PD7_M3[设备状态记录]\n    PD7_M4[异常处理与维护]\n    PD7_M5[点检结果确认]\n\n    %% 所有边的定义\n    PD7_M1 --> PD7_M2\n    PD7_M2 --> PD7_M3\n    PD7_M3 --> PD7_M4\n    PD7_M4 --> PD7_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD7 [生产设备点检] - 备用子流程 （简单目视检查）\n\n    %% 所有节点定义\n    PD7_A1[设备外观检查]\n    PD7_A2[基本功能测试]\n    PD7_A3[记录异常]\n    PD7_A4[班组长确认]\n\n    %% 所有边的定义\n    PD7_A1 --> PD7_A2\n    PD7_A2 --> PD7_A3\n    PD7_A3 --> PD7_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a903"
+  },
+  "nodeId": "PD8",
+  "description": "生产订单派工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD8 [生产订单派工] - 主子流程 （智能派工系统）\n\n    %% 所有节点定义\n    PD8_M1[工单优先级分析]\n    PD8_M2[人员技能匹配]\n    PD8_M3[工位负荷平衡]\n    PD8_M4[派工单生成]\n    PD8_M5[任务分发确认]\n\n    %% 所有边的定义\n    PD8_M1 --> PD8_M2\n    PD8_M2 --> PD8_M3\n    PD8_M3 --> PD8_M4\n    PD8_M4 --> PD8_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD8 [生产订单派工] - 备用子流程 （人工派工）\n\n    %% 所有节点定义\n    PD8_A1[班组长分配]\n    PD8_A2[口头通知]\n    PD8_A3[人员确认]\n    PD8_A4[开始生产]\n\n    %% 所有边的定义\n    PD8_A1 --> PD8_A2\n    PD8_A2 --> PD8_A3\n    PD8_A3 --> PD8_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a904"
+  },
+  "nodeId": "PD9",
+  "description": "金属加工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD9 [金属加工] - 主子流程 （数控加工中心）\n\n    %% 所有节点定义\n    PD9_M1[程序准备与校验]\n    PD9_M2[工装夹具安装]\n    PD9_M3[首件加工与检测]\n    PD9_M4[批量加工]\n    PD9_M5[质量检验与记录]\n\n    %% 所有边的定义\n    PD9_M1 --> PD9_M2\n    PD9_M2 --> PD9_M3\n    PD9_M3 --> PD9_M4\n    PD9_M4 --> PD9_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD9 [金属加工] - 备用子流程 （传统机加工）\n\n    %% 所有节点定义\n    PD9_A1[图纸确认]\n    PD9_A2[工具准备]\n    PD9_A3[人工加工]\n    PD9_A4[尺寸检查]\n\n    %% 所有边的定义\n    PD9_A1 --> PD9_A2\n    PD9_A2 --> PD9_A3\n    PD9_A3 --> PD9_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a905"
+  },
+  "nodeId": "PD10",
+  "description": "电气、电子件加工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD10 [电气、电子件加工] - 主子流程 （自动化生产线）\n\n    %% 所有节点定义\n    PD10_M1[PCB板准备]\n    PD10_M2[元器件自动贴装]\n    PD10_M3[回流焊接]\n    PD10_M4[功能测试]\n    PD10_M5[老化测试]\n\n    %% 所有边的定义\n    PD10_M1 --> PD10_M2\n    PD10_M2 --> PD10_M3\n    PD10_M3 --> PD10_M4\n    PD10_M4 --> PD10_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD10 [电气、电子件加工] - 备用子流程 （手工组装）\n\n    %% 所有节点定义\n    PD10_A1[元件准备]\n    PD10_A2[手工焊接]\n    PD10_A3[目视检查]\n    PD10_A4[简单测试]\n\n    %% 所有边的定义\n    PD10_A1 --> PD10_A2\n    PD10_A2 --> PD10_A3\n    PD10_A3 --> PD10_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a906"
+  },
+  "nodeId": "PD11",
+  "description": "非金属件加工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD11 [非金属件加工] - 主子流程 （自动化加工）\n\n    %% 所有节点定义\n    PD11_M1[模具准备与检查]\n    PD11_M2[原料预处理]\n    PD11_M3[注塑/成型]\n    PD11_M4[自动修边]\n    PD11_M5[尺寸与外观检验]\n\n    %% 所有边的定义\n    PD11_M1 --> PD11_M2\n    PD11_M2 --> PD11_M3\n    PD11_M3 --> PD11_M4\n    PD11_M4 --> PD11_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD11 [非金属件加工] - 备用子流程 （手工加工）\n\n    %% 所有节点定义\n    PD11_A1[材料准备]\n    PD11_A2[手工成型]\n    PD11_A3[人工修边]\n    PD11_A4[目视检查]\n\n    %% 所有边的定义\n    PD11_A1 --> PD11_A2\n    PD11_A2 --> PD11_A3\n    PD11_A3 --> PD11_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a907"
+  },
+  "nodeId": "PD12",
+  "description": "车体焊接",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD12 [车体焊接] - 主子流程 （机器人自动焊接）\n\n    %% 所有节点定义\n    PD12_M1[焊接工装定位]\n    PD12_M2[机器人程序校验]\n    PD12_M3[自动焊接执行]\n    PD12_M4[焊缝质量检测]\n    PD12_M5[无损探伤检验]\n\n    %% 所有边的定义\n    PD12_M1 --> PD12_M2\n    PD12_M2 --> PD12_M3\n    PD12_M3 --> PD12_M4\n    PD12_M4 --> PD12_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD12 [车体焊接] - 备用子流程 （手工焊接）\n\n    %% 所有节点定义\n    PD12_A1[工件定位固定]\n    PD12_A2[人工焊接]\n    PD12_A3[焊缝清理]\n    PD12_A4[外观检查]\n\n    %% 所有边的定义\n    PD12_A1 --> PD12_A2\n    PD12_A2 --> PD12_A3\n    PD12_A3 --> PD12_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a908"
+  },
+  "nodeId": "PD13",
+  "description": "转向架焊接",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD13 [转向架焊接] - 主子流程 （精密自动焊接）\n\n    %% 所有节点定义\n    PD13_M1[零件预热处理]\n    PD13_M2[自动定位系统]\n    PD13_M3[多轴机器人焊接]\n    PD13_M4[应力消除处理]\n    PD13_M5[精度测量检验]\n\n    %% 所有边的定义\n    PD13_M1 --> PD13_M2\n    PD13_M2 --> PD13_M3\n    PD13_M3 --> PD13_M4\n    PD13_M4 --> PD13_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD13 [转向架焊接] - 备用子流程 （半自动焊接）\n\n    %% 所有节点定义\n    PD13_A1[工装辅助定位]\n    PD13_A2[点焊固定]\n    PD13_A3[手工补焊]\n    PD13_A4[尺寸复检]\n\n    %% 所有边的定义\n    PD13_A1 --> PD13_A2\n    PD13_A2 --> PD13_A3\n    PD13_A3 --> PD13_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a909"
+  },
+  "nodeId": "PD14",
+  "description": "辅助结构焊接",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD14 [辅助结构焊接] - 主子流程 （柔性自动化焊接）\n\n    %% 所有节点定义\n    PD14_M1[工装快速切换]\n    PD14_M2[焊接参数加载]\n    PD14_M3[视觉引导定位]\n    PD14_M4[自动焊接执行]\n    PD14_M5[焊缝检测记录]\n\n    %% 所有边的定义\n    PD14_M1 --> PD14_M2\n    PD14_M2 --> PD14_M3\n    PD14_M3 --> PD14_M4\n    PD14_M4 --> PD14_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD14 [辅助结构焊接] - 备用子流程 （简易焊接）\n\n    %% 所有节点定义\n    PD14_A1[简易夹具定位]\n    PD14_A2[手工焊接]\n    PD14_A3[焊点检查]\n    PD14_A4[强度测试]\n\n    %% 所有边的定义\n    PD14_A1 --> PD14_A2\n    PD14_A2 --> PD14_A3\n    PD14_A3 --> PD14_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a910"
+  },
+  "nodeId": "PD15",
+  "description": "车体涂装处理",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD15 [车体涂装处理] - 主子流程 （自动化涂装线）\n\n    %% 所有节点定义\n    PD15_M1[表面预处理]\n    PD15_M2[底漆喷涂]\n    PD15_M3[中涂打磨]\n    PD15_M4[面漆喷涂]\n    PD15_M5[烘干固化]\n\n    %% 所有边的定义\n    PD15_M1 --> PD15_M2\n    PD15_M2 --> PD15_M3\n    PD15_M3 --> PD15_M4\n    PD15_M4 --> PD15_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD15 [车体涂装处理] - 备用子流程 （手工涂装）\n\n    %% 所有节点定义\n    PD15_A1[人工打磨]\n    PD15_A2[手工喷涂]\n    PD15_A3[自然晾干]\n    PD15_A4[外观检查]\n\n    %% 所有边的定义\n    PD15_A1 --> PD15_A2\n    PD15_A2 --> PD15_A3\n    PD15_A3 --> PD15_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a911"
+  },
+  "nodeId": "PD16",
+  "description": "零部件涂装处理",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD16 [零部件涂装处理] - 主子流程 （自动化零部件涂装）\n\n    %% 所有节点定义\n    PD16_M1[零部件分类]\n    PD16_M2[涂装参数设置]\n    PD16_M3[机器人喷涂]\n    PD16_M4[红外烘干]\n    PD16_M5[涂层检测]\n\n    %% 所有边的定义\n    PD16_M1 --> PD16_M2\n    PD16_M2 --> PD16_M3\n    PD16_M3 --> PD16_M4\n    PD16_M4 --> PD16_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD16 [零部件涂装处理] - 备用子流程 （手工零部件涂装）\n\n    %% 所有节点定义\n    PD16_A1[零件分组]\n    PD16_A2[手工刷涂]\n    PD16_A3[常温晾干]\n    PD16_A4[厚度检查]\n\n    %% 所有边的定义\n    PD16_A1 --> PD16_A2\n    PD16_A2 --> PD16_A3\n    PD16_A3 --> PD16_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a912"
+  },
+  "nodeId": "PD17",
+  "description": "车体总成",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD17 [车体总成] - 主子流程 （自动化装配线）\n\n    %% 所有节点定义\n    PD17_M1[部件就位检测]\n    PD17_M2[机器人辅助装配]\n    PD17_M3[扭矩力矩控制]\n    PD17_M4[几何尺寸校验]\n    PD17_M5[初步功能测试]\n\n    %% 所有边的定义\n    PD17_M1 --> PD17_M2\n    PD17_M2 --> PD17_M3\n    PD17_M3 --> PD17_M4\n    PD17_M4 --> PD17_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD17 [车体总成] - 备用子流程 （手工装配）\n\n    %% 所有节点定义\n    PD17_A1[部件定位]\n    PD17_A2[人工紧固]\n    PD17_A3[尺寸测量]\n    PD17_A4[外观检查]\n\n    %% 所有边的定义\n    PD17_A1 --> PD17_A2\n    PD17_A2 --> PD17_A3\n    PD17_A3 --> PD17_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a913"
+  },
+  "nodeId": "PD18",
+  "description": "转向架总成",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD18 [转向架总成] - 主子流程 （精密装配工艺）\n\n    %% 所有节点定义\n    PD18_M1[轴承安装定位]\n    PD18_M2[轮对装配]\n    PD18_M3[制动系统连接]\n    PD18_M4[动态平衡检测]\n    PD18_M5[安全性能测试]\n\n    %% 所有边的定义\n    PD18_M1 --> PD18_M2\n    PD18_M2 --> PD18_M3\n    PD18_M3 --> PD18_M4\n    PD18_M4 --> PD18_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD18 [转向架总成] - 备用子流程 （简易装配）\n\n    %% 所有节点定义\n    PD18_A1[部件摆放]\n    PD18_A2[螺栓连接]\n    PD18_A3[转动测试]\n    PD18_A4[噪音检查]\n\n    %% 所有边的定义\n    PD18_A1 --> PD18_A2\n    PD18_A2 --> PD18_A3\n    PD18_A3 --> PD18_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a914"
+  },
+  "nodeId": "PD19",
+  "description": "牵引系统总成",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD19 [牵引系统总成] - 主子流程 （电气安全装配）\n\n    %% 所有节点定义\n    PD19_M1[电机安装固定]\n    PD19_M2[传动系统连接]\n    PD19_M3[电气接线]\n    PD19_M4[绝缘电阻测试]\n    PD19_M5[空载运行检验]\n\n    %% 所有边的定义\n    PD19_M1 --> PD19_M2\n    PD19_M2 --> PD19_M3\n    PD19_M3 --> PD19_M4\n    PD19_M4 --> PD19_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD19 [牵引系统总成] - 备用子流程 （基础装配）\n\n    %% 所有节点定义\n    PD19_A1[电机就位]\n    PD19_A2[机械连接]\n    PD19_A3[简单接线]\n    PD19_A4[手动转动]\n\n    %% 所有边的定义\n    PD19_A1 --> PD19_A2\n    PD19_A2 --> PD19_A3\n    PD19_A3 --> PD19_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a915"
+  },
+  "nodeId": "PD20",
+  "description": "辅助系统总成",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD20 [辅助系统总成] - 主子流程 （系统集成装配）\n\n    %% 所有节点定义\n    PD20_M1[空调系统安装]\n    PD20_M2[照明系统布线]\n    PD20_M3[控制面板连接]\n    PD20_M4[系统联调测试]\n    PD20_M5[功能验证]\n\n    %% 所有边的定义\n    PD20_M1 --> PD20_M2\n    PD20_M2 --> PD20_M3\n    PD20_M3 --> PD20_M4\n    PD20_M4 --> PD20_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD20 [辅助系统总成] - 备用子流程 （独立安装）\n\n    %% 所有节点定义\n    PD20_A1[设备固定]\n    PD20_A2[管路连接]\n    PD20_A3[电气接线]\n    PD20_A4[单独测试]\n\n    %% 所有边的定义\n    PD20_A1 --> PD20_A2\n    PD20_A2 --> PD20_A3\n    PD20_A3 --> PD20_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a916"
+  },
+  "nodeId": "PD21",
+  "description": "车体模块连接",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD21 [车体模块连接] - 主子流程 （大型结构装配）\n\n    %% 所有节点定义\n    PD21_M1[模块定位对准]\n    PD21_M2[精密铰接]\n    PD21_M3[密封胶条安装]\n    PD21_M4[结构强度测试]\n    PD21_M5[气密性检验]\n\n    %% 所有边的定义\n    PD21_M1 --> PD21_M2\n    PD21_M2 --> PD21_M3\n    PD21_M3 --> PD21_M4\n    PD21_M4 --> PD21_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD21 [车体模块连接] - 备用子流程 （简易连接）\n\n    %% 所有节点定义\n    PD21_A1[模块对位]\n    PD21_A2[螺栓固定]\n    PD21_A3[密封处理]\n    PD21_A4[外观检查]\n\n    %% 所有边的定义\n    PD21_A1 --> PD21_A2\n    PD21_A2 --> PD21_A3\n    PD21_A3 --> PD21_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a917"
+  },
+  "nodeId": "PD22",
+  "description": "电气系统布线",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD22 [电气系统布线] - 主子流程 （标准电气布线）\n\n    %% 所有节点定义\n    PD22_M1[线缆路径规划]\n    PD22_M2[线缆敷设固定]\n    PD22_M3[电气连接]\n    PD22_M4[绝缘保护]\n    PD22_M5[电气测试]\n\n    %% 所有边的定义\n    PD22_M1 --> PD22_M2\n    PD22_M2 --> PD22_M3\n    PD22_M3 --> PD22_M4\n    PD22_M4 --> PD22_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD22 [电气系统布线] - 备用子流程 （简易布线）\n\n    %% 所有节点定义\n    PD22_A1[线缆整理]\n    PD22_A2[手动固定]\n    PD22_A3[端子连接]\n    PD22_A4[通断测试]\n\n    %% 所有边的定义\n    PD22_A1 --> PD22_A2\n    PD22_A2 --> PD22_A3\n    PD22_A3 --> PD22_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a918"
+  },
+  "nodeId": "PD23",
+  "description": "最终装配",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD23 [最终装配] - 主子流程 （整车集成装配）\n\n    %% 所有节点定义\n    PD23_M1[转向架安装]\n    PD23_M2[牵引系统集成]\n    PD23_M3[车体连接固定]\n    PD23_M4[系统联调]\n    PD23_M5[整车外观检查]\n\n    %% 所有边的定义\n    PD23_M1 --> PD23_M2\n    PD23_M2 --> PD23_M3\n    PD23_M3 --> PD23_M4\n    PD23_M4 --> PD23_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD23 [最终装配] - 备用子流程 （模块化装配）\n\n    %% 所有节点定义\n    PD23_A1[部件就位]\n    PD23_A2[连接固定]\n    PD23_A3[管线连接]\n    PD23_A4[初步检查]\n\n    %% 所有边的定义\n    PD23_A1 --> PD23_A2\n    PD23_A2 --> PD23_A3\n    PD23_A3 --> PD23_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a919"
+  },
+  "nodeId": "PD24",
+  "description": "功能测试",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD24 [功能测试] - 主子流程 （系统性功能测试）\n\n    %% 所有节点定义\n    PD24_M1[电气系统测试]\n    PD24_M2[机械系统测试]\n    PD24_M3[控制系统联调]\n    PD24_M4[安全系统验证]\n    PD24_M5[测试报告生成]\n\n    %% 所有边的定义\n    PD24_M1 --> PD24_M2\n    PD24_M2 --> PD24_M3\n    PD24_M3 --> PD24_M4\n    PD24_M4 --> PD24_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD24 [功能测试] - 备用子流程 （基础功能测试）\n\n    %% 所有节点定义\n    PD24_A1[电源接通]\n    PD24_A2[基本功能检查]\n    PD24_A3[手动控制测试]\n    PD24_A4[测试记录]\n\n    %% 所有边的定义\n    PD24_A1 --> PD24_A2\n    PD24_A2 --> PD24_A3\n    PD24_A3 --> PD24_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a920"
+  },
+  "nodeId": "PD25",
+  "description": "整机可靠性试验",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD25 [整机可靠性试验] - 主子流程 （标准可靠性测试）\n\n    %% 所有节点定义\n    PD25_M1[振动测试]\n    PD25_M2[冲击测试]\n    PD25_M3[高温试验]\n    PD25_M4[低温试验]\n    PD25_M5[耐久性测试]\n\n    %% 所有边的定义\n    PD25_M1 --> PD25_M2\n    PD25_M2 --> PD25_M3\n    PD25_M3 --> PD25_M4\n    PD25_M4 --> PD25_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD25 [整机可靠性试验] - 备用子流程 （简化试验）\n\n    %% 所有节点定义\n    PD25_A1[外观检查]\n    PD25_A2[基本功能测试]\n    PD25_A3[短时运行]\n    PD25_A4[结果记录]\n\n    %% 所有边的定义\n    PD25_A1 --> PD25_A2\n    PD25_A2 --> PD25_A3\n    PD25_A3 --> PD25_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a921"
+  },
+  "nodeId": "PD26",
+  "description": "生产完工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD26 [生产完工] - 主子流程 （质量审核验收）\n\n    %% 所有节点定义\n    PD26_M1[最终质量检查]\n    PD26_M2[技术文件整理]\n    PD26_M3[生产数据归档]\n    PD26_M4[客户验收准备]\n    PD26_M5[完工确认]\n\n    %% 所有边的定义\n    PD26_M1 --> PD26_M2\n    PD26_M2 --> PD26_M3\n    PD26_M3 --> PD26_M4\n    PD26_M4 --> PD26_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD26 [生产完工] - 备用子流程 （简易完工）\n\n    %% 所有节点定义\n    PD26_A1[基本检查]\n    PD26_A2[照片记录]\n    PD26_A3[信息录入]\n    PD26_A4[状态更新]\n\n    %% 所有边的定义\n    PD26_A1 --> PD26_A2\n    PD26_A2 --> PD26_A3\n    PD26_A3 --> PD26_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a922"
+  },
+  "nodeId": "PD27",
+  "description": "订单报工",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD27 [订单报工] - 主子流程 （ERP系统报工）\n\n    %% 所有节点定义\n    PD27_M1[工单状态更新]\n    PD27_M2[工时统计录入]\n    PD27_M3[物料消耗核销]\n    PD27_M4[质量数据上传]\n    PD27_M5[报工审核确认]\n\n    %% 所有边的定义\n    PD27_M1 --> PD27_M2\n    PD27_M2 --> PD27_M3\n    PD27_M3 --> PD27_M4\n    PD27_M4 --> PD27_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD27 [订单报工] - 备用子流程 （手动报工）\n\n    %% 所有节点定义\n    PD27_A1[工单标记]\n    PD27_A2[手工记录]\n    PD27_A3[报表填写]\n    PD27_A4[主管签字]\n\n    %% 所有边的定义\n    PD27_A1 --> PD27_A2\n    PD27_A2 --> PD27_A3\n    PD27_A3 --> PD27_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a923"
+  },
+  "nodeId": "PD28",
+  "description": "生产交付",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD28 [生产交付] - 主子流程 （标准交付流程）\n\n    %% 所有节点定义\n    PD28_M1[交付文件准备]\n    PD28_M2[产品清洁保养]\n    PD28_M3[包装防护处理]\n    PD28_M4[交付验收确认]\n    PD28_M5[交付单据签署]\n\n    %% 所有边的定义\n    PD28_M1 --> PD28_M2\n    PD28_M2 --> PD28_M3\n    PD28_M3 --> PD28_M4\n    PD28_M4 --> PD28_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD28 [生产交付] - 备用子流程 （简易交付）\n\n    %% 所有节点定义\n    PD28_A1[产品检查]\n    PD28_A2[简单包装]\n    PD28_A3[交付确认]\n    PD28_A4[记录备案]\n\n    %% 所有边的定义\n    PD28_A1 --> PD28_A2\n    PD28_A2 --> PD28_A3\n    PD28_A3 --> PD28_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "687b4908d2be03cbebc0a924"
+  },
+  "nodeId": "PD29",
+  "description": "产品质量档案",
+  "mermaidDefinition1": "flowchart LR\n    %% 图名: PD29 [产品质量档案] - 主子流程 （完整档案管理）\n\n    %% 所有节点定义\n    PD29_M1[测试数据整理]\n    PD29_M2[生产记录归档]\n    PD29_M3[质量文件编制]\n    PD29_M4[档案系统存储]\n    PD29_M5[追溯信息建立]\n\n    %% 所有边的定义\n    PD29_M1 --> PD29_M2\n    PD29_M2 --> PD29_M3\n    PD29_M3 --> PD29_M4\n    PD29_M4 --> PD29_M5",
+  "mermaidDefinition2": "flowchart LR\n    %% 图名: PD29 [产品质量档案] - 备用子流程 （基础档案记录）\n\n    %% 所有节点定义\n    PD29_A1[主要数据记录]\n    PD29_A2[照片存档]\n    PD29_A3[文件整理]\n    PD29_A4[简单归档]\n\n    %% 所有边的定义\n    PD29_A1 --> PD29_A2\n    PD29_A2 --> PD29_A3\n    PD29_A3 --> PD29_A4",
+  "flowCount": 2,
+  "currentFlowNumber": 1,
+  "createdAt": {
+    "$date": "2025-07-19T07:28:08.778Z"
+  }
 }]
