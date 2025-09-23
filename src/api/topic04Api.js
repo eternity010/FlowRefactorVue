@@ -7,6 +7,27 @@ class Topic04Api {
   constructor() {
     this.baseURL = API_BASE_URL;
     this.timeout = 10000; // 10秒超时
+    this.modelRunBatch = '20240905'; // 全局模型运行批次变量
+  }
+
+  /**
+   * 设置全局模型运行批次
+   * @param {string} batch - 新的批次号
+   */
+  setModelRunBatch(batch) {
+    if (!batch || typeof batch !== 'string') {
+      throw new Error('批次号不能为空且必须是字符串');
+    }
+    this.modelRunBatch = batch;
+    console.log(`🔄 Topic04 API 批次已设置为: ${batch}`);
+  }
+
+  /**
+   * 获取当前模型运行批次
+   * @returns {string} 当前批次号
+   */
+  getModelRunBatch() {
+    return this.modelRunBatch;
   }
 
   /**
@@ -243,10 +264,122 @@ class Topic04Api {
   async getPerformanceMetrics() {
     return await this.get('/api/topic04/maintenance/performance');
   }
+
+  // ===== 生产任务相关API =====
+
+  /**
+   * 获取生产任务数据
+   * @param {string} modelRunBatch - 模型运行批次 (可选，默认使用全局批次)
+   * @returns {Promise<Object>} 生产任务列表
+   */
+  async getProductionTasks(modelRunBatch = null) {
+    const batch = modelRunBatch || this.modelRunBatch;
+    return await this.get('/api/topic04/production/tasks', { model_run_batch: batch });
+  }
+
+  /**
+   * 根据订单号获取生产任务
+   * @param {string} orderNo - 订单号
+   * @returns {Promise<Object>} 指定订单的生产任务
+   */
+  async getProductionTasksByOrder(orderNo) {
+    if (!orderNo) {
+      throw new Error('订单号不能为空');
+    }
+    return await this.get(`/api/topic04/production/tasks/order/${encodeURIComponent(orderNo)}`);
+  }
+
+  /**
+   * 获取生产任务统计数据
+   * @param {string} modelRunBatch - 模型运行批次 (可选，默认使用全局批次)
+   * @returns {Promise<Object>} 统计结果
+   */
+  async getProductionTaskStatistics(modelRunBatch = null) {
+    const batch = modelRunBatch || this.modelRunBatch;
+    return await this.get('/api/topic04/production/statistics', { model_run_batch: batch });
+  }
+
+  /**
+   * 根据产品名称获取生产任务
+   * @param {string} productName - 产品名称
+   * @returns {Promise<Object>} 指定产品的生产任务
+   */
+  async getProductionTasksByProduct(productName) {
+    if (!productName) {
+      throw new Error('产品名称不能为空');
+    }
+    return await this.get(`/api/topic04/production/tasks/product/${encodeURIComponent(productName)}`);
+  }
+
+  /**
+   * 根据工序获取生产任务
+   * @param {string} procedureName - 工序名称
+   * @returns {Promise<Object>} 指定工序的生产任务
+   */
+  async getProductionTasksByProcedure(procedureName) {
+    if (!procedureName) {
+      throw new Error('工序名称不能为空');
+    }
+    return await this.get(`/api/topic04/production/tasks/procedure/${encodeURIComponent(procedureName)}`);
+  }
+
+  /**
+   * 根据操作员获取生产任务
+   * @param {string} jockeyName - 操作员姓名
+   * @returns {Promise<Object>} 指定操作员的生产任务
+   */
+  async getProductionTasksByJockey(jockeyName) {
+    if (!jockeyName) {
+      throw new Error('操作员姓名不能为空');
+    }
+    return await this.get(`/api/topic04/production/tasks/jockey/${encodeURIComponent(jockeyName)}`);
+  }
+
+  /**
+   * 根据工作中心获取生产任务
+   * @param {string} workCenterName - 工作中心名称
+   * @returns {Promise<Object>} 指定工作中心的生产任务
+   */
+  async getProductionTasksByWorkCenter(workCenterName) {
+    if (!workCenterName) {
+      throw new Error('工作中心名称不能为空');
+    }
+    return await this.get(`/api/topic04/production/tasks/workcenter/${encodeURIComponent(workCenterName)}`);
+  }
+
+  /**
+   * 搜索生产任务
+   * @param {Object} searchParams - 搜索参数
+   * @param {string} searchParams.keyword - 搜索关键词
+   * @param {string} searchParams.product - 产品名称
+   * @param {string} searchParams.procedure - 工序名称
+   * @param {string} searchParams.jockey - 操作员
+   * @param {string} searchParams.workCenter - 工作中心
+   * @param {string} searchParams.dateFrom - 开始日期
+   * @param {string} searchParams.dateTo - 结束日期
+   * @returns {Promise<Object>} 搜索结果
+   */
+  async searchProductionTasks(searchParams = {}) {
+    return await this.get('/api/topic04/production/tasks/search', searchParams);
+  }
 }
 
 // 创建并导出API实例
 const topic04Api = new Topic04Api();
+
+// 使用示例：
+// // 设置全局批次
+// topic04Api.setModelRunBatch('20240905');
+//
+// // 获取当前批次
+// const currentBatch = topic04Api.getModelRunBatch();
+//
+// // 使用全局批次调用API
+// const tasks = await topic04Api.getProductionTasks();
+// const stats = await topic04Api.getProductionTaskStatistics();
+//
+// // 或者指定特定的批次（覆盖全局设置）
+// const specificTasks = await topic04Api.getProductionTasks('20240906');
 
 export { Topic04Api, topic04Api };
 export default topic04Api;

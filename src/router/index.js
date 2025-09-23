@@ -12,16 +12,14 @@ import PlanningTimeView from '@/views/PlanningTimeView'
 import AIDataCollectionView from '@/views/AIDataCollectionView'
 import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
-import LLMChatView from '@/views/LLMChatView'
 import TaskAssignmentView from '@/views/TaskAssignmentView'
 import ProductionRefactor from '@/views/ProductionRefactor'
-import MaintenancePlanView from '@/views/MaintenancePlanView'
 import MarketingRefactor from '@/views/MarketingRefactor'
 import PurchaseRefactor from '@/views/PurchaseRefactor'
-import ProductionRefactorSimple from '@/views/ProductionRefactorSimple'
 import OperationRefactor from '@/views/OperationRefactor'
 import OperationRefactor2 from '@/views/OperationRefactor2'
 import OperationRefactor3 from '@/views/OperationRefactor3'
+import OperationManagement from '@/views/OperationManagement'
 
 Vue.use(Router)
 
@@ -87,19 +85,14 @@ export default new Router({
           component: RAGConfigView
         },
         {
-          path: 'llm-chat',
-          name: 'LLMChatView',
-          component: LLMChatView
-        },
-        {
           path: 'task-assignment',
           name: 'TaskAssignmentView',
           component: TaskAssignmentView
         },
         {
-          path: 'maintenance-plan',
-          name: 'MaintenancePlanView',
-          component: MaintenancePlanView
+          path: 'operation-management',
+          name: 'OperationManagement',
+          component: OperationManagement
         }
       ]
     },
@@ -122,11 +115,6 @@ export default new Router({
       path: '/refactor-purchase',
       name: 'PurchaseRefactor',
       component: PurchaseRefactor
-    },
-    {
-      path: '/refactor-production',
-      name: 'ProductionRefactorSimple',
-      component: ProductionRefactorSimple
     },
     {
       path: '/production-refactor',

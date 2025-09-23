@@ -1,7 +1,17 @@
 <template>
   <div class="production-refactor">
     <div class="page-header">
-      <h2>生产重构</h2>
+      <div class="header-left">
+        <el-button
+          type="primary"
+          icon="el-icon-arrow-left"
+          @click="goBack"
+          size="small"
+          class="back-btn">
+          返回上一步
+        </el-button>
+        <h2>生产重构</h2>
+      </div>
       <div class="header-info">
         <el-tag type="info">批次：{{ currentBatch }}</el-tag>
         <el-tag type="success">总订单数：{{ orderSummary.totalOrders }}</el-tag>
@@ -9,7 +19,35 @@
       </div>
     </div>
     
-    <div class="page-content">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-container">
+      <el-loading-wrap>
+        <div style="text-align: center; padding: 50px;">
+          <i class="el-icon-loading" style="font-size: 24px; color: #409EFF;"></i>
+          <p style="margin-top: 15px; color: #606266;">正在加载生产任务数据...</p>
+        </div>
+      </el-loading-wrap>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="error-container">
+      <el-alert
+        title="数据加载失败"
+        :description="error"
+        type="error"
+        show-icon
+        :closable="false">
+        <el-button 
+          type="primary" 
+          size="small" 
+          @click="loadData"
+          style="margin-top: 10px;">
+          重新加载
+        </el-button>
+      </el-alert>
+    </div>
+    
+    <div v-else class="page-content">
        <!-- 订单统计概览 -->
        <div class="order-overview">
          <el-row :gutter="16">
@@ -69,10 +107,11 @@
                 v-for="tick in timelineTicks"
                 :key="tick.time"
                 class="time-tick"
+                :class="{ 'hour-tick': tick.isHourMark }"
                 :style="{ left: tick.position + '%' }"
               >
-                <div class="tick-line"></div>
-                <div class="tick-label">{{ tick.label }}</div>
+                <div class="tick-line" :class="{ 'hour-line': tick.isHourMark }"></div>
+                <div class="tick-label" :class="{ 'hour-label': tick.isHourMark }">{{ tick.label }}</div>
               </div>
             </div>
           </div>
@@ -107,54 +146,117 @@
 
         <!-- 排产明细展示 -->
        <div class="production-schedule">
-         <h3>排产明细</h3>
-         <el-table :data="filteredProductionAssignments" style="width: 100%" border stripe>
-           <el-table-column prop="id" label="分配ID" width="80"></el-table-column>
-           <el-table-column prop="task_id" label="任务ID" width="100"></el-table-column>
-           <el-table-column prop="order_no" label="订单号" width="120"></el-table-column>
-           <el-table-column prop="procedure_name" label="工序名称" width="120"></el-table-column>
-           <el-table-column prop="equipment_desc" label="设备名称" width="150"></el-table-column>
-           <el-table-column prop="jockey_name" label="操作员" width="100"></el-table-column>
-           <el-table-column prop="plan_start_time" label="计划开始时间" width="180"></el-table-column>
-           <el-table-column prop="plan_end_time" label="计划结束时间" width="180"></el-table-column>
-           <el-table-column prop="remark" label="备注"></el-table-column>
-         </el-table>
+         <div class="schedule-header" @click="toggleScheduleExpanded">
+           <h3>
+             <i :class="scheduleExpanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" class="expand-icon"></i>
+             排产明细
+             <span class="task-count">({{ filteredProductionAssignments.length }}条任务)</span>
+           </h3>
+           <el-button size="mini" type="text">
+             {{ scheduleExpanded ? '收起' : '展开' }}
+           </el-button>
+         </div>
+         
+         <el-collapse-transition>
+           <div v-show="scheduleExpanded" class="schedule-content">
+             <!-- 按订单分组的排产明细 -->
+             <div v-for="group in groupedAssignments" :key="group.orderNo" class="order-group">
+               <div class="order-group-header" @click="toggleOrderGroup(group.orderNo)">
+                 <div class="order-info">
+                   <i :class="group.expanded ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" class="group-expand-icon"></i>
+                   <span class="order-title">订单 {{ group.orderNo }}</span>
+                   <el-tag size="mini" :type="getOrderStatusType(group.status)">{{ group.status }}</el-tag>
+                   <span class="product-info">{{ group.productName }} ({{ group.taskCount }}个任务)</span>
+                 </div>
+                 <div class="order-summary">
+                   <span class="time-range">{{ group.timeRange }}</span>
+                 </div>
+               </div>
+               
+               <el-collapse-transition>
+                 <div v-show="group.expanded" class="order-tasks">
+                   <div v-for="task in group.tasks" :key="task.id" class="task-card">
+                     <div class="task-header">
+                       <div class="task-basic-info">
+                         <span class="task-id">任务 {{ task.task_id }}</span>
+                         <el-tag size="mini" :type="getProcedureType(task.procedure_name)">
+                           {{ task.procedure_name }}
+                         </el-tag>
+                       </div>
+                       <div class="task-time">
+                         {{ task.plan_start_time }} ~ {{ task.plan_end_time }}
+                       </div>
+                     </div>
+                     <div class="task-details">
+                       <div class="detail-row">
+                         <span class="detail-label">设备：</span>
+                         <span class="detail-value">{{ task.equipment_desc }}</span>
+                       </div>
+                       <div class="detail-row">
+                         <span class="detail-label">操作员：</span>
+                         <span class="detail-value">{{ task.jockey_name }}</span>
+                       </div>
+                       <div class="detail-row" v-if="task.remark">
+                         <span class="detail-label">备注：</span>
+                         <span class="detail-value">{{ task.remark }}</span>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </el-collapse-transition>
+             </div>
+           </div>
+         </el-collapse-transition>
        </div>
     </div>
   </div>
 </template>
 
 <script>
-import taskData from '@/data/task_data.json'
-import productionAssignData from '@/data/production_assign_data.json' // 导入排产数据
+import topic04Api from '@/api/topic04Api' // 导入Topic04 API
 
 export default {
   name: 'ProductionRefactor',
   data() {
     return {
-      currentBatch: '2025-09-11_TSY_0401_COMPLEX_C', // 修改为排产数据的批次
+      currentBatch: '20240905', // 使用数据库中的模型运行批次
       allTasks: [],
-      productionAssignments: [] // 新增排产数据
+      productionAssignments: [], // 排产数据
+      loading: false,
+      error: null,
+      scheduleExpanded: false, // 排产明细展开状态
+      orderGroupStates: {} // 订单组展开状态
     }
   },
   computed: {
     orderSummary() {
-      const uniqueOrderNos = [...new Set(this.allTasks.map(task => task.order.order_no))]
+      if (!this.allTasks || this.allTasks.length === 0) {
+        return {
+          totalOrders: 0,
+          totalTasks: 0
+        }
+      }
+      
+      const uniqueOrderNos = [...new Set(this.allTasks.map(task => task.order_no))]
       return {
         totalOrders: uniqueOrderNos.length,
         totalTasks: this.allTasks.length
       }
     },
     orderStats() {
+      if (!this.allTasks || this.allTasks.length === 0) {
+        return []
+      }
+      
       const orderGroups = {}
       
       this.allTasks.forEach(task => {
-        const orderNo = task.order.order_no
+        const orderNo = task.order_no
         if (!orderGroups[orderNo]) {
           orderGroups[orderNo] = {
             orderNo: orderNo,
-            productName: task.product.name,
-            needNum: task.order.order_need_num,
+            productName: task.product_name,
+            needNum: task.order_need_num,
             tasks: [],
             status: '进行中'
           }
@@ -172,17 +274,17 @@ export default {
         }
         
         order.tasks.forEach(task => {
-          switch(task.procedure.code) {
-            case '101':
+          switch(task.procedure_code) {
+            case 101:
               dispatchCounts.cutting++
               break
-            case '102':
+            case 102:
               dispatchCounts.rough++
               break
-            case '103':
+            case 103:
               dispatchCounts.fine++
               break
-            case '106':
+            case 106:
               dispatchCounts.check++
               break
           }
@@ -203,25 +305,34 @@ export default {
       })
     },
     filteredProductionAssignments() {
-      // 进一步处理排产数据，使其适合表格展示
-      return this.productionAssignments.map(item => ({
-        id: item.id,
-        task_id: item.task_id,
-        order_no: (item.remark.match(/订单(ORD\d+)/) || [])[1] || 'N/A', // 从remark中提取订单号
-        procedure_name: (item.remark.match(/(\S+)工序/) || [])[1] || 'N/A', // 从remark中提取工序名称
-        equipment_desc: item.equipment_desc,
-        jockey_name: item.jockey_name,
-        plan_start_time: this.formatDate(item.plan_start_time.$date),
-        plan_end_time: this.formatDate(item.plan_end_time.$date),
-        remark: item.remark
+      // 将生产任务数据转换为表格展示格式
+      if (!this.allTasks || this.allTasks.length === 0) {
+        return []
+      }
+      
+      return this.allTasks.map(task => ({
+        id: task.id,
+        task_id: task.task_id,
+        order_no: task.order_no,
+        procedure_name: task.procedure_name,
+        equipment_desc: task.work_center_name, // 使用工作中心名称作为设备描述
+        jockey_name: task.jockey_name,
+        plan_start_time: this.formatDate(task.plan_start_time),
+        plan_end_time: this.formatDate(task.plan_end_time),
+        remark: task.remark || `${task.procedure_name}工序 - 订单${task.order_no}`
       }))
     },
     machineSchedules() {
+      if (!this.filteredProductionAssignments || this.filteredProductionAssignments.length === 0) {
+        return []
+      }
+      
       const schedules = {}
       this.filteredProductionAssignments.forEach(assignment => {
         const equipmentDesc = assignment.equipment_desc
-        const foundItem = this.productionAssignments.find(item => item.equipment_desc === equipmentDesc)
-        const equipmentCode = foundItem ? foundItem.equipment_code : ''
+        // 从任务中获取工作中心编码
+        const task = this.allTasks.find(t => t.id === assignment.id)
+        const equipmentCode = task ? task.work_center_code : ''
 
         if (!schedules[equipmentDesc]) {
           schedules[equipmentDesc] = {
@@ -258,59 +369,175 @@ export default {
 
       if (minTime === Infinity || maxTime === -Infinity) return []
 
+      // 基于数据库任务时间范围（08:00-17:30，约9.5小时）进行优化
       const totalDuration = maxTime - minTime
+      const totalHours = totalDuration / (60 * 60 * 1000)
       const ticks = []
 
-      // 根据时间跨度决定刻度间隔
-      let intervalMinutes = 60 // 默认1小时
+      // 针对生产任务时间特点调整刻度策略
+      let intervalMinutes
+      let showMinutes = false
 
-      if (totalDuration <= 2 * 60 * 60 * 1000) { // 2小时以内
-        intervalMinutes = 30 // 30分钟
-      } else if (totalDuration <= 8 * 60 * 60 * 1000) { // 8小时以内
-        intervalMinutes = 60 // 1小时
-      } else if (totalDuration <= 24 * 60 * 60 * 1000) { // 24小时以内
-        intervalMinutes = 120 // 2小时
+      if (totalHours <= 2) {
+        intervalMinutes = 15 // 15分钟间隔，适合短时间任务
+        showMinutes = true
+      } else if (totalHours <= 4) {
+        intervalMinutes = 30 // 30分钟间隔
+        showMinutes = true
+      } else if (totalHours <= 10) {
+        intervalMinutes = 60 // 1小时间隔，适合一个工作日的任务
+        showMinutes = false
+      } else if (totalHours <= 24) {
+        intervalMinutes = 120 // 2小时间隔
+        showMinutes = false
       } else {
-        intervalMinutes = 240 // 4小时
+        intervalMinutes = 240 // 4小时间隔
+        showMinutes = false
+      }
+
+      // 从整点开始生成刻度，更符合生产计划的习惯
+      const startTime = new Date(minTime)
+      if (!showMinutes) {
+        // 从整点开始
+        startTime.setMinutes(0, 0, 0)
+        // 如果起始时间早于任务开始时间，向前调整一个间隔
+        if (startTime.getTime() > minTime) {
+          startTime.setTime(startTime.getTime() - intervalMinutes * 60 * 1000)
+        }
+      } else {
+        // 从15分钟的倍数开始
+        const minutes = startTime.getMinutes()
+        const roundedMinutes = Math.floor(minutes / intervalMinutes) * intervalMinutes
+        startTime.setMinutes(roundedMinutes, 0, 0)
+      }
+
+      const endTime = new Date(maxTime)
+      if (!showMinutes) {
+        endTime.setMinutes(59, 59, 999) // 扩展到小时结束
+      } else {
+        const minutes = endTime.getMinutes()
+        const roundedMinutes = Math.ceil(minutes / intervalMinutes) * intervalMinutes
+        endTime.setMinutes(roundedMinutes, 0, 0)
       }
 
       // 生成时间刻度
-      const startTime = new Date(minTime)
-      startTime.setMinutes(Math.floor(startTime.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0)
-
-      const endTime = new Date(maxTime)
-      endTime.setMinutes(Math.ceil(endTime.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0)
-
       for (let time = startTime.getTime(); time <= endTime.getTime(); time += intervalMinutes * 60 * 1000) {
         const position = ((time - minTime) / totalDuration) * 100
-        if (position >= -5 && position <= 105) { // 稍微超出边界以确保显示完整
+        if (position >= -10 && position <= 110) { // 允许稍微超出边界
           const date = new Date(time)
           const hours = date.getHours().toString().padStart(2, '0')
           const minutes = date.getMinutes().toString().padStart(2, '0')
+          
+          let label
+          if (showMinutes || minutes !== '00') {
+            label = `${hours}:${minutes}`
+          } else {
+            label = `${hours}:00`
+          }
+          
           ticks.push({
             time: time,
             position: position,
-            label: `${hours}:${minutes}`
+            label: label,
+            isHourMark: minutes === '00' // 标记整点
           })
         }
       }
 
       return ticks
+    },
+    groupedAssignments() {
+      if (!this.filteredProductionAssignments || this.filteredProductionAssignments.length === 0) {
+        return []
+      }
+      
+      const groups = {}
+      
+      // 按订单号分组
+      this.filteredProductionAssignments.forEach(task => {
+        const orderNo = task.order_no
+        if (!groups[orderNo]) {
+          const orderTask = this.allTasks.find(t => t.order_no === orderNo)
+          groups[orderNo] = {
+            orderNo: orderNo,
+            productName: orderTask ? orderTask.product_name : '未知产品',
+            tasks: [],
+            expanded: this.orderGroupStates[orderNo] || false,
+            status: '已排产'
+          }
+        }
+        groups[orderNo].tasks.push(task)
+      })
+      
+      // 计算每个组的统计信息
+      Object.values(groups).forEach(group => {
+        group.taskCount = group.tasks.length
+        
+        // 排序任务按时间
+        group.tasks.sort((a, b) => new Date(a.plan_start_time) - new Date(b.plan_start_time))
+        
+        // 计算时间范围
+        if (group.tasks.length > 0) {
+          const firstTask = group.tasks[0]
+          const lastTask = group.tasks[group.tasks.length - 1]
+          const startTime = firstTask.plan_start_time.split(' ')[1].substring(0, 5)
+          const endTime = lastTask.plan_end_time.split(' ')[1].substring(0, 5)
+          group.timeRange = `${startTime} ~ ${endTime}`
+        } else {
+          group.timeRange = ''
+        }
+      })
+      
+      return Object.values(groups).sort((a, b) => a.orderNo.localeCompare(b.orderNo))
     }
   },
   created() {
     this.loadData()
   },
   methods: {
-    loadData() {
-      // 加载任务数据，过滤指定批次 (使用原始批次)
-      this.allTasks = taskData.filter(task =>
-        task.model_run_batch === '20240905'
-      )
-      // 加载排产数据，过滤指定批次
-      this.productionAssignments = productionAssignData.filter(item =>
-        item.model_run_batch === this.currentBatch
-      )
+    goBack() {
+      console.log('🔙 返回上一步')
+      this.$router.go(-1)
+    },
+    async loadData() {
+      this.loading = true
+      this.error = null
+      
+      try {
+        console.log('🔄 开始加载生产任务数据...')
+        
+        // 从API获取生产任务数据
+        const response = await topic04Api.getProductionTasks(this.currentBatch)
+        
+        if (response.success && response.data) {
+          this.allTasks = response.data.tasks || []
+          console.log(`✅ 成功加载 ${this.allTasks.length} 条生产任务数据`)
+          
+          // 清空排产数据，因为我们现在使用任务数据
+          this.productionAssignments = []
+          
+          this.$message({
+            type: 'success',
+            message: `成功加载${this.allTasks.length}条生产任务数据`,
+            duration: 3000
+          })
+        } else {
+          throw new Error(response.error || '获取生产任务数据失败')
+        }
+      } catch (error) {
+        console.error('❌ 加载生产任务数据失败:', error)
+        this.error = error.message
+        this.allTasks = []
+        this.productionAssignments = []
+        
+        this.$message({
+          type: 'error',
+          message: `加载数据失败: ${error.message}`,
+          duration: 5000
+        })
+      } finally {
+        this.loading = false
+      }
     },
     getOrderStatusType(status) {
       const types = {
@@ -320,9 +547,51 @@ export default {
       }
       return types[status] || 'default'
     },
+    getProcedureType(procedureName) {
+      const types = {
+        '下料': 'primary',
+        '粗加工': 'warning',
+        '精加工': 'info',
+        '检验包装': 'success'
+      }
+      return types[procedureName] || 'default'
+    },
+    toggleScheduleExpanded() {
+      this.scheduleExpanded = !this.scheduleExpanded
+    },
+    toggleOrderGroup(orderNo) {
+      this.$set(this.orderGroupStates, orderNo, !this.orderGroupStates[orderNo])
+      // 同时更新groupedAssignments中的状态
+      const group = this.groupedAssignments.find(g => g.orderNo === orderNo)
+      if (group) {
+        group.expanded = this.orderGroupStates[orderNo]
+      }
+    },
     formatDate(dateString) {
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      return new Date(dateString).toLocaleString('zh-CN', options).replace(/\//g, '-');
+      if (!dateString) return ''
+      
+      // 处理数据库返回的日期格式 (可能是字符串或者对象)
+      let date
+      if (typeof dateString === 'object' && dateString.$date) {
+        date = new Date(dateString.$date)
+      } else {
+        date = new Date(dateString)
+      }
+      
+      if (isNaN(date.getTime())) {
+        return dateString // 如果无法解析，返回原始字符串
+      }
+      
+      const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      }
+      return date.toLocaleString('zh-CN', options).replace(/\//g, '-')
     },
     getTaskBlockStyle(assignment, allAssignments) {
       // 计算这台机器所有任务的时间范围
@@ -375,6 +644,17 @@ export default {
   min-height: 100vh;
 }
 
+.loading-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.error-container {
+  margin: 20px 0;
+}
+
 .page-header {
   margin-bottom: 20px;
   display: flex;
@@ -384,6 +664,17 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.back-btn {
+  font-weight: 500;
+  border-radius: 6px;
 }
 
 .page-header h2 {
@@ -537,9 +828,15 @@ export default {
     align-items: flex-start;
     gap: 15px;
   }
-  
+
+  .header-left {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .header-info {
     flex-wrap: wrap;
+    width: 100%;
   }
 }
 
@@ -565,15 +862,187 @@ export default {
 .production-schedule {
   margin-top: 30px;
   background-color: #fff;
-  padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 排产明细头部 */
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e6ebf0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.schedule-header:hover {
+  background-color: #f0f2f5;
+}
+
+.schedule-header h3 {
+  font-size: 18px;
+  color: #303133;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expand-icon {
+  font-size: 14px;
+  color: #606266;
+  transition: transform 0.2s ease;
+}
+
+.task-count {
+  font-size: 14px;
+  color: #909399;
+  font-weight: normal;
+}
+
+/* 排产明细内容 */
+.schedule-content {
+  padding: 0;
+}
+
+/* 订单分组样式 */
+.order-group {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-group:last-child {
+  border-bottom: none;
+}
+
+.order-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #fafbfc;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.order-group-header:hover {
+  background-color: #f5f7fa;
+}
+
+.order-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.group-expand-icon {
+  font-size: 12px;
+  color: #909399;
+  transition: transform 0.2s ease;
+}
+
+.order-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.product-info {
+  font-size: 14px;
+  color: #606266;
+}
+
+.order-summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.time-range {
+  font-size: 13px;
+  color: #909399;
+  font-family: 'Courier New', monospace;
+  background-color: #f0f2f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 任务列表样式 */
+.order-tasks {
+  padding: 0 20px 16px;
+}
+
+.task-card {
+  background-color: #fff;
+  border: 1px solid #e6ebf0;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+.task-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.production-schedule h3 {
-  font-size: 20px;
+.task-card:last-child {
+  margin-bottom: 0;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fafbfc;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.task-basic-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-id {
+  font-size: 14px;
+  font-weight: 600;
   color: #303133;
-  margin-bottom: 15px;
+}
+
+.task-time {
+  font-size: 13px;
+  color: #606266;
+  font-family: 'Courier New', monospace;
+}
+
+.task-details {
+  padding: 12px 16px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: #909399;
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 13px;
+  color: #303133;
+  flex: 1;
 }
 
 /* 机器运转时间轴样式 */
@@ -629,6 +1098,14 @@ export default {
   background-color: #909399;
   margin-bottom: 4px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.tick-line.hour-line {
+  width: 2px;
+  height: 25px;
+  background-color: #409EFF;
+  box-shadow: 0 2px 4px rgba(64, 158, 255, 0.3);
 }
 
 .tick-label {
@@ -643,6 +1120,17 @@ export default {
   padding: 1px 4px;
   border-radius: 3px;
   border: 1px solid #e6ebf0;
+  transition: all 0.2s ease;
+}
+
+.tick-label.hour-label {
+  font-size: 12px;
+  color: #409EFF;
+  font-weight: 600;
+  background-color: rgba(64, 158, 255, 0.1);
+  border: 1px solid #409EFF;
+  transform: rotate(-30deg); /* 稍微减少旋转角度，更易读 */
+  z-index: 10;
 }
 
 .timeline-container {

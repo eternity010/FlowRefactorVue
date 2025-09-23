@@ -385,6 +385,359 @@ class Topic04Service {
   }
 
   /**
+   * 获取生产任务数据
+   * @param {string} modelRunBatch - 模型运行批次 (可选)
+   * @returns {Object} 生产任务列表
+   */
+  async getProductionTasks(modelRunBatch = '20240905') {
+    try {
+      console.log(`🔍 获取生产任务数据，批次: ${modelRunBatch}`);
+      
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          task_id,
+          work_no,
+          sale_order_no,
+          order_no,
+          order_need_num,
+          plan_no,
+          work_order_no,
+          batch_no,
+          dispatch_order_no,
+          procedure_id,
+          procedure_code,
+          procedure_name,
+          procedure_content,
+          procedure_order,
+          procedure_plan_preparation_time,
+          procedure_plan_work_time,
+          receive_id,
+          receive_time,
+          receive_name,
+          product_id,
+          product_code,
+          product_name,
+          order_type,
+          task_num,
+          report_num,
+          plan_start_time,
+          plan_end_time,
+          real_start_time,
+          real_end_time,
+          jockey_id,
+          jockey_no,
+          jockey_name,
+          equipment_ids,
+          equipment_speed_range,
+          equipment_unit_process_energy,
+          equipment_unit_idle_energy,
+          work_center_id,
+          work_center_code,
+          work_center_name,
+          line_id,
+          line_code,
+          line_name,
+          remark,
+          create_time,
+          update_time
+        FROM dm_topic0401_input_task 
+        WHERE model_run_batch = ?
+          AND del_flag = 0
+        ORDER BY task_id, procedure_order
+      `;
+      
+      const result = await this.mysqlService.executeCustomQuery(sql, [modelRunBatch]);
+      
+      if (result.success) {
+        const processedData = this.processProductionTaskData(result.data);
+        const summary = this.generateProductionTaskSummary(processedData);
+        
+        console.log(`✅ 成功获取 ${processedData.length} 条生产任务数据`);
+        
+        return {
+          success: true,
+          data: {
+            total: processedData.length,
+            tasks: processedData,
+            summary: summary,
+            timestamp: new Date().toISOString()
+          }
+        };
+      } else {
+        throw new Error(result.error || '查询生产任务数据失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取生产任务失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 根据订单号获取生产任务
+   * @param {string} orderNo - 订单号
+   * @returns {Object} 指定订单的生产任务
+   */
+  async getProductionTasksByOrder(orderNo) {
+    try {
+      console.log(`🔍 获取订单 "${orderNo}" 的生产任务`);
+      
+      const sql = `
+        SELECT 
+          id, task_id, work_no, order_no, procedure_name, procedure_order,
+          procedure_plan_preparation_time, procedure_plan_work_time,
+          product_name, order_need_num, jockey_name, work_center_name,
+          plan_start_time, plan_end_time, real_start_time, real_end_time,
+          equipment_ids, remark
+        FROM dm_topic0401_input_task 
+        WHERE order_no = ?
+          AND del_flag = 0
+        ORDER BY procedure_order
+      `;
+      
+      const result = await this.mysqlService.executeCustomQuery(sql, [orderNo]);
+      
+      if (result.success) {
+        const processedData = this.processProductionTaskData(result.data);
+        
+        return {
+          success: true,
+          data: {
+            orderNo: orderNo,
+            total: processedData.length,
+            tasks: processedData,
+            timestamp: new Date().toISOString()
+          }
+        };
+      } else {
+        throw new Error(result.error || `查询订单 ${orderNo} 生产任务失败`);
+      }
+    } catch (error) {
+      console.error(`❌ 获取订单 ${orderNo} 生产任务失败:`, error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 获取生产任务统计数据
+   * @param {string} modelRunBatch - 模型运行批次
+   * @returns {Object} 统计结果
+   */
+  async getProductionTaskStatistics(modelRunBatch = '20240905') {
+    try {
+      console.log('🔍 获取生产任务统计数据');
+      
+      const sql = `
+        SELECT 
+          order_no,
+          product_name,
+          order_need_num,
+          COUNT(*) as task_count,
+          COUNT(DISTINCT procedure_code) as procedure_count,
+          COUNT(DISTINCT jockey_id) as jockey_count,
+          COUNT(DISTINCT work_center_id) as work_center_count,
+          MIN(plan_start_time) as earliest_start,
+          MAX(plan_end_time) as latest_end,
+          SUM(procedure_plan_preparation_time) as total_prep_time,
+          SUM(procedure_plan_work_time) as total_work_time
+        FROM dm_topic0401_input_task 
+        WHERE model_run_batch = ?
+          AND del_flag = 0
+        GROUP BY order_no, product_name, order_need_num
+        ORDER BY order_no
+      `;
+      
+      const result = await this.mysqlService.executeCustomQuery(sql, [modelRunBatch]);
+      
+      if (result.success) {
+        const statistics = this.processProductionStatisticsData(result.data);
+        
+        return {
+          success: true,
+          data: {
+            statistics: statistics,
+            timestamp: new Date().toISOString()
+          }
+        };
+      } else {
+        throw new Error(result.error || '获取生产任务统计失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取生产任务统计失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 处理生产任务数据，添加额外信息
+   * @param {Array} rawData - 原始生产任务数据
+   * @returns {Array} 处理后的数据
+   */
+  processProductionTaskData(rawData) {
+    return rawData.map(record => ({
+      ...record,
+      // 格式化时间字段
+      formattedPlanStartTime: this.formatDateTime(record.plan_start_time),
+      formattedPlanEndTime: this.formatDateTime(record.plan_end_time),
+      formattedRealStartTime: this.formatDateTime(record.real_start_time),
+      formattedRealEndTime: this.formatDateTime(record.real_end_time),
+      formattedReceiveTime: this.formatDateTime(record.receive_time),
+      // 计算计划总时间
+      totalPlannedTime: (record.procedure_plan_preparation_time || 0) + (record.procedure_plan_work_time || 0),
+      // 工序状态
+      procedureStatus: this.getProcedureStatus(record.plan_start_time, record.plan_end_time),
+      // 设备ID数组
+      equipmentIdArray: record.equipment_ids ? record.equipment_ids.split(';').filter(id => id && id !== '-1') : [],
+      // 进度百分比
+      progressPercent: this.calculateTaskProgress(record.plan_start_time, record.plan_end_time)
+    }));
+  }
+
+  /**
+   * 处理生产统计数据
+   * @param {Array} rawData - 原始统计数据
+   * @returns {Object} 处理后的统计数据
+   */
+  processProductionStatisticsData(rawData) {
+    const statistics = {
+      totalOrders: rawData.length,
+      totalTasks: 0,
+      totalProducts: 0,
+      byProduct: {},
+      byWorkCenter: {},
+      timeline: {},
+      efficiency: {}
+    };
+
+    rawData.forEach(record => {
+      statistics.totalTasks += record.task_count;
+      statistics.totalProducts += record.order_need_num;
+
+      // 按产品统计
+      if (!statistics.byProduct[record.product_name]) {
+        statistics.byProduct[record.product_name] = {
+          orderCount: 0,
+          taskCount: 0,
+          needNum: 0
+        };
+      }
+      statistics.byProduct[record.product_name].orderCount++;
+      statistics.byProduct[record.product_name].taskCount += record.task_count;
+      statistics.byProduct[record.product_name].needNum += record.order_need_num;
+
+      // 时间线统计
+      const startDate = new Date(record.earliest_start).toDateString();
+      if (!statistics.timeline[startDate]) {
+        statistics.timeline[startDate] = 0;
+      }
+      statistics.timeline[startDate] += record.task_count;
+
+      // 效率统计
+      const totalTime = record.total_prep_time + record.total_work_time;
+      statistics.efficiency[record.order_no] = {
+        totalTime: totalTime,
+        taskCount: record.task_count,
+        avgTimePerTask: totalTime / record.task_count
+      };
+    });
+
+    return statistics;
+  }
+
+  /**
+   * 获取工序状态
+   * @param {Date} planStartTime - 计划开始时间
+   * @param {Date} planEndTime - 计划结束时间
+   * @returns {string} 工序状态
+   */
+  getProcedureStatus(planStartTime, planEndTime) {
+    const now = new Date();
+    const start = new Date(planStartTime);
+    const end = new Date(planEndTime);
+
+    if (now < start) {
+      return '未开始';
+    } else if (now > end) {
+      return '已完成';
+    } else {
+      return '进行中';
+    }
+  }
+
+  /**
+   * 计算任务进度
+   * @param {Date} planStartTime - 计划开始时间
+   * @param {Date} planEndTime - 计划结束时间
+   * @returns {number} 进度百分比
+   */
+  calculateTaskProgress(planStartTime, planEndTime) {
+    const now = new Date();
+    const start = new Date(planStartTime);
+    const end = new Date(planEndTime);
+
+    if (now <= start) return 0;
+    if (now >= end) return 100;
+
+    const total = end - start;
+    const elapsed = now - start;
+    return Math.round((elapsed / total) * 100);
+  }
+
+  /**
+   * 生成生产任务汇总信息
+   * @param {Array} data - 生产任务数据
+   * @returns {Object} 汇总信息
+   */
+  generateProductionTaskSummary(data) {
+    const summary = {
+      totalCount: data.length,
+      byProcedure: {},
+      byProduct: {},
+      byWorkCenter: {},
+      byStatus: {},
+      avgPreparationTime: 0,
+      avgWorkTime: 0
+    };
+
+    // 统计各维度数据
+    data.forEach(record => {
+      // 按工序统计
+      summary.byProcedure[record.procedure_name] = 
+        (summary.byProcedure[record.procedure_name] || 0) + 1;
+      
+      // 按产品统计
+      summary.byProduct[record.product_name] = 
+        (summary.byProduct[record.product_name] || 0) + 1;
+      
+      // 按工作中心统计
+      summary.byWorkCenter[record.work_center_name] = 
+        (summary.byWorkCenter[record.work_center_name] || 0) + 1;
+
+      // 按状态统计
+      summary.byStatus[record.procedureStatus] = 
+        (summary.byStatus[record.procedureStatus] || 0) + 1;
+    });
+
+    // 计算平均时间
+    const totalPrepTime = data.reduce((sum, record) => sum + (record.procedure_plan_preparation_time || 0), 0);
+    const totalWorkTime = data.reduce((sum, record) => sum + (record.procedure_plan_work_time || 0), 0);
+    summary.avgPreparationTime = data.length > 0 ? Math.round(totalPrepTime / data.length) : 0;
+    summary.avgWorkTime = data.length > 0 ? Math.round(totalWorkTime / data.length) : 0;
+
+    return summary;
+  }
+
+  /**
    * 获取服务状态
    * @returns {Object} 服务状态
    */

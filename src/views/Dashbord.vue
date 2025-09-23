@@ -45,6 +45,10 @@
               <i class="el-icon-s-grid menu-icon"></i>
               <span>子流程管理</span>
             </el-menu-item>
+            <el-menu-item index="1-3">
+              <i class="el-icon-monitor menu-icon"></i>
+              <span>运维管理</span>
+            </el-menu-item>
           </el-submenu>
 
           <!-- 资源管理 (独立菜单项) -->
@@ -71,11 +75,6 @@
             <span>流程重构优化</span>
           </el-menu-item>
           
-          <!-- 大模型对话 (独立菜单项) -->
-          <el-menu-item index="6">
-            <i class="el-icon-chat-line-square menu-icon"></i>
-            <span>大模型对话</span>
-          </el-menu-item>
 
           <!-- 人员分配计划 (独立菜单项) -->
           <el-menu-item index="7">
@@ -83,11 +82,6 @@
             <span>人员分配计划</span>
           </el-menu-item>
 
-          <!-- 运维计划 (独立菜单项) -->
-          <el-menu-item index="8">
-            <i class="el-icon-s-platform menu-icon"></i>
-            <span>运维计划</span>
-          </el-menu-item>
 
         </el-menu>
       </el-aside>
@@ -124,6 +118,9 @@ export default {
         case '1-2':
           this.$router.push('/home/sub-process')
           break
+        case '1-3':
+          this.$router.push('/home/operation-management')
+          break
         case '2':
           this.$router.push('/home/resource')
           break
@@ -136,14 +133,8 @@ export default {
         case '5':
           this.$router.push('/home/process-optimization')
           break
-        case '6':
-          this.$router.push('/home/llm-chat')
-          break
         case '7':
           this.$router.push('/home/task-assignment')
-          break
-        case '8':
-          this.$router.push('/home/maintenance-plan')
           break
         // 其他菜单项的路由可以在这里添加
       }

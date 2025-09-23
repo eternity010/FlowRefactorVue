@@ -2277,6 +2277,251 @@ app.get('/api/topic04/maintenance/search', async (req, res) => {
   }
 });
 
+// ================================
+// Topic04 生产任务相关API路由
+// ================================
+
+// 获取生产任务数据
+app.get('/api/topic04/production/tasks', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取生产任务数据的请求，批次: ${model_run_batch || '20240905'}`);
+    
+    const result = await topic04Service.getProductionTasks(model_run_batch);
+    sendResponse(res, result, '获取生产任务数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据订单号获取生产任务
+app.get('/api/topic04/production/tasks/order/:orderNo', async (req, res) => {
+  try {
+    const { orderNo } = req.params;
+    console.log(`📥 收到获取订单 "${orderNo}" 生产任务的请求`);
+    
+    const result = await topic04Service.getProductionTasksByOrder(orderNo);
+    sendResponse(res, result, `获取订单 ${orderNo} 生产任务失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取生产任务统计数据
+app.get('/api/topic04/production/statistics', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取生产任务统计数据的请求，批次: ${model_run_batch || '20240905'}`);
+    
+    const result = await topic04Service.getProductionTaskStatistics(model_run_batch);
+    sendResponse(res, result, '获取生产任务统计数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据产品名称获取生产任务
+app.get('/api/topic04/production/tasks/product/:productName', async (req, res) => {
+  try {
+    const { productName } = req.params;
+    console.log(`📥 收到获取产品 "${productName}" 生产任务的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0401_input_task 
+      WHERE product_name = ? AND del_flag = 0
+      ORDER BY task_id, procedure_order
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [productName]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processProductionTaskData(result.data);
+      res.json({
+        success: true,
+        data: {
+          productName: productName,
+          total: processedData.length,
+          tasks: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取产品 ${productName} 生产任务失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据工序获取生产任务
+app.get('/api/topic04/production/tasks/procedure/:procedureName', async (req, res) => {
+  try {
+    const { procedureName } = req.params;
+    console.log(`📥 收到获取工序 "${procedureName}" 生产任务的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0401_input_task 
+      WHERE procedure_name = ? AND del_flag = 0
+      ORDER BY task_id, procedure_order
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [procedureName]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processProductionTaskData(result.data);
+      res.json({
+        success: true,
+        data: {
+          procedureName: procedureName,
+          total: processedData.length,
+          tasks: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取工序 ${procedureName} 生产任务失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据操作员获取生产任务
+app.get('/api/topic04/production/tasks/jockey/:jockeyName', async (req, res) => {
+  try {
+    const { jockeyName } = req.params;
+    console.log(`📥 收到获取操作员 "${jockeyName}" 生产任务的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0401_input_task 
+      WHERE jockey_name = ? AND del_flag = 0
+      ORDER BY task_id, procedure_order
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [jockeyName]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processProductionTaskData(result.data);
+      res.json({
+        success: true,
+        data: {
+          jockeyName: jockeyName,
+          total: processedData.length,
+          tasks: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取操作员 ${jockeyName} 生产任务失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据工作中心获取生产任务
+app.get('/api/topic04/production/tasks/workcenter/:workCenterName', async (req, res) => {
+  try {
+    const { workCenterName } = req.params;
+    console.log(`📥 收到获取工作中心 "${workCenterName}" 生产任务的请求`);
+    
+    const sql = `
+      SELECT * FROM dm_topic0401_input_task 
+      WHERE work_center_name = ? AND del_flag = 0
+      ORDER BY task_id, procedure_order
+    `;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, [workCenterName]);
+    
+    if (result.success) {
+      const processedData = topic04Service.processProductionTaskData(result.data);
+      res.json({
+        success: true,
+        data: {
+          workCenterName: workCenterName,
+          total: processedData.length,
+          tasks: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, `获取工作中心 ${workCenterName} 生产任务失败`);
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 搜索生产任务
+app.get('/api/topic04/production/tasks/search', async (req, res) => {
+  try {
+    const { keyword, product, procedure, jockey, workCenter, dateFrom, dateTo } = req.query;
+    console.log('📥 收到搜索生产任务的请求:', req.query);
+    
+    let sql = `
+      SELECT * FROM dm_topic0401_input_task 
+      WHERE del_flag = 0
+    `;
+    const params = [];
+    
+    if (keyword) {
+      sql += ` AND (task_id LIKE ? OR work_no LIKE ? OR order_no LIKE ? OR product_name LIKE ?)`;
+      params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+    
+    if (product) {
+      sql += ` AND product_name = ?`;
+      params.push(product);
+    }
+    
+    if (procedure) {
+      sql += ` AND procedure_name = ?`;
+      params.push(procedure);
+    }
+    
+    if (jockey) {
+      sql += ` AND jockey_name = ?`;
+      params.push(jockey);
+    }
+    
+    if (workCenter) {
+      sql += ` AND work_center_name = ?`;
+      params.push(workCenter);
+    }
+    
+    if (dateFrom) {
+      sql += ` AND plan_start_time >= ?`;
+      params.push(dateFrom);
+    }
+    
+    if (dateTo) {
+      sql += ` AND plan_end_time <= ?`;
+      params.push(dateTo);
+    }
+    
+    sql += ` ORDER BY task_id, procedure_order LIMIT 200`;
+    
+    const result = await topic04Service.mysqlService.executeCustomQuery(sql, params);
+    
+    if (result.success) {
+      const processedData = topic04Service.processProductionTaskData(result.data);
+      res.json({
+        success: true,
+        data: {
+          searchParams: req.query,
+          total: processedData.length,
+          tasks: processedData,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      sendResponse(res, result, '搜索生产任务失败');
+    }
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // 获取Topic04状态信息
 app.get('/api/topic04/status', async (req, res) => {
   try {

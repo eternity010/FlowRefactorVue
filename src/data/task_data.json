@@ -25,8 +25,8 @@
     "name": "下料",
     "content": "原材料下料切割",
     "order": 1,
-    "plan_preparation_time": 30,
-    "plan_work_time": 120
+    "plan_preparation_time": 5,
+    "plan_work_time": 15
   },
   "receive": {
     "id": "1001",
@@ -429,8 +429,8 @@
     "name": "下料",
     "content": "原材料下料切割",
     "order": 1,
-    "plan_preparation_time": 30,
-    "plan_work_time": 120
+    "plan_preparation_time": 5,
+    "plan_work_time": 15
   },
   "receive": {
     "id": "1007",
@@ -833,8 +833,8 @@
     "name": "下料",
     "content": "原材料下料切割",
     "order": 1,
-    "plan_preparation_time": 30,
-    "plan_work_time": 120
+    "plan_preparation_time": 5,
+    "plan_work_time": 15
   },
   "receive": {
     "id": "1013",
@@ -1237,8 +1237,8 @@
     "name": "下料",
     "content": "原材料下料切割",
     "order": 1,
-    "plan_preparation_time": 30,
-    "plan_work_time": 120
+    "plan_preparation_time": 5,
+    "plan_work_time": 15
   },
   "receive": {
     "id": "1019",
@@ -1641,8 +1641,8 @@
     "name": "下料",
     "content": "原材料下料切割",
     "order": 1,
-    "plan_preparation_time": 30,
-    "plan_work_time": 120
+    "plan_preparation_time": 5,
+    "plan_work_time": 15
   },
   "receive": {
     "id": "1025",
