@@ -362,7 +362,7 @@ export default {
         
         // 1.5秒后跳转到重构时机界面
         setTimeout(() => {
-          this.$router.push('/home/refactor-timing');
+          this.$router.push('/topic4/home/refactor-timing');
         }, 1500);
       }, 3000);
     }

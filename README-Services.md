@@ -128,4 +128,16 @@ curl http://localhost:3001/health
 
 ### 环境变量
 - `VUE_APP_API_URL`: 前端API基础URL配置
-- 火山引擎API密钥（大模型服务） 
+- `MONGODB_URI`: MongoDB连接字符串
+- `MONGODB_DB`: MongoDB数据库名称
+- `NODE_ENV`: 运行环境 (development/production/test)
+- 火山引擎API密钥（大模型服务）
+
+### MongoDB配置管理
+项目使用统一的MongoDB配置文件 `config/mongodb.config.js`，支持：
+- 多环境配置管理 (开发/生产/测试)
+- 自动配置验证和连接选项优化
+- 详细的连接调试信息
+- 向后兼容现有环境变量
+
+详细配置说明请参考: [MongoDB配置管理说明](config/README-MongoDB-Config.md) 

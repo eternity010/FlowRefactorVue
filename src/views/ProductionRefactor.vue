@@ -208,6 +208,17 @@
            </div>
          </el-collapse-transition>
        </div>
+       
+       <!-- 下一步按钮 -->
+       <div class="next-step-container">
+         <el-button 
+           type="primary" 
+           size="medium" 
+           @click="goToNextStep"
+           icon="el-icon-arrow-right">
+           下一步
+         </el-button>
+       </div>
     </div>
   </div>
 </template>
@@ -489,6 +500,26 @@ export default {
       })
       
       return Object.values(groups).sort((a, b) => a.orderNo.localeCompare(b.orderNo))
+    },
+    globalTimeRange() {
+      // 计算全局时间范围，用于甘特图任务块定位
+      let minTime = Infinity
+      let maxTime = -Infinity
+
+      this.machineSchedules.forEach(machine => {
+        machine.assignments.forEach(assignment => {
+          const startTime = new Date(assignment.plan_start_time).getTime()
+          const endTime = new Date(assignment.plan_end_time).getTime()
+          minTime = Math.min(minTime, startTime)
+          maxTime = Math.max(maxTime, endTime)
+        })
+      })
+
+      return {
+        minTime: minTime === Infinity ? 0 : minTime,
+        maxTime: maxTime === -Infinity ? 0 : maxTime,
+        totalDuration: (maxTime === -Infinity || minTime === Infinity) ? 0 : maxTime - minTime
+      }
     }
   },
   created() {
@@ -498,6 +529,15 @@ export default {
     goBack() {
       console.log('🔙 返回上一步')
       this.$router.go(-1)
+    },
+    goToNextStep() {
+      console.log('🔜 跳转到下一步')
+      this.$router.push({
+        name: 'ProductionRefactor2',
+        query: {
+          batch: this.currentBatch
+        }
+      })
     },
     async loadData() {
       this.loading = true
@@ -594,19 +634,33 @@ export default {
       return date.toLocaleString('zh-CN', options).replace(/\//g, '-')
     },
     getTaskBlockStyle(assignment, allAssignments) {
-      // 计算这台机器所有任务的时间范围
-      const startTimes = allAssignments.map(a => new Date(a.plan_start_time))
-      const endTimes = allAssignments.map(a => new Date(a.plan_end_time))
-      const machineStart = Math.min(...startTimes)
-      const machineEnd = Math.max(...endTimes)
-      const totalDuration = machineEnd - machineStart
+      // 使用全局时间范围计算属性，与时间轴刻度保持一致
+      const { minTime, maxTime, totalDuration } = this.globalTimeRange
+
+      // 如果没有有效的时间范围，返回默认样式
+      if (totalDuration === 0) {
+        return {
+          left: '0%',
+          width: '100%',
+          backgroundColor: '#909399',
+          position: 'absolute',
+          height: '30px',
+          borderRadius: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '12px'
+        }
+      }
 
       // 计算当前任务的位置和宽度
-      const taskStart = new Date(assignment.plan_start_time)
-      const taskEnd = new Date(assignment.plan_end_time)
+      const taskStart = new Date(assignment.plan_start_time).getTime()
+      const taskEnd = new Date(assignment.plan_end_time).getTime()
       const taskDuration = taskEnd - taskStart
 
-      const leftPercent = ((taskStart - machineStart) / totalDuration) * 100
+      // 基于全局时间轴计算位置和宽度
+      const leftPercent = ((taskStart - minTime) / totalDuration) * 100
       const widthPercent = (taskDuration / totalDuration) * 100
 
       // 根据工序类型设置颜色
@@ -619,7 +673,7 @@ export default {
 
       return {
         left: leftPercent + '%',
-        width: Math.max(widthPercent, 5) + '%', // 最小宽度5%，确保可见
+        width: Math.max(widthPercent, 2) + '%', // 最小宽度2%，确保可见
         backgroundColor: procedureColors[assignment.procedure_name] || '#909399',
         position: 'absolute',
         height: '30px',
@@ -630,7 +684,8 @@ export default {
         color: 'white',
         fontSize: '12px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid rgba(255,255,255,0.2)'
+        border: '1px solid rgba(255,255,255,0.2)',
+        zIndex: 1
       }
     }
   }
@@ -1043,6 +1098,16 @@ export default {
   font-size: 13px;
   color: #303133;
   flex: 1;
+}
+
+/* 下一步按钮样式 */
+.next-step-container {
+  margin-top: 30px;
+  padding: 20px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 机器运转时间轴样式 */

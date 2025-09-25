@@ -1073,13 +1073,13 @@ export default {
     // 显示神经网络设置
     showNeuralNetworkSettings() {
       // 跳转到神经网络参数设置页面
-      this.$router.push('/home/neural-network-settings');
+      this.$router.push('/topic4/home/neural-network-settings');
     },
 
     // 配置RAG
     configureRAG() {
       // 跳转到RAG配置页面
-      this.$router.push('/home/rag-config');
+      this.$router.push('/topic4/home/rag-config');
     },
 
     // 重新加载参数配置

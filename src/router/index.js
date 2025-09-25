@@ -14,11 +14,13 @@ import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
 import TaskAssignmentView from '@/views/TaskAssignmentView'
 import ProductionRefactor from '@/views/ProductionRefactor'
+import ProductionRefactor2 from '@/views/ProductionRefactor2'
 import MarketingRefactor from '@/views/MarketingRefactor'
 import PurchaseRefactor from '@/views/PurchaseRefactor'
 import OperationRefactor from '@/views/OperationRefactor'
 import OperationRefactor2 from '@/views/OperationRefactor2'
 import OperationRefactor3 from '@/views/OperationRefactor3'
+import RiskReassessment from '@/views/RiskReassessment'
 import OperationManagement from '@/views/OperationManagement'
 
 Vue.use(Router)
@@ -26,11 +28,11 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
-      redirect: '/home'
+      path: '/topic4/',
+      redirect: '/topic4/home'
     },
     {
-      path: '/home',
+      path: '/topic4/home',
       name: 'Dashbord',
       component: Dashbord,
       children: [
@@ -97,44 +99,54 @@ export default new Router({
       ]
     },
     {
-      path: '/node-detail',
+      path: '/topic4/node-detail',
       name: 'NodeDetail',
       component: NodeDetailView
     },
     {
-      path: '/resource-management',
+      path: '/topic4/resource-management',
       name: 'ResourceManagementPage',
       component: ResourceManagement
     },
     {
-      path: '/refactor-marketing',
+      path: '/topic4/refactor-marketing',
       name: 'MarketingRefactor',
       component: MarketingRefactor
     },
     {
-      path: '/refactor-purchase',
+      path: '/topic4/refactor-purchase',
       name: 'PurchaseRefactor',
       component: PurchaseRefactor
     },
     {
-      path: '/production-refactor',
+      path: '/topic4/production-refactor',
       name: 'ProductionRefactor',
       component: ProductionRefactor
     },
     {
-      path: '/refactor-operation',
+      path: '/topic4/production-refactor2',
+      name: 'ProductionRefactor2',
+      component: ProductionRefactor2
+    },
+    {
+      path: '/topic4/refactor-operation',
       name: 'OperationRefactor',
       component: OperationRefactor
     },
     {
-      path: '/refactor-operation2',
+      path: '/topic4/refactor-operation2',
       name: 'OperationRefactor2',
       component: OperationRefactor2
     },
     {
-      path: '/refactor-operation3',
+      path: '/topic4/refactor-operation3',
       name: 'OperationRefactor3',
       component: OperationRefactor3
+    },
+    {
+      path: '/topic4/risk-reassessment',
+      name: 'RiskReassessment',
+      component: RiskReassessment
     }
   ]
 })

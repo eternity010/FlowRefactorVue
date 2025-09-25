@@ -721,7 +721,7 @@ export default {
          orderSuggestion.progressText = step.text;
          
         // 每个步骤间隔（加快速度）
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise(resolve => setTimeout(resolve, 0.01));
        }
        
        // 简化建议生成，不需要详细内容

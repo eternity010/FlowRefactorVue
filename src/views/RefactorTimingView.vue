@@ -992,18 +992,18 @@ export default {
     },
     // 跳转到风险监控页面
     goToRiskMonitoring() {
-      this.$router.push('/home/risk');
+      this.$router.push('/topic4/home/risk');
     },
     goToSubProcessManagement() {
-      this.$router.push('/home/sub-process');
+      this.$router.push('/topic4/home/sub-process');
     },
     // 跳转到流程重构优化页面
     goToProcessOptimization() {
-      this.$router.push('/home/process-optimization');
+      this.$router.push('/topic4/home/process-optimization');
     },
     // 大模型联网收集信息
     handleAIDataCollection() {
-      this.$router.push('/home/ai-data-collection');
+      this.$router.push('/topic4/home/ai-data-collection');
     },
     async handleManualAnalysis() {
       const isCurrentlyNeedsRefactor = this.currentDataMoment === 'needs_refactor';
@@ -1284,7 +1284,7 @@ export default {
     },
     // 跳转到规划完成时间页面
     goToPlanningTime() {
-      this.$router.push('/home/planning-time');
+      this.$router.push('/topic4/home/planning-time');
     },
     // 跳转到业务态势全景感知页面
     goToBusinessSituation() {

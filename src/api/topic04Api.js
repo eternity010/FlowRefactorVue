@@ -7,27 +7,73 @@ class Topic04Api {
   constructor() {
     this.baseURL = API_BASE_URL;
     this.timeout = 10000; // 10秒超时
-    this.modelRunBatch = '20240905'; // 全局模型运行批次变量
+  }
+
+
+  /**
+   * 生成新的批次号
+   * @param {string} projectCode - 项目代码 (如: TSY)
+   * @param {string} topicCode - 专题代码 (如: 0401)  
+   * @param {string} version - 版本标识 (如: A, B, C)
+   * @returns {string} 新的批次号
+   */
+  generateBatchNumber(projectCode = 'TSY', topicCode = '0401', version = 'A') {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}_${projectCode}_${topicCode}_${version}`;
   }
 
   /**
-   * 设置全局模型运行批次
-   * @param {string} batch - 新的批次号
+   * 解析批次号
+   * @param {string} batch - 批次号
+   * @returns {Object} 解析结果
    */
-  setModelRunBatch(batch) {
-    if (!batch || typeof batch !== 'string') {
-      throw new Error('批次号不能为空且必须是字符串');
+  parseBatchNumber(batch) {
+    if (!batch) {
+      throw new Error('批次号不能为空');
     }
-    this.modelRunBatch = batch;
-    console.log(`🔄 Topic04 API 批次已设置为: ${batch}`);
-  }
-
-  /**
-   * 获取当前模型运行批次
-   * @returns {string} 当前批次号
-   */
-  getModelRunBatch() {
-    return this.modelRunBatch;
+    const batchToParse = batch;
+    
+    // 匹配新格式: 2025-09-23_TSY_0401_A
+    const newFormatMatch = batchToParse.match(/^(\d{4})-(\d{2})-(\d{2})_([A-Z]+)_(\d+)_([A-Z])$/);
+    if (newFormatMatch) {
+      return {
+        format: 'new',
+        date: `${newFormatMatch[1]}-${newFormatMatch[2]}-${newFormatMatch[3]}`,
+        year: newFormatMatch[1],
+        month: newFormatMatch[2],
+        day: newFormatMatch[3],
+        projectCode: newFormatMatch[4],
+        topicCode: newFormatMatch[5],
+        version: newFormatMatch[6],
+        raw: batchToParse
+      };
+    }
+    
+    // 匹配旧格式: 20240905
+    const oldFormatMatch = batchToParse.match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (oldFormatMatch) {
+      return {
+        format: 'old',
+        date: `${oldFormatMatch[1]}-${oldFormatMatch[2]}-${oldFormatMatch[3]}`,
+        year: oldFormatMatch[1],
+        month: oldFormatMatch[2],
+        day: oldFormatMatch[3],
+        projectCode: null,
+        topicCode: null,
+        version: null,
+        raw: batchToParse
+      };
+    }
+    
+    return {
+      format: 'unknown',
+      raw: batchToParse,
+      error: '无法解析的批次格式'
+    };
   }
 
   /**
@@ -269,12 +315,14 @@ class Topic04Api {
 
   /**
    * 获取生产任务数据
-   * @param {string} modelRunBatch - 模型运行批次 (可选，默认使用全局批次)
+   * @param {string} modelRunBatch - 模型运行批次 (必需)
    * @returns {Promise<Object>} 生产任务列表
    */
-  async getProductionTasks(modelRunBatch = null) {
-    const batch = modelRunBatch || this.modelRunBatch;
-    return await this.get('/api/topic04/production/tasks', { model_run_batch: batch });
+  async getProductionTasks(modelRunBatch) {
+    if (!modelRunBatch) {
+      throw new Error('模型运行批次不能为空');
+    }
+    return await this.get('/api/topic04/production/tasks', { model_run_batch: modelRunBatch });
   }
 
   /**
@@ -291,12 +339,14 @@ class Topic04Api {
 
   /**
    * 获取生产任务统计数据
-   * @param {string} modelRunBatch - 模型运行批次 (可选，默认使用全局批次)
+   * @param {string} modelRunBatch - 模型运行批次 (必需)
    * @returns {Promise<Object>} 统计结果
    */
-  async getProductionTaskStatistics(modelRunBatch = null) {
-    const batch = modelRunBatch || this.modelRunBatch;
-    return await this.get('/api/topic04/production/statistics', { model_run_batch: batch });
+  async getProductionTaskStatistics(modelRunBatch) {
+    if (!modelRunBatch) {
+      throw new Error('模型运行批次不能为空');
+    }
+    return await this.get('/api/topic04/production/statistics', { model_run_batch: modelRunBatch });
   }
 
   /**
@@ -368,18 +418,22 @@ class Topic04Api {
 const topic04Api = new Topic04Api();
 
 // 使用示例：
-// // 设置全局批次
-// topic04Api.setModelRunBatch('20240905');
+// // 生成新的批次号
+// const newBatch = topic04Api.generateBatchNumber('TSY', '0401', 'B');
+// console.log(newBatch); // 输出: 2025-09-23_TSY_0401_B
 //
-// // 获取当前批次
-// const currentBatch = topic04Api.getModelRunBatch();
+// // 解析批次号
+// const batchInfo = topic04Api.parseBatchNumber('2025-09-23_TSY_0401_A');
+// console.log(batchInfo.projectCode); // 输出: TSY
+// console.log(batchInfo.date); // 输出: 2025-09-23
 //
-// // 使用全局批次调用API
-// const tasks = await topic04Api.getProductionTasks();
-// const stats = await topic04Api.getProductionTaskStatistics();
+// // 调用API时必须提供批次号
+// const currentBatch = '2025-09-23_TSY_0401_A';
+// const tasks = await topic04Api.getProductionTasks(currentBatch);
+// const stats = await topic04Api.getProductionTaskStatistics(currentBatch);
 //
-// // 或者指定特定的批次（覆盖全局设置）
-// const specificTasks = await topic04Api.getProductionTasks('20240906');
+// // 使用不同的批次号
+// const specificTasks = await topic04Api.getProductionTasks('2025-09-24_TSY_0401_B');
 
 export { Topic04Api, topic04Api };
 export default topic04Api;

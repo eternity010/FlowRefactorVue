@@ -300,6 +300,131 @@ class Topic03Api {
     return await this.post('/api/topic03/batch-matches', params);
   }
 
+  // ============= 火车装配人员匹配API =============
+
+  /**
+   * 获取火车装配人员列表及其任务匹配度统计
+   * @param {Object} options - 查询选项
+   * @param {string} options.sortBy - 排序字段 (avg_match_rate, task_count, user_id, high_match_count)
+   * @param {string} options.sortOrder - 排序方向 (asc, desc)
+   * @param {number} options.page - 页码
+   * @param {number} options.pageSize - 每页大小
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 火车装配人员列表数据
+   */
+  async getTrainAssemblyUsers(options = {}) {
+    const params = {
+      sort_by: options.sortBy || 'avg_match_rate',
+      sort_order: options.sortOrder || 'desc',
+      page: options.page || 1,
+      page_size: options.pageSize || 20,
+      model_run_batch: options.modelRunBatch || 'TRAIN_ASSEMBLY_2025',
+      ...options
+    };
+
+    return await this.get('/api/topic03/train-assembly/users', params);
+  }
+
+  /**
+   * 获取特定火车装配人员的详细任务匹配信息
+   * @param {number} userId - 用户ID
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @param {string} options.sortBy - 排序字段
+   * @param {string} options.sortOrder - 排序方向
+   * @returns {Promise<Object>} 火车装配人员详细信息
+   */
+  async getTrainAssemblyUserDetail(userId, options = {}) {
+    if (!userId) {
+      throw new Error('用户ID不能为空');
+    }
+
+    const params = {
+      model_run_batch: options.modelRunBatch || 'TRAIN_ASSEMBLY_2025',
+      sort_by: options.sortBy || 'rate_percent',
+      sort_order: options.sortOrder || 'desc',
+      ...options
+    };
+
+    return await this.get(`/api/topic03/train-assembly/user/${userId}`, params);
+  }
+
+  /**
+   * 获取火车装配任务匹配统计
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 火车装配统计数据
+   */
+  async getTrainAssemblyStatistics(options = {}) {
+    const params = {
+      model_run_batch: options.modelRunBatch || 'TRAIN_ASSEMBLY_2025',
+      ...options
+    };
+
+    return await this.get('/api/topic03/train-assembly/statistics', params);
+  }
+
+  /**
+   * 搜索火车装配人员匹配记录
+   * @param {Object} searchParams - 搜索参数
+   * @param {number} searchParams.userId - 用户ID (可选)
+   * @param {number} searchParams.taskId - 任务ID (可选)
+   * @param {number} searchParams.minRate - 最小匹配度
+   * @param {number} searchParams.maxRate - 最大匹配度
+   * @param {string} searchParams.modelRunBatch - 模型运行批次
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 搜索结果
+   */
+  async searchTrainAssemblyMatches(searchParams = {}, options = {}) {
+    const params = {
+      ...searchParams,
+      model_run_batch: searchParams.modelRunBatch || 'TRAIN_ASSEMBLY_2025',
+      sort_by: options.sortBy || 'rate_percent',
+      sort_order: options.sortOrder || 'desc',
+      page: options.page || 1,
+      page_size: options.pageSize || 20
+    };
+
+    return await this.get('/api/topic03/train-assembly/search', params);
+  }
+
+  /**
+   * 获取火车装配人员任务名称映射
+   * @returns {Promise<Object>} 任务名称映射
+   */
+  async getTrainAssemblyTaskNames() {
+    // 根据之前的数据，返回任务名称映射
+    return {
+      success: true,
+      data: {
+        taskNames: {
+          2001: '主车体焊接',
+          2002: '侧面板安装', 
+          2003: '车顶安装',
+          2004: '电气布线',
+          2005: '制动系统',
+          2006: '内饰安装',
+          2007: '涂装准备',
+          2008: '质量检查',
+          2009: '调试测试',
+          2010: '最终验收'
+        },
+        userNames: {
+          1: '车体装配专家',
+          2: '电气工程师',
+          3: '制动系统专家',
+          4: '内饰装配工',
+          5: '涂装技师',
+          6: '质量检验员',
+          7: '调试工程师',
+          8: '验收工程师',
+          9: '装配学徒',
+          10: '技术主管'
+        }
+      }
+    };
+  }
+
   // ============= 数据管理相关API =============
 
   /**
