@@ -2281,14 +2281,27 @@ app.get('/api/topic04/maintenance/search', async (req, res) => {
 // Topic04 生产任务相关API路由
 // ================================
 
-// 获取生产任务数据
+// 获取生产任务数据 (从input_task表)
 app.get('/api/topic04/production/tasks', async (req, res) => {
   try {
     const { model_run_batch } = req.query;
     console.log(`📥 收到获取生产任务数据的请求，批次: ${model_run_batch || '20240905'}`);
-    
+
     const result = await topic04Service.getProductionTasks(model_run_batch);
     sendResponse(res, result, '获取生产任务数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取生产任务输出数据 (从output_task表)
+app.get('/api/topic04/production/output-tasks', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取生产任务输出数据的请求，批次: ${model_run_batch || '20240905'}`);
+
+    const result = await topic04Service.getProductionOutputTasks(model_run_batch);
+    sendResponse(res, result, '获取生产任务输出数据失败');
   } catch (error) {
     sendError(res, error);
   }
@@ -2935,6 +2948,95 @@ app.get('/api/topic03/train-assembly/search', async (req, res) => {
 
     const result = await topic03Service.searchTrainAssemblyMatches(searchParams, options);
     sendResponse(res, result, '搜索火车装配匹配记录失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
+// Topic03 火车装配设备健康度API路由
+// ================================
+
+// 获取设备健康度列表
+app.get('/api/topic03/train-assembly/equipment', async (req, res) => {
+  try {
+    const {
+      sortBy,
+      sortOrder,
+      page,
+      pageSize,
+      modelRunBatch
+    } = req.query;
+
+    const options = {
+      sortBy: sortBy || 'equipment_id',
+      sortOrder: sortOrder || 'asc',
+      page: parseInt(page) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      modelRunBatch: modelRunBatch || 'TRAIN_ASSEMBLY_2025'
+    };
+
+    const result = await topic03Service.getTrainAssemblyEquipment(options);
+    sendResponse(res, result, '获取设备健康度列表失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取设备健康度统计信息
+app.get('/api/topic03/train-assembly/equipment/statistics', async (req, res) => {
+  try {
+    const { modelRunBatch } = req.query;
+
+    const options = {
+      modelRunBatch: modelRunBatch || 'TRAIN_ASSEMBLY_2025'
+    };
+
+    const result = await topic03Service.getTrainAssemblyEquipmentStatistics(options);
+    sendResponse(res, result, '获取设备健康度统计失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据设备ID获取设备详情
+app.get('/api/topic03/train-assembly/equipment/:equipmentId', async (req, res) => {
+  try {
+    const { equipmentId } = req.params;
+    const { modelRunBatch } = req.query;
+
+    const options = {
+      modelRunBatch: modelRunBatch || 'TRAIN_ASSEMBLY_2025'
+    };
+
+    const result = await topic03Service.getTrainAssemblyEquipmentDetail(equipmentId, options);
+    sendResponse(res, result, '获取设备详情失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 搜索设备
+app.get('/api/topic03/train-assembly/equipment/search', async (req, res) => {
+  try {
+    const {
+      keyword,
+      healthLevel,
+      page,
+      pageSize,
+      modelRunBatch
+    } = req.query;
+
+    const searchParams = {
+      keyword: keyword || '',
+      healthLevel: healthLevel || '',
+      page: parseInt(page) || 1,
+      pageSize: parseInt(pageSize) || 10,
+      modelRunBatch: modelRunBatch || 'TRAIN_ASSEMBLY_2025'
+    };
+
+    const result = await topic03Service.searchTrainAssemblyEquipment(searchParams);
+    sendResponse(res, result, '搜索设备失败');
   } catch (error) {
     sendError(res, error);
   }

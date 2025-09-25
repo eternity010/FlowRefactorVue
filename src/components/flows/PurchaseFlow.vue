@@ -240,7 +240,7 @@ export default {
         
             // 跳转到详情页面
         this.$router.push({
-          path: '/topic4/node-detail',
+          path: '/node-detail',
           query: {
                 id: flowNode.id,
                 title: flowNode.text,

@@ -444,6 +444,99 @@ class Topic03Api {
     return await this.get('/api/topic03/matches', params);
   }
 
+  // ========================================
+  // 列车最终装配设备健康度管理API
+  // ========================================
+
+  /**
+   * 获取设备健康度列表
+   * @param {Object} options - 查询选项
+   * @param {string} options.sortBy - 排序字段 (rate_percent, equipment_id, create_time)
+   * @param {string} options.sortOrder - 排序顺序 (asc, desc)
+   * @param {number} options.page - 页码
+   * @param {number} options.pageSize - 每页大小
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 设备列表
+   */
+  async getTrainAssemblyEquipment(options = {}) {
+    const params = new URLSearchParams();
+
+    // 设置默认排序参数
+    const sortBy = options.sortBy || 'equipment_id';
+    const sortOrder = options.sortOrder || 'asc';
+
+    params.append('sortBy', sortBy);
+    params.append('sortOrder', sortOrder);
+
+    if (options.page) params.append('page', options.page);
+    if (options.pageSize) params.append('pageSize', options.pageSize);
+    if (options.modelRunBatch) params.append('modelRunBatch', options.modelRunBatch);
+
+    const queryString = params.toString();
+    const url = `/api/topic03/train-assembly/equipment${queryString ? '?' + queryString : ''}`;
+
+    return await this.get(url);
+  }
+
+  /**
+   * 获取设备健康度统计信息
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 统计信息
+   */
+  async getTrainAssemblyEquipmentStatistics(options = {}) {
+    const params = new URLSearchParams();
+
+    if (options.modelRunBatch) params.append('modelRunBatch', options.modelRunBatch);
+
+    const queryString = params.toString();
+    const url = `/api/topic03/train-assembly/equipment/statistics${queryString ? '?' + queryString : ''}`;
+
+    return await this.get(url);
+  }
+
+  /**
+   * 根据设备ID获取设备详情
+   * @param {string} equipmentId - 设备ID
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 设备详情
+   */
+  async getTrainAssemblyEquipmentDetail(equipmentId, options = {}) {
+    const params = new URLSearchParams();
+
+    if (options.modelRunBatch) params.append('modelRunBatch', options.modelRunBatch);
+
+    const queryString = params.toString();
+    const url = `/api/topic03/train-assembly/equipment/${equipmentId}${queryString ? '?' + queryString : ''}`;
+
+    return await this.get(url);
+  }
+
+  /**
+   * 搜索设备
+   * @param {Object} searchParams - 搜索参数
+   * @param {string} searchParams.keyword - 关键词
+   * @param {string} searchParams.healthLevel - 健康度等级 (excellent, good, warning, poor)
+   * @param {number} searchParams.page - 页码
+   * @param {number} searchParams.pageSize - 每页大小
+   * @param {string} searchParams.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 搜索结果
+   */
+  async searchTrainAssemblyEquipment(searchParams = {}) {
+    const params = new URLSearchParams();
+
+    if (searchParams.keyword) params.append('keyword', searchParams.keyword);
+    if (searchParams.healthLevel) params.append('healthLevel', searchParams.healthLevel);
+    if (searchParams.page) params.append('page', searchParams.page);
+    if (searchParams.pageSize) params.append('pageSize', searchParams.pageSize);
+    if (searchParams.modelRunBatch) params.append('modelRunBatch', searchParams.modelRunBatch);
+
+    const queryString = params.toString();
+    const url = `/api/topic03/train-assembly/equipment/search${queryString ? '?' + queryString : ''}`;
+
+    return await this.get(url);
+  }
 
   /**
    * 获取API状态信息

@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const mongoConfig = require('../../config/mongodb.config');
+const mongoConfig = require('../config/mongodb.config');
 
 // 使用统一的MongoDB配置
 const MONGODB_URI = mongoConfig.getConnectionString();

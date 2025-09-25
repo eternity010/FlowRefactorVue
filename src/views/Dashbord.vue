@@ -104,8 +104,8 @@ export default {
   },
   created() {
     // 页面加载时，如果当前路由是/home，则跳转到流程管理页面
-    if (this.$route.path === '/topic4/home') {
-      this.$router.push('/topic4/home/process')
+    if (this.$route.path === '/home') {
+      this.$router.push('/home/process')
     }
   },
   methods: {
@@ -113,28 +113,28 @@ export default {
       // 根据选中的菜单项进行路由跳转
       switch(index) {
         case '1-1':
-          this.$router.push('/topic4/home/process')
+          this.$router.push('/home/process')
           break
         case '1-2':
-          this.$router.push('/topic4/home/sub-process')
+          this.$router.push('/home/sub-process')
           break
         case '1-3':
-          this.$router.push('/topic4/home/operation-management')
+          this.$router.push('/home/operation-management')
           break
         case '2':
-          this.$router.push('/topic4/home/resource')
+          this.$router.push('/home/resource')
           break
         case '3':
-          this.$router.push('/topic4/home/risk')
+          this.$router.push('/home/risk')
           break
         case '4':
-          this.$router.push('/topic4/home/refactor-timing')
+          this.$router.push('/home/refactor-timing')
           break
         case '5':
-          this.$router.push('/topic4/home/process-optimization')
+          this.$router.push('/home/process-optimization')
           break
         case '7':
-          this.$router.push('/topic4/home/task-assignment')
+          this.$router.push('/home/task-assignment')
           break
         // 其他菜单项的路由可以在这里添加
       }

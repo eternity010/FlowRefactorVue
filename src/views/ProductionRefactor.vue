@@ -14,6 +14,7 @@
       </div>
       <div class="header-info">
         <el-tag type="info">批次：{{ currentBatch }}</el-tag>
+        <el-tag type="primary" v-if="nodeId">节点ID：{{ nodeId }}</el-tag>
         <el-tag type="success">总订单数：{{ orderSummary.totalOrders }}</el-tag>
         <el-tag type="warning">总任务数：{{ orderSummary.totalTasks }}</el-tag>
       </div>
@@ -96,9 +97,9 @@
          </el-row>
        </div>
 
-        <!-- 机器运转甘特图 -->
+        <!-- 设备运转甘特图 -->
         <div class="machine-timeline">
-          <h3>机器运转甘特图</h3>
+          <h3>设备运转甘特图</h3>
 
           <!-- 时间轴刻度 -->
           <div class="timeline-scale">
@@ -119,8 +120,10 @@
           <div class="timeline-container">
             <div v-for="(schedule, index) in machineSchedules" :key="index" class="machine-row">
               <div class="machine-header">
-                <h4>{{ schedule.equipment_desc }}</h4>
-                <span class="machine-code">{{ schedule.equipment_code }}</span>
+                <h4>设备ID: {{ schedule.equipment_id }}</h4>
+                <span class="work-center-info">
+                  工作中心: {{ schedule.work_center_id }} - {{ schedule.work_center_name }}
+                </span>
               </div>
               <div class="timeline-track">
                 <div
@@ -231,6 +234,9 @@ export default {
   data() {
     return {
       currentBatch: '20240905', // 使用数据库中的模型运行批次
+      nodeId: '', // 节点ID
+      nodeTitle: '', // 节点标题
+      nodeType: '', // 节点类型
       allTasks: [],
       productionAssignments: [], // 排产数据
       loading: false,
@@ -337,25 +343,45 @@ export default {
       if (!this.filteredProductionAssignments || this.filteredProductionAssignments.length === 0) {
         return []
       }
-      
+
       const schedules = {}
       this.filteredProductionAssignments.forEach(assignment => {
-        const equipmentDesc = assignment.equipment_desc
-        // 从任务中获取工作中心编码
+        // 从原始任务数据中获取设备ID
         const task = this.allTasks.find(t => t.id === assignment.id)
-        const equipmentCode = task ? task.work_center_code : ''
+        const equipmentIds = task ? task.equipment_ids : ''
 
-        if (!schedules[equipmentDesc]) {
-          schedules[equipmentDesc] = {
-            equipment_desc: equipmentDesc,
-            equipment_code: equipmentCode,
-            assignments: []
+        // 解析设备ID（可能逗号分隔）
+        const equipmentIdList = equipmentIds ? equipmentIds.split(',').map(id => id.trim()).filter(id => id && id !== '-1') : []
+
+        // 如果没有有效设备ID，使用默认设备
+        if (equipmentIdList.length === 0) {
+          const defaultEquipmentId = 'DEFAULT-001'
+          if (!schedules[defaultEquipmentId]) {
+            schedules[defaultEquipmentId] = {
+              equipment_id: defaultEquipmentId,
+              work_center_id: task ? task.work_center_id : '',
+              work_center_name: task ? task.work_center_name : '',
+              assignments: []
+            }
           }
+          schedules[defaultEquipmentId].assignments.push(assignment)
+        } else {
+          // 为每个设备ID创建条目
+          equipmentIdList.forEach(equipmentId => {
+          if (!schedules[equipmentId]) {
+            schedules[equipmentId] = {
+              equipment_id: equipmentId,
+              work_center_id: task ? task.work_center_id : '',
+              work_center_name: task ? task.work_center_name : '',
+              assignments: []
+            }
+          }
+            schedules[equipmentId].assignments.push(assignment)
+          })
         }
-        schedules[equipmentDesc].assignments.push(assignment)
       })
 
-      // 按开始时间排序每台机器的任务
+      // 按开始时间排序每台设备（机器）的任务
       Object.values(schedules).forEach(machine => {
         machine.assignments.sort((a, b) => new Date(a.plan_start_time) - new Date(b.plan_start_time))
       })
@@ -523,6 +549,18 @@ export default {
     }
   },
   created() {
+    // 从路由参数获取节点信息
+    this.nodeId = this.$route.query.nodeId || ''
+    this.nodeTitle = this.$route.query.nodeTitle || ''
+    this.nodeType = this.$route.query.nodeType || ''
+    
+    console.log('📋 进入生产重构页面，节点信息:', {
+      nodeId: this.nodeId,
+      nodeTitle: this.nodeTitle,
+      nodeType: this.nodeType,
+      batch: this.currentBatch
+    })
+    
     this.loadData()
   },
   methods: {
@@ -535,7 +573,10 @@ export default {
       this.$router.push({
         name: 'ProductionRefactor2',
         query: {
-          batch: this.currentBatch
+          batch: this.currentBatch,
+          nodeId: this.nodeId,
+          nodeTitle: this.nodeTitle,
+          nodeType: this.nodeType
         }
       })
     },
@@ -1231,13 +1272,14 @@ export default {
   font-weight: 600;
 }
 
-.machine-code {
+.work-center-info {
   font-size: 12px;
-  color: #909399;
-  background-color: #e9ecef;
-  padding: 2px 8px;
-  border-radius: 12px;
+  color: #606266;
+  background-color: #f0f2f5;
+  padding: 4px 8px;
+  border-radius: 4px;
   font-weight: 500;
+  margin-left: 10px;
 }
 
 .timeline-track {

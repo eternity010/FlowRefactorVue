@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const mongoConfig = require('../../config/mongodb.config');
+const mongoConfig = require('../config/mongodb.config');
 
 class ProcessOptimizationService {
   constructor() {

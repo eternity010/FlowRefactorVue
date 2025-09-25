@@ -314,7 +314,7 @@ class Topic04Api {
   // ===== 生产任务相关API =====
 
   /**
-   * 获取生产任务数据
+   * 获取生产任务数据 (从input_task表)
    * @param {string} modelRunBatch - 模型运行批次 (必需)
    * @returns {Promise<Object>} 生产任务列表
    */
@@ -323,6 +323,18 @@ class Topic04Api {
       throw new Error('模型运行批次不能为空');
     }
     return await this.get('/api/topic04/production/tasks', { model_run_batch: modelRunBatch });
+  }
+
+  /**
+   * 获取生产任务输出数据 (从output_task表)
+   * @param {string} modelRunBatch - 模型运行批次 (必需)
+   * @returns {Promise<Object>} 生产任务输出列表
+   */
+  async getProductionOutputTasks(modelRunBatch) {
+    if (!modelRunBatch) {
+      throw new Error('模型运行批次不能为空');
+    }
+    return await this.get('/api/topic04/production/output-tasks', { model_run_batch: modelRunBatch });
   }
 
   /**

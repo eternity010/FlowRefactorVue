@@ -10,6 +10,7 @@ class Topic03Service {
     this.mysqlService = new MySQLService();
     this.tableName = 'dm_topic0305_output_train_person_match';
     this.trainAssemblyTableName = 'dm_topic0301_output_user_2';
+    this.equipmentTableName = 'dm_topic0302_output_equipment_2';
   }
 
   /**
@@ -1433,6 +1434,333 @@ class Topic03Service {
     } catch (error) {
       console.error(`❌ ${this.serviceName} 资源清理失败:`, error);
       return { success: false, error: error.message };
+    }
+  }
+
+  // ========================================
+  // 列车最终装配设备健康度管理
+  // ========================================
+
+  /**
+   * 获取设备健康度列表
+   * @param {Object} options - 查询选项
+   */
+  async getTrainAssemblyEquipment(options = {}) {
+    try {
+      const {
+        sortBy = 'rate_percent',
+        sortOrder = 'desc',
+        page = 1,
+        pageSize = 10,
+        modelRunBatch = 'TRAIN_ASSEMBLY_2025'
+      } = options;
+
+      // 验证和格式化参数
+      const validSortFields = ['rate_percent', 'equipment_id', 'create_time', 'update_time'];
+      const validSortOrders = ['asc', 'desc'];
+
+      const orderField = validSortFields.includes(sortBy) ? sortBy : 'rate_percent';
+      const orderDirection = validSortOrders.includes(sortOrder.toLowerCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+      // 确保参数是数值类型
+      const pageNum = parseInt(page) || 1;
+      const pageSizeNum = parseInt(pageSize) || 10;
+      const offset = (pageNum - 1) * pageSizeNum;
+
+      const sql = `
+        SELECT
+          id,
+          equipment_id,
+          rate_percent,
+          remark,
+          create_time,
+          update_time,
+          model_run_batch
+        FROM ${this.equipmentTableName}
+        WHERE del_flag = 0 AND model_run_batch = '${modelRunBatch}'
+        ORDER BY ${orderField} ${orderDirection}
+        LIMIT ${pageSizeNum} OFFSET ${offset}
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // 获取总设备数
+      const countSql = `
+        SELECT COUNT(*) as total
+        FROM ${this.equipmentTableName}
+        WHERE del_flag = 0 AND model_run_batch = '${modelRunBatch}'
+      `;
+
+      const countResult = await this.mysqlService.query(countSql);
+
+      if (!countResult.success) {
+        throw new Error(countResult.error);
+      }
+
+      const total = countResult.data[0]?.total || 0;
+      const totalPages = Math.ceil(total / pageSizeNum);
+
+      return {
+        success: true,
+        data: {
+          equipment: result.data || [],
+          pagination: {
+            page: pageNum,
+            pageSize: pageSizeNum,
+            total: total,
+            totalPages: totalPages
+          },
+          sortBy: orderField,
+          sortOrder: orderDirection.toLowerCase()
+        }
+      };
+
+    } catch (error) {
+      console.error('获取设备健康度列表失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取设备健康度列表失败'
+      };
+    }
+  }
+
+  /**
+   * 获取设备健康度统计信息
+   * @param {Object} options - 查询选项
+   */
+  async getTrainAssemblyEquipmentStatistics(options = {}) {
+    try {
+      const { modelRunBatch = 'TRAIN_ASSEMBLY_2025' } = options;
+
+      const sql = `
+        SELECT
+          COUNT(*) as total_equipment,
+          AVG(rate_percent) as avg_health_rate,
+          MAX(rate_percent) as max_health_rate,
+          MIN(rate_percent) as min_health_rate,
+          SUM(CASE WHEN rate_percent >= 0.90 THEN 1 ELSE 0 END) as excellent_count,
+          SUM(CASE WHEN rate_percent >= 0.75 AND rate_percent < 0.90 THEN 1 ELSE 0 END) as good_count,
+          SUM(CASE WHEN rate_percent >= 0.60 AND rate_percent < 0.75 THEN 1 ELSE 0 END) as warning_count,
+          SUM(CASE WHEN rate_percent < 0.60 THEN 1 ELSE 0 END) as poor_count
+        FROM ${this.equipmentTableName}
+        WHERE del_flag = 0 AND model_run_batch = '${modelRunBatch}'
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const stats = result.data[0] || {};
+
+      return {
+        success: true,
+        data: {
+          overall: {
+            total_equipment: stats.total_equipment || 0,
+            avg_health_rate: parseFloat(stats.avg_health_rate || 0).toFixed(3),
+            max_health_rate: parseFloat(stats.max_health_rate || 0).toFixed(3),
+            min_health_rate: parseFloat(stats.min_health_rate || 0).toFixed(3)
+          },
+          distribution: {
+            excellent: stats.excellent_count || 0,
+            good: stats.good_count || 0,
+            warning: stats.warning_count || 0,
+            poor: stats.poor_count || 0
+          }
+        }
+      };
+
+    } catch (error) {
+      console.error('获取设备健康度统计失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取设备健康度统计失败'
+      };
+    }
+  }
+
+  /**
+   * 根据设备ID获取设备详情
+   * @param {string} equipmentId - 设备ID
+   * @param {Object} options - 查询选项
+   */
+  async getTrainAssemblyEquipmentDetail(equipmentId, options = {}) {
+    try {
+      const { modelRunBatch = 'TRAIN_ASSEMBLY_2025' } = options;
+
+      const sql = `
+        SELECT
+          id,
+          equipment_id,
+          rate_percent,
+          remark,
+          create_time,
+          update_time,
+          model_run_batch
+        FROM ${this.equipmentTableName}
+        WHERE del_flag = 0
+          AND equipment_id = '${equipmentId}'
+          AND model_run_batch = '${modelRunBatch}'
+        LIMIT 1
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      if (!result.data || result.data.length === 0) {
+        return {
+          success: false,
+          error: '设备不存在'
+        };
+      }
+
+      const equipment = result.data[0];
+
+      return {
+        success: true,
+        data: {
+          ...equipment,
+          rate_percent: parseFloat(equipment.rate_percent || 0),
+          create_time: equipment.create_time,
+          update_time: equipment.update_time
+        }
+      };
+
+    } catch (error) {
+      console.error('获取设备详情失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取设备详情失败'
+      };
+    }
+  }
+
+  /**
+   * 搜索设备
+   * @param {Object} searchParams - 搜索参数
+   */
+  async searchTrainAssemblyEquipment(searchParams = {}) {
+    try {
+      const {
+        keyword = '',
+        healthLevel = '',
+        page = 1,
+        pageSize = 10,
+        modelRunBatch = 'TRAIN_ASSEMBLY_2025'
+      } = searchParams;
+
+      // 确保参数是数值类型
+      const pageNum = parseInt(page) || 1;
+      const pageSizeNum = parseInt(pageSize) || 10;
+      const offset = (pageNum - 1) * pageSizeNum;
+
+      let whereConditions = [
+        'del_flag = 0',
+        `model_run_batch = '${modelRunBatch}'`
+      ];
+
+      // 关键词搜索
+      if (keyword && keyword.trim()) {
+        const searchKeyword = keyword.trim();
+        whereConditions.push(`(
+          equipment_id LIKE '%${searchKeyword}%' OR
+          remark LIKE '%${searchKeyword}%'
+        )`);
+      }
+
+      // 健康度等级筛选
+      if (healthLevel && ['excellent', 'good', 'warning', 'poor'].includes(healthLevel)) {
+        let rateCondition = '';
+        switch (healthLevel) {
+          case 'excellent':
+            rateCondition = 'rate_percent >= 0.90';
+            break;
+          case 'good':
+            rateCondition = 'rate_percent >= 0.75 AND rate_percent < 0.90';
+            break;
+          case 'warning':
+            rateCondition = 'rate_percent >= 0.60 AND rate_percent < 0.75';
+            break;
+          case 'poor':
+            rateCondition = 'rate_percent < 0.60';
+            break;
+        }
+        if (rateCondition) {
+          whereConditions.push(rateCondition);
+        }
+      }
+
+      const whereClause = whereConditions.join(' AND ');
+
+      const sql = `
+        SELECT
+          id,
+          equipment_id,
+          rate_percent,
+          remark,
+          create_time,
+          update_time,
+          model_run_batch
+        FROM ${this.equipmentTableName}
+        WHERE ${whereClause}
+        ORDER BY rate_percent DESC, equipment_id ASC
+        LIMIT ${pageSizeNum} OFFSET ${offset}
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // 获取总数量
+      const countSql = `
+        SELECT COUNT(*) as total
+        FROM ${this.equipmentTableName}
+        WHERE ${whereClause}
+      `;
+
+      const countResult = await this.mysqlService.query(countSql);
+
+      if (!countResult.success) {
+        throw new Error(countResult.error);
+      }
+
+      const total = countResult.data[0]?.total || 0;
+      const totalPages = Math.ceil(total / pageSizeNum);
+
+      return {
+        success: true,
+        data: {
+          equipment: result.data || [],
+          pagination: {
+            page: pageNum,
+            pageSize: pageSizeNum,
+            total: total,
+            totalPages: totalPages
+          },
+          searchParams: {
+            keyword: keyword || '',
+            healthLevel: healthLevel || ''
+          }
+        }
+      };
+
+    } catch (error) {
+      console.error('搜索设备失败:', error);
+      return {
+        success: false,
+        error: error.message || '搜索设备失败'
+      };
     }
   }
 }

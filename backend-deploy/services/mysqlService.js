@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const mysqlConfig = require('../../config/mysql.config');
+const mysqlConfig = require('../config/mysql.config');
 
 class MySQLService {
   constructor() {

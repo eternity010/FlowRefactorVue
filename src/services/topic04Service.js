@@ -478,6 +478,99 @@ class Topic04Service {
   }
 
   /**
+   * 获取生产任务输出数据 (从output_task表)
+   * @param {string} modelRunBatch - 模型运行批次
+   * @returns {Object} 生产任务输出数据
+   */
+  async getProductionOutputTasks(modelRunBatch = '20240905') {
+    try {
+      console.log(`🔍 获取生产任务输出数据，批次: ${modelRunBatch}`);
+
+      const sql = `
+        SELECT
+          id,
+          model_run_batch,
+          task_id,
+          work_no,
+          sale_order_no,
+          order_no,
+          order_need_num,
+          plan_no,
+          work_order_no,
+          batch_no,
+          dispatch_order_no,
+          procedure_id,
+          procedure_code,
+          procedure_name,
+          procedure_content,
+          procedure_order,
+          procedure_plan_preparation_time,
+          procedure_plan_work_time,
+          receive_id,
+          receive_time,
+          receive_name,
+          product_id,
+          product_code,
+          product_name,
+          order_type,
+          task_num,
+          report_num,
+          plan_start_time,
+          plan_end_time,
+          real_start_time,
+          real_end_time,
+          jockey_id,
+          jockey_no,
+          jockey_name,
+          equipment_ids,
+          equipment_speed_range,
+          equipment_unit_process_energy,
+          equipment_unit_idle_energy,
+          work_center_id,
+          work_center_code,
+          work_center_name,
+          line_id,
+          line_code,
+          line_name,
+          remark,
+          create_time,
+          update_time
+        FROM dm_topic0401_output_task
+        WHERE model_run_batch = ?
+          AND del_flag = 0
+        ORDER BY task_id, procedure_order
+      `;
+
+      const result = await this.mysqlService.executeCustomQuery(sql, [modelRunBatch]);
+
+      if (result.success) {
+        const processedData = this.processProductionTaskData(result.data);
+        const summary = this.generateProductionTaskSummary(processedData);
+
+        console.log(`✅ 成功获取 ${processedData.length} 条生产任务输出数据`);
+
+        return {
+          success: true,
+          data: {
+            total: processedData.length,
+            tasks: processedData,
+            summary: summary,
+            timestamp: new Date().toISOString()
+          }
+        };
+      } else {
+        throw new Error(result.error || '查询生产任务输出数据失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取生产任务输出数据失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
    * 根据订单号获取生产任务
    * @param {string} orderNo - 订单号
    * @returns {Object} 指定订单的生产任务

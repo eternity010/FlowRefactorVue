@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "exportTime": "2025-08-06T01:48:46.523Z",
+    "apiEndpoint": "/api/llm/analyze-process-node-risk",
+    "dataSource": "数据库采购流程",
+    "version": "1.0.0"
+  },
+  "inputData": {
+    "riskData": [
+      {
+        "_id": "6885da965159d67710eaa4e8",
+        "confidence": "99%",
+        "purchase": {
+          "项目制采购发起": 46.7968,
+          "战略安全库存评估": 69.4312,
+          "制定装备采购计划": 173.7064,
+          "供应商资质核验与选择": 126.6235,
+          "样件检验与签约": 678.8708,
+          "IQC与入库管理": 322.4326,
+          "款项结算": 758.3362,
+          "质量追溯与供应商管理": 264.6366
+        },
+        "riskClassification": {
+          "highRisk": {
+            "threshold": ">500",
+            "steps": [
+              "样件检验与签约",
+              "款项结算"
+            ],
+            "description": "风险值极高，涉及合同签订和资金支付，存在重大舞弊风险"
+          },
+          "mediumRisk": {
+            "threshold": "200-500",
+            "steps": [
+              "IQC与入库管理",
+              "质量追溯与供应商管理",
+              "制定装备采购计划"
+            ],
+            "description": "风险值中等，涉及物资验收和供应商评估环节"
+          },
+          "lowRisk": {
+            "threshold": "<200",
+            "steps": [
+              "项目制采购发起",
+              "战略安全库存评估",
+              "供应商资质核验与选择"
+            ],
+            "description": "风险值较低，属于前期准备和资质审核环节"
+          }
+        },
+        "summary": {
+          "totalSteps": 8,
+          "highRiskCount": 2,
+          "mediumRiskCount": 3,
+          "lowRiskCount": 3,
+          "criticalStep": "款项结算",
+          "recommendation": "加强付款环节的审批控制和资金监管，实施双人复核机制"
+        }
+      }
+    ],
+    "inputInfo": {
+      "riskDataCount": 1,
+      "dataSource": "数据库采购流程"
+    }
+  },
+  "analysisResult": {
+    "highRiskNodes": [
+      {
+        "nodeId": "PU22",
+        "nodeName": "采购合同起草",
+        "riskLevel": "HIGH",
+        "riskScore": 678.8708,
+        "riskFactors": [
+          "合同签订风险",
+          "舞弊风险"
+        ],
+        "riskReason": "该节点对应风险数据中的'样件检验与签约'环节，风险值高达678.8708，属于高风险阈值(>500)。合同起草环节涉及法律条款和商业条款的确定，存在重大舞弊和合规风险。",
+        "recommendation": "实施合同模板标准化、增加法律合规审查环节、建立双人复核机制"
+      },
+      {
+        "nodeId": "PU23",
+        "nodeName": "合同审批",
+        "riskLevel": "HIGH",
+        "riskScore": 758.3362,
+        "riskFactors": [
+          "资金支付风险",
+          "审批舞弊风险"
+        ],
+        "riskReason": "该节点对应风险数据中的'款项结算'环节，风险值达到758.3362，是流程中最高风险点。合同审批直接关联资金支付，存在支付错误、舞弊和违规审批的高风险。",
+        "recommendation": "建立多级审批制度、实施金额分级授权、加强审批痕迹管理、与财务系统集成验证"
+      },
+      {
+        "nodeId": "PU27",
+        "nodeName": "物料验收",
+        "riskLevel": "MEDIUM",
+        "riskScore": 322.4326,
+        "riskFactors": [
+          "质量风险",
+          "验收舞弊风险"
+        ],
+        "riskReason": "对应风险数据中的'IQC与入库管理'环节，风险值322.4326属于中等风险区间(200-500)。物料验收环节存在质量把关不严和验收舞弊的风险。",
+        "recommendation": "实施第三方质检、建立验收标准库、加强验收过程记录"
+      }
+    ],
+    "summary": {
+      "totalNodes": 28,
+      "highRiskNodes": 2,
+      "mediumRiskNodes": 3,
+      "lowRiskNodes": 23,
+      "overallRiskLevel": "MEDIUM",
+      "criticalPath": "采购合同起草→合同审批→物料验收",
+      "mainRecommendation": "重点加强合同管理和支付审批环节的风险控制，建议：1)实施合同全生命周期管理系统 2)建立支付审批双人复核机制 3)对高风险环节实施专项审计"
+    }
+  },
+  "apiInfo": {
+    "model": "deepseek-v3-250324",
+    "timestamp": "2025-08-06T01:48:46.516Z",
+    "usage": {
+      "completion_tokens": 531,
+      "prompt_tokens": 3908,
+      "total_tokens": 4439,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ import RAGConfigView from '@/views/RAGConfigView'
 import TaskAssignmentView from '@/views/TaskAssignmentView'
 import ProductionRefactor from '@/views/ProductionRefactor'
 import ProductionRefactor2 from '@/views/ProductionRefactor2'
+import ProductionRefactor3 from '@/views/ProductionRefactor3'
 import MarketingRefactor from '@/views/MarketingRefactor'
 import PurchaseRefactor from '@/views/PurchaseRefactor'
 import OperationRefactor from '@/views/OperationRefactor'
@@ -28,11 +29,11 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/topic4/',
-      redirect: '/topic4/home'
+      path: '/',
+      redirect: '/home'
     },
     {
-      path: '/topic4/home',
+      path: '/home',
       name: 'Dashbord',
       component: Dashbord,
       children: [
@@ -99,52 +100,57 @@ export default new Router({
       ]
     },
     {
-      path: '/topic4/node-detail',
+      path: '/node-detail',
       name: 'NodeDetail',
       component: NodeDetailView
     },
     {
-      path: '/topic4/resource-management',
+      path: '/resource-management',
       name: 'ResourceManagementPage',
       component: ResourceManagement
     },
     {
-      path: '/topic4/refactor-marketing',
+      path: '/refactor-marketing',
       name: 'MarketingRefactor',
       component: MarketingRefactor
     },
     {
-      path: '/topic4/refactor-purchase',
+      path: '/refactor-purchase',
       name: 'PurchaseRefactor',
       component: PurchaseRefactor
     },
     {
-      path: '/topic4/production-refactor',
+      path: '/production-refactor',
       name: 'ProductionRefactor',
       component: ProductionRefactor
     },
     {
-      path: '/topic4/production-refactor2',
+      path: '/production-refactor2',
       name: 'ProductionRefactor2',
       component: ProductionRefactor2
     },
     {
-      path: '/topic4/refactor-operation',
+      path: '/production-refactor3',
+      name: 'ProductionRefactor3',
+      component: ProductionRefactor3
+    },
+    {
+      path: '/refactor-operation',
       name: 'OperationRefactor',
       component: OperationRefactor
     },
     {
-      path: '/topic4/refactor-operation2',
+      path: '/refactor-operation2',
       name: 'OperationRefactor2',
       component: OperationRefactor2
     },
     {
-      path: '/topic4/refactor-operation3',
+      path: '/refactor-operation3',
       name: 'OperationRefactor3',
       component: OperationRefactor3
     },
     {
-      path: '/topic4/risk-reassessment',
+      path: '/risk-reassessment',
       name: 'RiskReassessment',
       component: RiskReassessment
     }
