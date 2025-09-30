@@ -194,20 +194,49 @@ class Topic01Service {
    * @returns {Object} 统计结果
    */
   calculateRiskStats(data) {
-    const highRiskNodes = data.filter(item => item.activity_risk === '高');
-    const mediumRiskNodes = data.filter(item => item.activity_risk === '中');
-    const lowRiskNodes = data.filter(item => item.activity_risk === '低');
+    // 将activity_risk转换为数字进行比较
+    // 高于80: 高风险，50-80: 中风险，低于50: 低风险（正常）
+    const highRiskNodes = data.filter(item => {
+      const riskValue = parseFloat(item.activity_risk);
+      return !isNaN(riskValue) && riskValue > 80;
+    });
+    
+    const mediumRiskNodes = data.filter(item => {
+      const riskValue = parseFloat(item.activity_risk);
+      return !isNaN(riskValue) && riskValue >= 50 && riskValue <= 80;
+    });
+    
+    const lowRiskNodes = data.filter(item => {
+      const riskValue = parseFloat(item.activity_risk);
+      return !isNaN(riskValue) && riskValue < 50;
+    });
     
     // 格式化节点数据，包含更丰富的信息
     const formatNodeData = (nodes) => {
-      return nodes.map(item => ({
-        id: item.activity_id,
-        name: item.activity_name,
-        fullName: `${item.activity_id}: ${item.activity_name}`,
-        description: item.remark || '暂无描述',
-        risk: item.activity_risk,
-        updateTime: item.update_time
-      }));
+      return nodes.map(item => {
+        const riskValue = parseFloat(item.activity_risk);
+        let riskLevel = '未知';
+        if (!isNaN(riskValue)) {
+          if (riskValue > 80) {
+            riskLevel = '高风险';
+          } else if (riskValue >= 50) {
+            riskLevel = '中风险';
+          } else {
+            riskLevel = '低风险';
+          }
+        }
+        
+        return {
+          id: item.activity_id,
+          name: item.activity_name,
+          fullName: `${item.activity_id}: ${item.activity_name}`,
+          description: item.remark || `风险值: ${riskValue}，${riskLevel}`,
+          risk: item.activity_risk,
+          riskLevel: riskLevel,
+          riskValue: riskValue,
+          updateTime: item.update_time
+        };
+      });
     };
     
     return {
@@ -268,19 +297,34 @@ class Topic01Service {
       
       if (result.success && result.data && result.data.length > 0) {
         const nodeData = result.data[0];
+        const riskValue = parseFloat(nodeData.activity_risk);
+        
+        // 根据数值确定风险等级
+        let riskLevel = '未知';
+        if (!isNaN(riskValue)) {
+          if (riskValue > 80) {
+            riskLevel = '高';
+          } else if (riskValue >= 50) {
+            riskLevel = '中';
+          } else {
+            riskLevel = '低';
+          }
+        }
         
         return {
           success: true,
           data: {
             nodeId: nodeData.activity_id,
             nodeName: nodeData.activity_name,
-            riskLevel: nodeData.activity_risk,
-            riskDescription: nodeData.remark || '暂无风险描述',
+            riskLevel: riskLevel,
+            riskValue: riskValue,
+            originalRiskValue: nodeData.activity_risk,
+            riskDescription: nodeData.remark || `风险值: ${riskValue}，等级: ${riskLevel}`,
             processType: nodeData.process_type,
             updateTime: nodeData.update_time,
-            riskLevelColor: this.getRiskLevelColor(nodeData.activity_risk),
-            riskLevelIcon: this.getRiskLevelIcon(nodeData.activity_risk),
-            riskLevelClass: this.getRiskLevelClass(nodeData.activity_risk)
+            riskLevelColor: this.getRiskLevelColor(riskLevel),
+            riskLevelIcon: this.getRiskLevelIcon(riskLevel),
+            riskLevelClass: this.getRiskLevelClass(riskLevel)
           }
         };
       } else {

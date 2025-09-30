@@ -223,21 +223,40 @@
 
         <!-- 底部操作按钮 -->
         <div class="risk-analysis-actions">
-          <el-button 
+          <el-button
             v-if="!nodeRiskStatusData && !nodeRiskAnalysisLoading"
-            type="primary" 
-            @click="analyzeNodeRiskStatus" 
+            type="primary"
+            @click="analyzeNodeRiskStatus(2)"
             :disabled="!riskAnalysisData">
             继续优化分析
           </el-button>
-          
-          <el-button 
+
+          <!-- 分析进行中时显示的按钮 -->
+          <el-button
+            v-if="nodeRiskAnalysisLoading"
+            type="warning"
+            @click="cancelNodeRiskAnalysis"
+            class="cancel-button">
+            <i class="el-icon-video-pause"></i>
+            取消分析
+          </el-button>
+
+          <el-button
             v-if="nodeRiskStatusData"
-            type="success" 
+            type="success"
             @click="proceedToOptimization">
             进入流程优化
           </el-button>
-          
+
+          <!-- 分析失败时显示重试按钮 -->
+          <el-button
+            v-if="nodeRiskAnalysisError && !nodeRiskAnalysisLoading"
+            type="danger"
+            @click="retryNodeRiskAnalysis">
+            <i class="el-icon-refresh"></i>
+            重试分析
+          </el-button>
+
           <el-button @click="goBackToStart">
             返回
           </el-button>
@@ -1152,7 +1171,7 @@ export default {
     },
 
     // 分析节点风险状态（新方法）
-    async analyzeNodeRiskStatus() {
+    async analyzeNodeRiskStatus(maxRetries = 1) {
       try {
         // 检查是否有保存的风险数据
         if (!this.savedRiskData || !this.savedAnalysisData) {
@@ -1163,56 +1182,118 @@ export default {
         // 开始加载
         this.nodeRiskAnalysisLoading = true;
         this.nodeRiskAnalysisError = null;
-        this.$message.info('正在进行流程节点风险分析...');
-        
-        // 调用节点风险状态分析API
-        const riskStatusData = await this.getNodeRiskStatus();
-        
-        if (riskStatusData) {
-          // 保存格式化后的节点风险状态数据
-          this.nodeRiskStatusData = riskStatusData;
-          console.log('✅ 节点风险状态数据已保存:', riskStatusData);
-          
-          // 调用API将原始API结果保存到MongoDB
+        this.$message.info('正在进行流程节点风险分析，这可能需要较长时间，请耐心等待...');
+
+        let lastError = null;
+
+        // 尝试多次调用API（带重试机制）
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
           try {
-            console.log('🔄 开始将原始节点风险状态数据保存到MongoDB...');
-            
-            // 使用原始API结果而不是格式化后的数据
-            const originalApiResult = this.processNodeRiskAnalysis;
-            console.log('📋 准备保存的原始API数据:', originalApiResult);
-            
-            const saveResult = await llmApi.saveNodeRiskStatusData(originalApiResult);
-            
-            if (saveResult.success) {
-              console.log('✅ 原始节点风险状态数据已成功保存到MongoDB:', saveResult.data);
-              this.$message.success('节点风险状态分析完成，原始数据已保存到数据库');
-            } else {
-              console.warn('⚠️ 原始节点风险状态数据保存到MongoDB失败:', saveResult.error);
-              this.$message.warning('节点风险状态分析完成，但原始数据保存失败: ' + saveResult.error);
+            if (attempt > 1) {
+              this.$message.info(`第${attempt}次尝试进行节点风险分析...`);
             }
-          } catch (saveError) {
-            console.error('❌ 保存原始节点风险状态数据到MongoDB异常:', saveError);
-            this.$message.warning('节点风险状态分析完成，但原始数据保存异常: ' + saveError.message);
+
+            // 调用节点风险状态分析API
+            const riskStatusData = await this.getNodeRiskStatus();
+            lastError = null; // 成功则清除错误
+
+            if (riskStatusData) {
+              // 保存格式化后的节点风险状态数据
+              this.nodeRiskStatusData = riskStatusData;
+              console.log('✅ 节点风险状态数据已保存:', riskStatusData);
+
+              // 调用API将原始API结果保存到MongoDB
+              try {
+                console.log('🔄 开始将原始节点风险状态数据保存到MongoDB...');
+
+                // 使用原始API结果而不是格式化后的数据
+                const originalApiResult = this.processNodeRiskAnalysis;
+                console.log('📋 准备保存的原始API数据:', originalApiResult);
+
+                const saveResult = await llmApi.saveNodeRiskStatusData(originalApiResult);
+
+                if (saveResult.success) {
+                  console.log('✅ 原始节点风险状态数据已成功保存到MongoDB:', saveResult.data);
+                  this.$message.success('节点风险状态分析完成，原始数据已保存到数据库');
+                } else {
+                  console.warn('⚠️ 原始节点风险状态数据保存到MongoDB失败:', saveResult.error);
+                  this.$message.warning('节点风险状态分析完成，但原始数据保存失败: ' + saveResult.error);
+                }
+              } catch (saveError) {
+                console.error('❌ 保存原始节点风险状态数据到MongoDB异常:', saveError);
+                this.$message.warning('节点风险状态分析完成，但原始数据保存异常: ' + saveError.message);
+              }
+
+              // 自动获取高危节点的详细数据
+              await this.fetchHighRiskNodeData();
+            } else {
+              throw new Error('未能获取到节点风险状态数据');
+            }
+
+            // 如果成功，跳出重试循环
+            break;
+
+          } catch (error) {
+            lastError = error;
+            console.warn(`❌ 第${attempt}次尝试节点风险分析失败:`, error.message);
+
+            // 如果是最后一次尝试，抛出错误
+            if (attempt === maxRetries) {
+              throw error;
+            }
+
+            // 如果不是最后一次尝试，等待一段时间后重试
+            if (attempt < maxRetries) {
+              console.log(`⏳ 等待3秒后进行第${attempt + 1}次重试...`);
+              await new Promise(resolve => setTimeout(resolve, 3000));
+            }
           }
-          
-          // 自动获取高危节点的详细数据
-          await this.fetchHighRiskNodeData();
-        } else {
-          throw new Error('未能获取到节点风险状态数据');
         }
-        
+
+        // 如果所有重试都失败了
+        if (lastError) {
+          throw lastError;
+        }
+
       } catch (error) {
         console.error('❌ 节点风险状态分析失败:', error);
-        this.nodeRiskAnalysisError = error.message || '节点风险状态分析失败';
-        this.$message.error('节点风险状态分析失败: ' + error.message);
+
+        // 提供更详细的错误信息
+        let errorMessage = '节点风险状态分析失败';
+        if (error.message.includes('超时')) {
+          errorMessage = '请求超时，可能需要更长时间处理，请稍后重试或联系管理员';
+        } else if (error.message.includes('网络')) {
+          errorMessage = '网络连接错误，请检查网络连接后重试';
+        } else {
+          errorMessage += ': ' + error.message;
+        }
+
+        this.nodeRiskAnalysisError = errorMessage;
+        this.$message.error(errorMessage);
       } finally {
         this.nodeRiskAnalysisLoading = false;
       }
     },
 
-    // 重试节点风险分析
+    // 重试节点风险分析（使用重试机制）
     async retryNodeRiskAnalysis() {
-      await this.analyzeNodeRiskStatus();
+      await this.analyzeNodeRiskStatus(2); // 最多重试2次
+    },
+
+    // 取消节点风险分析
+    cancelNodeRiskAnalysis() {
+      this.$confirm('确定要取消当前的节点风险分析吗？', '取消确认', {
+        confirmButtonText: '确定取消',
+        cancelButtonText: '继续分析',
+        type: 'warning'
+      }).then(() => {
+        // 停止加载状态
+        this.nodeRiskAnalysisLoading = false;
+        this.nodeRiskAnalysisError = '用户主动取消了分析';
+        this.$message.warning('节点风险分析已取消');
+      }).catch(() => {
+        // 用户选择继续分析，不做任何操作
+      });
     },
 
     // 获取高危节点的详细数据
@@ -2656,15 +2737,29 @@ export default {
   padding: 12px 24px;
 }
 
+/* 取消按钮样式 */
+.cancel-button {
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(230, 162, 60, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(230, 162, 60, 0);
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
 
-  
+
   .risk-analysis-actions {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .risk-analysis-actions .el-button {
     width: 100%;
   }

@@ -12,7 +12,6 @@ import PlanningTimeView from '@/views/PlanningTimeView'
 import AIDataCollectionView from '@/views/AIDataCollectionView'
 import NeuralNetworkSettingsView from '@/views/NeuralNetworkSettingsView'
 import RAGConfigView from '@/views/RAGConfigView'
-import TaskAssignmentView from '@/views/TaskAssignmentView'
 import ProductionRefactor from '@/views/ProductionRefactor'
 import ProductionRefactor2 from '@/views/ProductionRefactor2'
 import ProductionRefactor3 from '@/views/ProductionRefactor3'
@@ -86,11 +85,6 @@ export default new Router({
           path: 'rag-config',
           name: 'RAGConfigView',
           component: RAGConfigView
-        },
-        {
-          path: 'task-assignment',
-          name: 'TaskAssignmentView',
-          component: TaskAssignmentView
         },
         {
           path: 'operation-management',

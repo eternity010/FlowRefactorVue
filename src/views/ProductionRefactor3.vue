@@ -301,6 +301,18 @@
               </el-col>
             </el-row>
           </div>
+
+          <!-- 回到主界面按钮 -->
+          <div class="back-to-home-section">
+            <el-button
+              type="primary"
+              size="large"
+              @click="backToHome"
+              icon="el-icon-s-home"
+              class="back-home-btn">
+              回到主界面
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -1047,7 +1059,7 @@ export default {
 
       // 模拟优化效果
       const efficiencyGain = Math.floor(Math.random() * 15) + 10 // 10-25%的效率提升
-      const resourceUtilization = Math.floor(Math.random() * 20) + 80 // 80-100%的资源利用率
+      const resourceUtilization = Math.floor(Math.random() * 11) + 70 // 70-80%的资源利用率
 
       this.optimizedStats = {
         totalTasks,
@@ -1055,6 +1067,18 @@ export default {
         resourceUtilization,
         totalDuration: totalDuration.toFixed(1)
       }
+    },
+
+    /**
+     * 回到主界面
+     */
+    backToHome() {
+      console.log('🏠 回到主界面')
+
+      // 跳转到主界面（Dashbord）
+      this.$router.push({
+        name: 'Dashbord'
+      })
     },
 
     /**
@@ -1189,7 +1213,6 @@ export default {
           {
             name: '原始效率',
             type: 'line',
-            stack: 'Total',
             smooth: true,
             lineStyle: {
               width: 2,
@@ -1206,17 +1229,16 @@ export default {
           {
             name: '优化效率',
             type: 'line',
-            stack: 'Total',
             smooth: true,
             lineStyle: {
-              width: 2,
-              color: '#67C23A'
+              width: 3,
+              color: '#409EFF'
             },
             itemStyle: {
-              color: '#67C23A'
+              color: '#409EFF'
             },
             areaStyle: {
-              color: 'rgba(103, 194, 58, 0.1)'
+              color: 'rgba(64, 158, 255, 0.15)'
             },
             data: [82, 85, 88, 90, 87, 89, 91, 88, 86]
           }
@@ -2264,6 +2286,38 @@ export default {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   border-radius: 8px;
   border: 1px solid #e2e8f0;
+}
+
+/* ==================== 回到主界面按钮样式 ==================== */
+
+.back-to-home-section {
+  margin-top: 40px;
+  padding: 30px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.back-home-btn {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #409EFF 0%, #66B1FF 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.back-home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(64, 158, 255, 0.4);
+}
+
+.back-home-btn:active {
+  transform: translateY(0);
 }
 
 .stat-card {

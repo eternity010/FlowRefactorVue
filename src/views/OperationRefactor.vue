@@ -649,14 +649,14 @@ export default {
     },
 
     /**
-     * 批量获取维修建议
+     * 批量获取维修建议（优化版本 - 并发处理）
      */
     async getBatchMaintenanceSuggestions() {
       try {
         this.gettingSuggestions = true;
         this.batchProcessing = true;
         console.log('🔍 开始批量获取维修建议...');
-        
+
         // 初始化订单建议列表
         this.orderSuggestions = this.orders.map(order => ({
           orderId: order.id,
@@ -668,34 +668,49 @@ export default {
           progressText: '等待处理',
           suggestion: null
         }));
-        
-        // 保持用户选择的展开状态，不强制展开
-        
-        // 逐个处理订单
-        for (let i = 0; i < this.orderSuggestions.length; i++) {
-          const orderSuggestion = this.orderSuggestions[i];
-          this.processingOrderId = orderSuggestion.orderId;
-          
-          // 开始处理当前订单
-          orderSuggestion.status = 'processing';
-          orderSuggestion.progressText = '正在分析故障...';
-          
-          // 模拟分析过程
-          await this.simulateOrderAnalysis(orderSuggestion);
-          
-          // 标记为完成
-          orderSuggestion.status = 'completed';
-          orderSuggestion.progress = 100;
-          orderSuggestion.progressText = '分析完成';
-          
-          // 每处理完一个订单稍作停顿（减少停顿时间）
-          await new Promise(resolve => setTimeout(resolve, 50));
+
+        // 使用并发处理提高速度
+        const batchSize = 10; // 每批处理10个订单
+        const batches = [];
+
+        // 将订单分组为批次
+        for (let i = 0; i < this.orderSuggestions.length; i += batchSize) {
+          batches.push(this.orderSuggestions.slice(i, i + batchSize));
         }
-        
+
+        // 逐批处理订单
+        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+          const batch = batches[batchIndex];
+          console.log(`处理批次 ${batchIndex + 1}/${batches.length} (${batch.length} 个订单)`);
+
+          // 并发处理当前批次的订单
+          const batchPromises = batch.map(async (orderSuggestion, index) => {
+            // 开始处理当前订单
+            orderSuggestion.status = 'processing';
+            orderSuggestion.progressText = '正在分析故障...';
+
+            // 使用更快的模拟分析过程
+            await this.simulateOrderAnalysisFast(orderSuggestion);
+
+            // 标记为完成
+            orderSuggestion.status = 'completed';
+            orderSuggestion.progress = 100;
+            orderSuggestion.progressText = '分析完成';
+          });
+
+          // 等待当前批次的所有订单完成
+          await Promise.all(batchPromises);
+
+          // 批次间稍作停顿，给用户视觉反馈
+          if (batchIndex < batches.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 20));
+          }
+        }
+
         this.batchProcessing = false;
         this.processingOrderId = null;
         this.$message.success(`✅ 批量获取维修建议完成，共处理 ${this.orderSuggestions.length} 个订单`);
-        
+
       } catch (error) {
         this.batchProcessing = false;
         this.processingOrderId = null;
@@ -707,7 +722,22 @@ export default {
     },
 
      /**
-      * 模拟订单分析过程
+      * 模拟订单分析过程（快速版本 - 用于并发处理）
+      */
+     async simulateOrderAnalysisFast(orderSuggestion) {
+       // 直接设置进度，无需分步骤显示
+       orderSuggestion.progress = 100;
+       orderSuggestion.progressText = '分析完成';
+
+       // 简化的建议生成，直接返回结果
+       orderSuggestion.suggestion = { completed: true };
+
+       // 最小延迟以确保UI更新
+       await new Promise(resolve => setTimeout(resolve, 1));
+     },
+
+     /**
+      * 模拟订单分析过程（原始版本 - 保持向后兼容）
       */
      async simulateOrderAnalysis(orderSuggestion) {
        const analysisSteps = [
@@ -715,15 +745,15 @@ export default {
          { progress: 60, text: '匹配维修方案...' },
          { progress: 100, text: '分析完成' }
        ];
-       
+
        for (const step of analysisSteps) {
          orderSuggestion.progress = step.progress;
          orderSuggestion.progressText = step.text;
-         
+
         // 每个步骤间隔（加快速度）
         await new Promise(resolve => setTimeout(resolve, 0.01));
        }
-       
+
        // 简化建议生成，不需要详细内容
        orderSuggestion.suggestion = { completed: true };
      },

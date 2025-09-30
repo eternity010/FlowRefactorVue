@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.VUE_APP_API_URL || '';
 class LLMApi {
   constructor() {
     this.baseURL = API_BASE_URL;
-    this.timeout = 30000; // 30秒超时，因为大模型响应可能较慢
+    this.timeout = 120000; // 120秒超时，对于复杂的节点风险分析
   }
 
   /**

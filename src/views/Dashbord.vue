@@ -76,13 +76,6 @@
           </el-menu-item>
           
 
-          <!-- 人员分配计划 (独立菜单项) -->
-          <el-menu-item index="7">
-            <i class="el-icon-user-solid menu-icon"></i>
-            <span>人员分配计划</span>
-          </el-menu-item>
-
-
         </el-menu>
       </el-aside>
 
@@ -132,9 +125,6 @@ export default {
           break
         case '5':
           this.$router.push('/home/process-optimization')
-          break
-        case '7':
-          this.$router.push('/home/task-assignment')
           break
         // 其他菜单项的路由可以在这里添加
       }

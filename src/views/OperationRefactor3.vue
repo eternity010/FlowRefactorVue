@@ -336,17 +336,17 @@
       </el-card>
     </div>
 
-    <!-- 下一步按钮 -->
+    <!-- 回到主界面按钮 -->
     <div class="page-footer">
       <div class="footer-content">
         <el-button
           v-if="refactorData"
           type="primary"
           size="large"
-          @click="goNext"
-          class="next-btn">
-          <i class="el-icon-arrow-right"></i>
-          下一步
+          @click="goHome"
+          class="home-btn">
+          <i class="el-icon-house"></i>
+          回到主界面
         </el-button>
         <div v-else class="next-hint">
           <i class="el-icon-info"></i>
@@ -553,14 +553,13 @@ export default {
     },
 
     /**
-     * 前往下一页
+     * 回到主界面
      */
-    goNext() {
-      console.log('➡️ 前往风险重评估页面')
+    goHome() {
+      console.log('🏠 回到主界面')
       this.$router.push({
-        name: 'RiskReassessment',
-        params: this.routeParams,
-        query: this.routeQuery
+        name: 'Dashbord',
+        query: {}
       })
     },
     
@@ -657,7 +656,7 @@ export default {
   font-size: 16px;
 }
 
-.next-btn {
+.home-btn {
   background: linear-gradient(135deg, #409EFF, #66B1FF);
   border: none;
   padding: 12px 24px;
@@ -667,13 +666,13 @@ export default {
   transition: all 0.3s ease;
 }
 
-.next-btn:hover {
+.home-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
 }
 
-.next-btn i {
-  margin-left: 8px;
+.home-btn i {
+  margin-right: 8px;
 }
 
 /* 数据状态卡片样式 */
@@ -1099,7 +1098,7 @@ export default {
     align-items: center;
   }
 
-  .next-btn {
+  .home-btn {
     padding: 8px 16px;
     font-size: 14px;
   }
@@ -1362,7 +1361,7 @@ export default {
     align-items: center;
   }
 
-  .next-btn {
+  .home-btn {
     padding: 8px 16px;
     font-size: 14px;
   }
