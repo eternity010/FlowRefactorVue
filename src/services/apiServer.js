@@ -2535,6 +2535,87 @@ app.get('/api/topic04/production/tasks/search', async (req, res) => {
   }
 });
 
+// 获取供应商数据（含物料能力）
+app.get('/api/topic04/suppliers', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取供应商的请求，批次: ${model_run_batch || '2025-10-12_TSY_HSR_01'}`);
+    
+    const result = await topic04Service.getSuppliers(model_run_batch);
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条供应商数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取供应商数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取供应商数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取供应商数据异常:', error);
+    sendError(res, error);
+  }
+});
+
+// 获取采购订单数据（含物料明细）
+app.get('/api/topic04/purchase/orders', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取采购订单的请求，批次: ${model_run_batch || '2025-10-12_TSY_HSR_01'}`);
+    
+    const result = await topic04Service.getPurchaseOrders(model_run_batch);
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条采购订单数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取采购订单数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取采购订单数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取采购订单数据异常:', error);
+    sendError(res, error);
+  }
+});
+
+// 获取采购物料清单数据
+app.get('/api/topic04/purchase/items', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取采购物料清单的请求，批次: ${model_run_batch || '2025-10-12_TSY_HSR_01'}`);
+    
+    const result = await topic04Service.getPurchaseItems(model_run_batch);
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条采购物料清单数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取采购物料清单数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取采购物料清单数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取采购物料清单数据异常:', error);
+    sendError(res, error);
+  }
+});
+
 // 获取Topic04状态信息
 app.get('/api/topic04/status', async (req, res) => {
   try {

@@ -6,18 +6,6 @@
         <img src="../assets/logos/唐车logo.png" alt="Logo" class="logo">
         <span class="title">流程重构可视化平台</span>
       </div>
-      <div class="header-right">
-        <el-dropdown>
-          <span class="el-dropdown-link">
-            管理员<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人信息</el-dropdown-item>
-            <el-dropdown-item>修改密码</el-dropdown-item>
-            <el-dropdown-item divided>退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
     </el-header>
 
     <div class="main-container">
@@ -164,26 +152,6 @@ export default {
   font-size: 18px;
   font-weight: bold;
   color: #303133;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.el-dropdown-link {
-  cursor: pointer;
-  color: #606266;
-  display: flex;
-  align-items: center;
-}
-
-.el-dropdown-link:hover {
-  color: #409eff;
-}
-
-.el-icon-arrow-down {
-  margin-left: 5px;
 }
 
 /* 主容器样式 */

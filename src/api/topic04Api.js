@@ -424,6 +424,104 @@ class Topic04Api {
   async searchProductionTasks(searchParams = {}) {
     return await this.get('/api/topic04/production/tasks/search', searchParams);
   }
+
+  // ================================
+  // 供应商相关API方法
+  // ================================
+
+  /**
+   * 获取供应商数据（含物料能力）
+   * @param {string} modelRunBatch - 模型运行批次 (默认: 2025-10-12_TSY_HSR_01)
+   * @returns {Promise<Object>} 供应商数据
+   */
+  async getSuppliers(modelRunBatch = '2025-10-12_TSY_HSR_01') {
+    try {
+      console.log('🔍 获取供应商数据:', modelRunBatch);
+      
+      const response = await this.get('/api/topic04/suppliers', {
+        model_run_batch: modelRunBatch
+      });
+      
+      if (response.success) {
+        console.log('✅ 供应商数据获取成功:', {
+          total: response.data.total,
+          summary: response.data.summary
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('❌ 获取供应商数据失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // ================================
+  // 采购相关API方法
+  // ================================
+
+  /**
+   * 获取采购订单数据（含物料明细）
+   * @param {string} modelRunBatch - 模型运行批次 (默认: 2025-10-12_TSY_HSR_01)
+   * @returns {Promise<Object>} 采购订单数据
+   */
+  async getPurchaseOrders(modelRunBatch = '2025-10-12_TSY_HSR_01') {
+    try {
+      console.log('🔍 获取采购订单数据:', modelRunBatch);
+      
+      const response = await this.get('/api/topic04/purchase/orders', {
+        model_run_batch: modelRunBatch
+      });
+      
+      if (response.success) {
+        console.log('✅ 采购订单数据获取成功:', {
+          total: response.data.total,
+          summary: response.data.summary
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('❌ 获取采购订单数据失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 获取采购物料清单数据
+   * @param {string} modelRunBatch - 模型运行批次 (默认: 2025-10-12_TSY_HSR_01)
+   * @returns {Promise<Object>} 采购物料清单数据
+   */
+  async getPurchaseItems(modelRunBatch = '2025-10-12_TSY_HSR_01') {
+    try {
+      console.log('🔍 获取采购物料清单:', modelRunBatch);
+      
+      const response = await this.get('/api/topic04/purchase/items', {
+        model_run_batch: modelRunBatch
+      });
+      
+      if (response.success) {
+        console.log('✅ 采购物料清单获取成功:', {
+          total: response.data.total,
+          summary: response.data.summary
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('❌ 获取采购物料清单失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
 }
 
 // 创建并导出API实例
