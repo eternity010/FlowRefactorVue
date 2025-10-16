@@ -18,6 +18,7 @@ import ProductionRefactor3 from '@/views/ProductionRefactor3'
 import MarketingRefactor from '@/views/MarketingRefactor'
 import PurchaseRefactor from '@/views/PurchaseRefactor'
 import PurchaseRefactor2 from '@/views/PurchaseRefactor2'
+import PurchaseRefactor3 from '@/views/PurchaseRefactor3'
 import OperationRefactor from '@/views/OperationRefactor'
 import OperationRefactor2 from '@/views/OperationRefactor2'
 import OperationRefactor3 from '@/views/OperationRefactor3'
@@ -118,6 +119,11 @@ export default new Router({
       path: '/refactor-purchase2',
       name: 'PurchaseRefactor2',
       component: PurchaseRefactor2
+    },
+    {
+      path: '/refactor-purchase3',
+      name: 'PurchaseRefactor3',
+      component: PurchaseRefactor3
     },
     {
       path: '/production-refactor',

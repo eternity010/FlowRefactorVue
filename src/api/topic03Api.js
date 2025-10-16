@@ -539,6 +539,34 @@ class Topic03Api {
   }
 
   /**
+   * 获取供应商分类数据
+   * @param {string} modelRunBatch - 模型运行批次
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 供应商分类数据
+   */
+  async getSupplierClassifications(modelRunBatch = '2025-10-12_TSY_HSR_01', options = {}) {
+    const params = {
+      model_run_batch: modelRunBatch,
+      sort_by: options.sortBy || 'supplier_id',
+      sort_order: options.sortOrder || 'asc',
+      class_label: options.classLabel || '', // 可选：按稳定性等级筛选
+      supplier_id: options.supplierId || '', // 可选：按供应商ID筛选
+      material_code: options.materialCode || '' // 可选：按物料编码筛选
+    };
+
+    console.log('🔍 获取供应商分类数据:', params);
+    
+    try {
+      const response = await this.get('/api/topic03/supplier-classifications', params);
+      console.log('✅ 供应商分类数据获取成功');
+      return response;
+    } catch (error) {
+      console.error('❌ 获取供应商分类数据失败:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 获取API状态信息
    * @returns {Promise<Object>} 状态信息
    */

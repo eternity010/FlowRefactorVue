@@ -2616,6 +2616,33 @@ app.get('/api/topic04/purchase/items', async (req, res) => {
   }
 });
 
+// 获取采购优化结果数据
+app.get('/api/topic04/purchase/optimization-results', async (req, res) => {
+  try {
+    const { model_run_batch } = req.query;
+    console.log(`📥 收到获取采购优化结果的请求，批次: ${model_run_batch || '2025-10-12_TSY_HSR_01'}`);
+    
+    const result = await topic04Service.getPurchaseOptimizationResults(model_run_batch);
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条采购优化结果数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取采购优化结果数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取采购优化结果数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取采购优化结果数据异常:', error);
+    sendError(res, error);
+  }
+});
+
 // 获取Topic04状态信息
 app.get('/api/topic04/status', async (req, res) => {
   try {
@@ -2893,6 +2920,41 @@ app.get('/api/topic03/connection', async (req, res) => {
 });
 
 // 获取Topic03状态信息
+// 获取供应商分类数据
+app.get('/api/topic03/supplier-classifications', async (req, res) => {
+  try {
+    const { model_run_batch, sort_by, sort_order, class_label, supplier_id, material_code } = req.query;
+    console.log(`📥 收到获取供应商分类数据的请求，批次: ${model_run_batch || '2025-10-12_TSY_HSR_01'}`);
+    
+    const options = {
+      sortBy: sort_by || 'supplier_id',
+      sortOrder: sort_order || 'asc',
+      classLabel: class_label || '',
+      supplierId: supplier_id || '',
+      materialCode: material_code || ''
+    };
+
+    const result = await topic03Service.getSupplierClassifications(model_run_batch, options);
+    
+    if (result.success) {
+      console.log(`✅ 成功返回 ${result.data.total} 条供应商分类数据`);
+      res.json({
+        success: true,
+        data: result.data,
+        message: '获取供应商分类数据成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.error || '获取供应商分类数据失败'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 获取供应商分类数据异常:', error);
+    sendError(res, error);
+  }
+});
+
 app.get('/api/topic03/status', async (req, res) => {
   try {
     const result = {
@@ -2909,7 +2971,8 @@ app.get('/api/topic03/status', async (req, res) => {
           '推荐算法',
           '批量数据操作',
           '搜索功能',
-          '数据管理'
+          '数据管理',
+          '供应商分类数据查询'
         ],
         timestamp: new Date().toISOString()
       }

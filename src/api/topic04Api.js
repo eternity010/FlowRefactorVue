@@ -522,6 +522,31 @@ class Topic04Api {
       };
     }
   }
+
+  /**
+   * 获取采购优化结果数据
+   * @param {string} modelRunBatch - 模型运行批次
+   * @returns {Promise} API响应
+   */
+  async getPurchaseOptimizationResults(modelRunBatch = '2025-10-12_TSY_HSR_01') {
+    try {
+      console.log('🔍 获取采购优化结果数据:', modelRunBatch);
+      const response = await this.get('/api/topic04/purchase/optimization-results', {
+        model_run_batch: modelRunBatch
+      });
+      if (response.success) {
+        console.log('✅ 采购优化结果数据获取成功:', {
+          total: response.data.total,
+          totalSavings: response.data.summary.totalSavings,
+          optimizationRate: response.data.summary.optimizationRate
+        });
+      }
+      return response;
+    } catch (error) {
+      console.error('❌ 获取采购优化结果数据失败:', error);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 // 创建并导出API实例
@@ -544,6 +569,9 @@ const topic04Api = new Topic04Api();
 //
 // // 使用不同的批次号
 // const specificTasks = await topic04Api.getProductionTasks('2025-09-24_TSY_0401_B');
+//
+// // 获取采购优化结果
+// const optimizationResults = await topic04Api.getPurchaseOptimizationResults('2025-10-12_TSY_HSR_01');
 
 export { Topic04Api, topic04Api };
 export default topic04Api;

@@ -1374,6 +1374,186 @@ class Topic04Service {
   }
 
   /**
+   * 获取采购优化结果数据
+   * @param {string} modelRunBatch - 模型运行批次
+   * @returns {Object} 采购优化结果列表
+   */
+  async getPurchaseOptimizationResults(modelRunBatch = '2025-10-12_TSY_HSR_01') {
+    try {
+      console.log(`🔍 开始获取采购优化结果数据, 批次: ${modelRunBatch}`);
+      
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          po_no,
+          line_no,
+          material_code,
+          material_name,
+          spec_model,
+          unit,
+          qty,
+          old_unit_price,
+          unit_price,
+          amount,
+          need_date,
+          warehouse_code,
+          demand_dept,
+          transport_mode,
+          transport_cost,
+          ship_time,
+          arrival_time,
+          new_buyer_id,
+          new_buyer_name,
+          old_supplier_id,
+          new_supplier_id,
+          new_supplier_name,
+          remark,
+          create_time,
+          update_time
+        FROM dm_topic0403_output_purchase_item 
+        WHERE model_run_batch = ? 
+          AND del_flag = 0
+        ORDER BY po_no, line_no
+      `;
+      
+      const result = await this.mysqlService.executeCustomQuery(sql, [modelRunBatch]);
+      
+      if (result.success) {
+        const processedData = this.processPurchaseOptimizationData(result.data);
+        
+        console.log(`✅ 成功获取 ${processedData.length} 条采购优化结果数据`);
+        
+        return {
+          success: true,
+          data: {
+            total: processedData.length,
+            records: processedData,
+            summary: this.generateOptimizationSummary(processedData),
+            timestamp: new Date().toISOString()
+          }
+        };
+      } else {
+        throw new Error(result.error || '查询采购优化结果数据失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取采购优化结果失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 处理采购优化结果数据
+   * @param {Array} data - 原始数据
+   * @returns {Array} 处理后的数据
+   */
+  processPurchaseOptimizationData(data) {
+    return data.map(item => ({
+      id: item.id,
+      modelRunBatch: item.model_run_batch,
+      poNo: item.po_no,
+      lineNo: item.line_no,
+      materialCode: item.material_code,
+      materialName: item.material_name,
+      specModel: item.spec_model,
+      unit: item.unit,
+      qty: parseFloat(item.qty),
+      oldUnitPrice: item.old_unit_price ? parseFloat(item.old_unit_price) : null,
+      unitPrice: parseFloat(item.unit_price),
+      amount: parseFloat(item.amount),
+      needDate: item.need_date,
+      warehouseCode: item.warehouse_code,
+      demandDept: item.demand_dept,
+      transportMode: item.transport_mode,
+      transportCost: parseFloat(item.transport_cost),
+      shipTime: item.ship_time,
+      arrivalTime: item.arrival_time,
+      newBuyerId: item.new_buyer_id,
+      newBuyerName: item.new_buyer_name,
+      oldSupplierId: item.old_supplier_id,
+      newSupplierId: item.new_supplier_id,
+      newSupplierName: item.new_supplier_name,
+      remark: item.remark,
+      createTime: item.create_time,
+      updateTime: item.update_time,
+      // 计算优化效果
+      priceSavings: item.old_unit_price && item.unit_price ? 
+        (parseFloat(item.old_unit_price) - parseFloat(item.unit_price)) * parseFloat(item.qty) : 0,
+      priceChangePercent: item.old_unit_price && item.unit_price ? 
+        ((parseFloat(item.old_unit_price) - parseFloat(item.unit_price)) / parseFloat(item.old_unit_price) * 100).toFixed(2) : 0,
+      supplierChanged: item.old_supplier_id && item.new_supplier_id ? 
+        item.old_supplier_id !== item.new_supplier_id : false
+    }));
+  }
+
+  /**
+   * 生成采购优化结果汇总统计
+   * @param {Array} data - 处理后的数据
+   * @returns {Object} 汇总统计
+   */
+  generateOptimizationSummary(data) {
+    const totalItems = data.length;
+    const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
+    const totalSavings = data.reduce((sum, item) => sum + item.priceSavings, 0);
+    const supplierChangedCount = data.filter(item => item.supplierChanged).length;
+    const optimizedCount = data.filter(item => item.priceSavings > 0).length;
+    
+    // 按采购订单分组
+    const orderGroups = {};
+    data.forEach(item => {
+      if (!orderGroups[item.poNo]) {
+        orderGroups[item.poNo] = {
+          poNo: item.poNo,
+          items: [],
+          totalAmount: 0,
+          totalSavings: 0
+        };
+      }
+      orderGroups[item.poNo].items.push(item);
+      orderGroups[item.poNo].totalAmount += item.amount;
+      orderGroups[item.poNo].totalSavings += item.priceSavings;
+    });
+    
+    // 按供应商分组
+    const supplierGroups = {};
+    data.forEach(item => {
+      const supplierId = item.newSupplierId;
+      const supplierName = item.newSupplierName;
+      
+      if (!supplierGroups[supplierId]) {
+        supplierGroups[supplierId] = {
+          supplierId,
+          supplierName,
+          items: [],
+          totalAmount: 0,
+          totalSavings: 0
+        };
+      }
+      supplierGroups[supplierId].items.push(item);
+      supplierGroups[supplierId].totalAmount += item.amount;
+      supplierGroups[supplierId].totalSavings += item.priceSavings;
+    });
+    
+    return {
+      totalItems,
+      totalAmount: parseFloat(totalAmount.toFixed(2)),
+      totalSavings: parseFloat(totalSavings.toFixed(2)),
+      savingsRate: totalAmount > 0 ? parseFloat((totalSavings / totalAmount * 100).toFixed(2)) : 0,
+      supplierChangedCount,
+      supplierChangeRate: totalItems > 0 ? parseFloat((supplierChangedCount / totalItems * 100).toFixed(2)) : 0,
+      optimizedCount,
+      optimizationRate: totalItems > 0 ? parseFloat((optimizedCount / totalItems * 100).toFixed(2)) : 0,
+      orderCount: Object.keys(orderGroups).length,
+      supplierCount: Object.keys(supplierGroups).length,
+      orderGroups: Object.values(orderGroups),
+      supplierGroups: Object.values(supplierGroups)
+    };
+  }
+
+  /**
    * 处理采购物料清单数据
    * @param {Array} data - 原始数据
    * @returns {Array} 处理后的数据

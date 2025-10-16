@@ -1763,6 +1763,115 @@ class Topic03Service {
       };
     }
   }
+
+  /**
+   * 获取供应商分类数据
+   * @param {string} modelRunBatch - 模型运行批次
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 供应商分类数据
+   */
+  async getSupplierClassifications(modelRunBatch = '2025-10-12_TSY_HSR_01', options = {}) {
+    try {
+      console.log(`🔍 开始获取供应商分类数据, 批次: ${modelRunBatch}`);
+      
+      const {
+        sortBy = 'supplier_id',
+        sortOrder = 'asc',
+        classLabel = '',
+        supplierId = '',
+        materialCode = ''
+      } = options;
+
+      // 构建查询条件
+      let whereConditions = ['model_run_batch = ? AND del_flag = 0'];
+      let queryParams = [modelRunBatch];
+
+      if (classLabel) {
+        whereConditions.push('class_label = ?');
+        queryParams.push(classLabel);
+      }
+
+      if (supplierId) {
+        whereConditions.push('supplier_id = ?');
+        queryParams.push(parseInt(supplierId));
+      }
+
+      if (materialCode) {
+        whereConditions.push('material_code LIKE ?');
+        queryParams.push(`%${materialCode}%`);
+      }
+
+      const whereClause = whereConditions.join(' AND ');
+      
+      // 验证排序字段
+      const validSortFields = ['id', 'supplier_id', 'material_code', 'class_label', 'create_time'];
+      const sortField = validSortFields.includes(sortBy) ? sortBy : 'supplier_id';
+      const sortDirection = sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+
+      // 查询供应商分类数据
+      const sql = `
+        SELECT 
+          id, model_run_batch, supplier_id, material_code, class_label, remark,
+          create_time, update_time
+        FROM dm_topic0303_output_supplier_class 
+        WHERE ${whereClause}
+        ORDER BY ${sortField} ${sortDirection}
+      `;
+
+      console.log('🔍 执行SQL查询:', sql);
+      console.log('📊 查询参数:', queryParams);
+
+      const result = await this.mysqlService.executeCustomQuery(sql, queryParams);
+      
+      if (!result.success) {
+        throw new Error(result.error || '查询供应商分类数据失败');
+      }
+
+      const records = result.data || [];
+      
+      // 处理数据格式
+      const processedRecords = records.map(record => ({
+        id: record.id,
+        modelRunBatch: record.model_run_batch,
+        supplierId: record.supplier_id,
+        materialCode: record.material_code,
+        classLabel: record.class_label,
+        remark: record.remark || '',
+        createTime: record.create_time,
+        updateTime: record.update_time
+      }));
+
+      // 计算分类汇总
+      const classificationSummary = {};
+      processedRecords.forEach(record => {
+        const label = record.classLabel || '未分类';
+        classificationSummary[label] = (classificationSummary[label] || 0) + 1;
+      });
+
+      console.log(`✅ 成功获取 ${processedRecords.length} 条供应商分类数据`);
+
+      return {
+        success: true,
+        data: {
+          total: processedRecords.length,
+          records: processedRecords,
+          summary: {
+            classificationCounts: classificationSummary,
+            modelRunBatch: modelRunBatch,
+            queryOptions: options
+          },
+          timestamp: new Date().toISOString()
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ 获取供应商分类数据失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取供应商分类数据失败'
+      };
+    }
+  }
 }
 
 module.exports = Topic03Service;
