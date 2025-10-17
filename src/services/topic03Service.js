@@ -11,6 +11,8 @@ class Topic03Service {
     this.tableName = 'dm_topic0305_output_train_person_match';
     this.trainAssemblyTableName = 'dm_topic0301_output_user_2';
     this.equipmentTableName = 'dm_topic0302_output_equipment_2';
+    this.customerBaseTableName = 'dm_topic0304_input_customer_base';
+    this.leadTableName = 'dm_topic0304_input_lead';
   }
 
   /**
@@ -1869,6 +1871,379 @@ class Topic03Service {
       return {
         success: false,
         error: error.message || '获取供应商分类数据失败'
+      };
+    }
+  }
+
+  // ========================================
+  // 营销环节 - 客户线索管理
+  // ========================================
+
+  /**
+   * 获取客户基础信息
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 客户信息
+   */
+  async getCustomerBase(customerId, options = {}) {
+    try {
+      const { modelRunBatch = '20251013A' } = options;
+
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          customer_name,
+          customer_code,
+          customer_address,
+          contact_name,
+          biz_owner_id,
+          biz_owner_name,
+          customer_type,
+          hist_contract_cnt,
+          hist_contract_amount,
+          received_amount,
+          overdue_amount,
+          remark,
+          create_time,
+          update_time
+        FROM ${this.customerBaseTableName}
+        WHERE id = ${parseInt(customerId)} 
+          AND model_run_batch = '${modelRunBatch}' 
+          AND del_flag = 0
+        LIMIT 1
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      if (!result.data || result.data.length === 0) {
+        return {
+          success: false,
+          error: '客户不存在'
+        };
+      }
+
+      const customer = result.data[0];
+
+      return {
+        success: true,
+        data: {
+          ...customer,
+          hist_contract_amount: parseFloat(customer.hist_contract_amount || 0),
+          received_amount: parseFloat(customer.received_amount || 0),
+          overdue_amount: parseFloat(customer.overdue_amount || 0)
+        }
+      };
+
+    } catch (error) {
+      console.error('获取客户基础信息失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取客户基础信息失败'
+      };
+    }
+  }
+
+  /**
+   * 获取客户的线索列表
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 线索列表
+   */
+  async getCustomerLeads(customerId, options = {}) {
+    try {
+      const { 
+        modelRunBatch = '20251013A',
+        sortBy = 'create_time',
+        sortOrder = 'desc',
+        page = 1,
+        pageSize = 10
+      } = options;
+
+      // 验证排序参数
+      const validSortFields = ['lead_code', 'lead_title', 'lead_type', 'lead_status', 'create_time', 'update_time'];
+      const orderField = validSortFields.includes(sortBy) ? sortBy : 'create_time';
+      const orderDirection = ['asc', 'desc'].includes(sortOrder.toLowerCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+      // 确保参数是数值类型
+      const pageNum = parseInt(page) || 1;
+      const pageSizeNum = parseInt(pageSize) || 10;
+      const offset = (pageNum - 1) * pageSizeNum;
+
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          customer_id,
+          lead_code,
+          lead_title,
+          lead_type,
+          lead_source,
+          lead_status,
+          lead_detail,
+          remark,
+          create_time,
+          update_time
+        FROM ${this.leadTableName}
+        WHERE customer_id = ${parseInt(customerId)} 
+          AND model_run_batch = '${modelRunBatch}' 
+          AND del_flag = 0
+        ORDER BY ${orderField} ${orderDirection}
+        LIMIT ${pageSizeNum} OFFSET ${offset}
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // 获取总数
+      const countSql = `
+        SELECT COUNT(*) as total 
+        FROM ${this.leadTableName} 
+        WHERE customer_id = ${parseInt(customerId)} 
+          AND model_run_batch = '${modelRunBatch}' 
+          AND del_flag = 0
+      `;
+      const countResult = await this.mysqlService.query(countSql);
+      const total = countResult.success ? countResult.data[0].total : 0;
+
+      return {
+        success: true,
+        data: {
+          leads: result.data || [],
+          pagination: {
+            page: pageNum,
+            pageSize: pageSizeNum,
+            total,
+            totalPages: Math.ceil(total / pageSizeNum)
+          },
+          customerId: parseInt(customerId)
+        }
+      };
+
+    } catch (error) {
+      console.error('获取客户线索列表失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取客户线索列表失败'
+      };
+    }
+  }
+
+  /**
+   * 获取客户及其线索的完整信息
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 客户及线索信息
+   */
+  async getCustomerWithLeads(customerId, options = {}) {
+    try {
+      // 获取客户基础信息
+      const customerResult = await this.getCustomerBase(customerId, options);
+      if (!customerResult.success) {
+        return customerResult;
+      }
+
+      // 获取客户线索列表
+      const leadsResult = await this.getCustomerLeads(customerId, options);
+      if (!leadsResult.success) {
+        return leadsResult;
+      }
+
+      return {
+        success: true,
+        data: {
+          customer: customerResult.data,
+          leads: leadsResult.data.leads,
+          leadCount: leadsResult.data.pagination.total,
+          pagination: leadsResult.data.pagination
+        }
+      };
+
+    } catch (error) {
+      console.error('获取客户完整信息失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取客户完整信息失败'
+      };
+    }
+  }
+
+  /**
+   * 根据客户编号获取客户信息
+   * @param {string} customerCode - 客户编号
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 客户信息
+   */
+  async getCustomerByCode(customerCode, options = {}) {
+    try {
+      const { modelRunBatch = '20251013A' } = options;
+
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          customer_name,
+          customer_code,
+          customer_address,
+          contact_name,
+          biz_owner_id,
+          biz_owner_name,
+          customer_type,
+          hist_contract_cnt,
+          hist_contract_amount,
+          received_amount,
+          overdue_amount,
+          remark,
+          create_time,
+          update_time
+        FROM ${this.customerBaseTableName}
+        WHERE customer_code = '${customerCode}' 
+          AND model_run_batch = '${modelRunBatch}' 
+          AND del_flag = 0
+        LIMIT 1
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      if (!result.data || result.data.length === 0) {
+        return {
+          success: false,
+          error: '客户不存在'
+        };
+      }
+
+      const customer = result.data[0];
+
+      return {
+        success: true,
+        data: {
+          ...customer,
+          hist_contract_amount: parseFloat(customer.hist_contract_amount || 0),
+          received_amount: parseFloat(customer.received_amount || 0),
+          overdue_amount: parseFloat(customer.overdue_amount || 0)
+        }
+      };
+
+    } catch (error) {
+      console.error('根据客户编号获取客户信息失败:', error);
+      return {
+        success: false,
+        error: error.message || '根据客户编号获取客户信息失败'
+      };
+    }
+  }
+
+  /**
+   * 获取客户列表
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 客户列表
+   */
+  async getCustomerList(options = {}) {
+    try {
+      const {
+        modelRunBatch = '20251013A',
+        sortBy = 'customer_code',
+        sortOrder = 'asc',
+        page = 1,
+        pageSize = 20,
+        customerType = '',
+        bizOwnerName = ''
+      } = options;
+
+      // 构建查询条件
+      let whereConditions = [`model_run_batch = '${modelRunBatch}'`, 'del_flag = 0'];
+      
+      if (customerType) {
+        whereConditions.push(`customer_type = '${customerType}'`);
+      }
+      
+      if (bizOwnerName) {
+        whereConditions.push(`biz_owner_name = '${bizOwnerName}'`);
+      }
+
+      // 验证排序参数
+      const validSortFields = ['customer_code', 'customer_name', 'customer_type', 'biz_owner_name', 'hist_contract_amount', 'create_time'];
+      const orderField = validSortFields.includes(sortBy) ? sortBy : 'customer_code';
+      const orderDirection = ['asc', 'desc'].includes(sortOrder.toLowerCase()) ? sortOrder.toUpperCase() : 'ASC';
+
+      // 确保参数是数值类型
+      const pageNum = parseInt(page) || 1;
+      const pageSizeNum = parseInt(pageSize) || 20;
+      const offset = (pageNum - 1) * pageSizeNum;
+
+      const sql = `
+        SELECT 
+          id,
+          model_run_batch,
+          customer_name,
+          customer_code,
+          customer_address,
+          contact_name,
+          biz_owner_id,
+          biz_owner_name,
+          customer_type,
+          hist_contract_cnt,
+          hist_contract_amount,
+          received_amount,
+          overdue_amount,
+          remark,
+          create_time,
+          update_time
+        FROM ${this.customerBaseTableName}
+        WHERE ${whereConditions.join(' AND ')}
+        ORDER BY ${orderField} ${orderDirection}
+        LIMIT ${pageSizeNum} OFFSET ${offset}
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // 获取总数
+      const countSql = `
+        SELECT COUNT(*) as total 
+        FROM ${this.customerBaseTableName} 
+        WHERE ${whereConditions.join(' AND ')}
+      `;
+      const countResult = await this.mysqlService.query(countSql);
+      const total = countResult.success ? countResult.data[0].total : 0;
+
+      return {
+        success: true,
+        data: {
+          customers: result.data.map(customer => ({
+            ...customer,
+            hist_contract_amount: parseFloat(customer.hist_contract_amount || 0),
+            received_amount: parseFloat(customer.received_amount || 0),
+            overdue_amount: parseFloat(customer.overdue_amount || 0)
+          })),
+          pagination: {
+            page: pageNum,
+            pageSize: pageSizeNum,
+            total,
+            totalPages: Math.ceil(total / pageSizeNum)
+          }
+        }
+      };
+
+    } catch (error) {
+      console.error('获取客户列表失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取客户列表失败'
       };
     }
   }

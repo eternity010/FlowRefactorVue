@@ -2994,6 +2994,116 @@ app.get('/api/topic03/table-structure', async (req, res) => {
 });
 
 // ================================
+// 营销环节 - 客户线索管理API
+// ================================
+
+// 获取客户基础信息
+app.get('/api/topic03/customer/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { model_run_batch } = req.query;
+
+    const options = {
+      modelRunBatch: model_run_batch || '20251013A'
+    };
+
+    const result = await topic03Service.getCustomerBase(parseInt(customerId), options);
+    sendResponse(res, result, `获取客户 ${customerId} 信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 根据客户编号获取客户信息
+app.get('/api/topic03/customer-by-code/:customerCode', async (req, res) => {
+  try {
+    const { customerCode } = req.params;
+    const { model_run_batch } = req.query;
+
+    const options = {
+      modelRunBatch: model_run_batch || '20251013A'
+    };
+
+    const result = await topic03Service.getCustomerByCode(customerCode, options);
+    sendResponse(res, result, `获取客户编号 ${customerCode} 信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取客户的线索列表
+app.get('/api/topic03/customer/:customerId/leads', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { model_run_batch, sort_by, sort_order, page, page_size } = req.query;
+
+    const options = {
+      modelRunBatch: model_run_batch || '20251013A',
+      sortBy: sort_by || 'create_time',
+      sortOrder: sort_order || 'desc',
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 10
+    };
+
+    const result = await topic03Service.getCustomerLeads(parseInt(customerId), options);
+    sendResponse(res, result, `获取客户 ${customerId} 的线索列表失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取客户及其线索的完整信息
+app.get('/api/topic03/customer/:customerId/with-leads', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { model_run_batch, sort_by, sort_order, page, page_size } = req.query;
+
+    const options = {
+      modelRunBatch: model_run_batch || '20251013A',
+      sortBy: sort_by || 'create_time',
+      sortOrder: sort_order || 'desc',
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 10
+    };
+
+    const result = await topic03Service.getCustomerWithLeads(parseInt(customerId), options);
+    sendResponse(res, result, `获取客户 ${customerId} 完整信息失败`);
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取客户列表
+app.get('/api/topic03/customers', async (req, res) => {
+  try {
+    const { 
+      model_run_batch, 
+      sort_by, 
+      sort_order, 
+      page, 
+      page_size, 
+      customer_type,
+      biz_owner_name
+    } = req.query;
+
+    const options = {
+      modelRunBatch: model_run_batch || '20251013A',
+      sortBy: sort_by || 'customer_code',
+      sortOrder: sort_order || 'asc',
+      page: parseInt(page) || 1,
+      pageSize: parseInt(page_size) || 20,
+      customerType: customer_type || '',
+      bizOwnerName: biz_owner_name || ''
+    };
+
+    const result = await topic03Service.getCustomerList(options);
+    sendResponse(res, result, '获取客户列表失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// ================================
 // Topic03 火车装配人员匹配API路由
 // ================================
 

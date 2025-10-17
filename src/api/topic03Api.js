@@ -573,6 +573,128 @@ class Topic03Api {
   async getStatus() {
     return await this.get('/api/topic03/status');
   }
+
+  // ========================================
+  // 营销环节 - 客户线索管理API
+  // ========================================
+
+  /**
+   * 获取客户基础信息
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 客户信息
+   */
+  async getCustomerBase(customerId, options = {}) {
+    if (!customerId) {
+      throw new Error('客户ID不能为空');
+    }
+
+    const params = {
+      model_run_batch: options.modelRunBatch || '20251013A'
+    };
+
+    return await this.get(`/api/topic03/customer/${customerId}`, params);
+  }
+
+  /**
+   * 根据客户编号获取客户信息
+   * @param {string} customerCode - 客户编号
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @returns {Promise<Object>} 客户信息
+   */
+  async getCustomerByCode(customerCode, options = {}) {
+    if (!customerCode) {
+      throw new Error('客户编号不能为空');
+    }
+
+    const params = {
+      model_run_batch: options.modelRunBatch || '20251013A'
+    };
+
+    return await this.get(`/api/topic03/customer-by-code/${encodeURIComponent(customerCode)}`, params);
+  }
+
+  /**
+   * 获取客户的线索列表
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @param {string} options.sortBy - 排序字段
+   * @param {string} options.sortOrder - 排序方向
+   * @param {number} options.page - 页码
+   * @param {number} options.pageSize - 每页大小
+   * @returns {Promise<Object>} 线索列表
+   */
+  async getCustomerLeads(customerId, options = {}) {
+    if (!customerId) {
+      throw new Error('客户ID不能为空');
+    }
+
+    const params = {
+      model_run_batch: options.modelRunBatch || '20251013A',
+      sort_by: options.sortBy || 'create_time',
+      sort_order: options.sortOrder || 'desc',
+      page: options.page || 1,
+      page_size: options.pageSize || 10
+    };
+
+    return await this.get(`/api/topic03/customer/${customerId}/leads`, params);
+  }
+
+  /**
+   * 获取客户及其线索的完整信息
+   * @param {number} customerId - 客户ID
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @param {string} options.sortBy - 排序字段
+   * @param {string} options.sortOrder - 排序方向
+   * @param {number} options.page - 页码
+   * @param {number} options.pageSize - 每页大小
+   * @returns {Promise<Object>} 客户及线索信息
+   */
+  async getCustomerWithLeads(customerId, options = {}) {
+    if (!customerId) {
+      throw new Error('客户ID不能为空');
+    }
+
+    const params = {
+      model_run_batch: options.modelRunBatch || '20251013A',
+      sort_by: options.sortBy || 'create_time',
+      sort_order: options.sortOrder || 'desc',
+      page: options.page || 1,
+      page_size: options.pageSize || 10
+    };
+
+    return await this.get(`/api/topic03/customer/${customerId}/with-leads`, params);
+  }
+
+  /**
+   * 获取客户列表
+   * @param {Object} options - 查询选项
+   * @param {string} options.modelRunBatch - 模型运行批次
+   * @param {string} options.sortBy - 排序字段
+   * @param {string} options.sortOrder - 排序方向
+   * @param {number} options.page - 页码
+   * @param {number} options.pageSize - 每页大小
+   * @param {string} options.customerType - 客户类型筛选
+   * @param {string} options.bizOwnerName - 业务负责人筛选
+   * @returns {Promise<Object>} 客户列表
+   */
+  async getCustomerList(options = {}) {
+    const params = {
+      model_run_batch: options.modelRunBatch || '20251013A',
+      sort_by: options.sortBy || 'customer_code',
+      sort_order: options.sortOrder || 'asc',
+      page: options.page || 1,
+      page_size: options.pageSize || 20,
+      customer_type: options.customerType || '',
+      biz_owner_name: options.bizOwnerName || ''
+    };
+
+    return await this.get('/api/topic03/customers', params);
+  }
 }
 
 // 创建并导出API实例

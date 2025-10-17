@@ -7,8 +7,77 @@
 
     <!-- 页面内容区域 -->
     <div class="content-section">
+      <!-- 采购优化操作卡片 -->
+      <el-card class="optimization-action-card" v-if="!showOptimizationResults" shadow="hover">
+        <div class="optimization-action-content">
+          <!-- 标题区域 -->
+          <div class="action-header">
+            <div class="header-icon-wrapper">
+              <div class="header-icon">
+                <i class="el-icon-cpu"></i>
+              </div>
+            </div>
+            <h2 class="action-title">智能采购优化分析</h2>
+            <p class="action-subtitle">基于供应商稳定性和价格对比的智能决策支持系统</p>
+          </div>
+
+          <!-- 分隔线 -->
+          <el-divider></el-divider>
+
+          <!-- 功能特性区域 -->
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon supplier-icon">
+                <i class="el-icon-connection"></i>
+              </div>
+              <div class="feature-content">
+                <h4>供应商切换建议</h4>
+                <p>智能推荐最优供应商</p>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon cost-icon">
+                <i class="el-icon-coin"></i>
+              </div>
+              <div class="feature-content">
+                <h4>成本节省分析</h4>
+                <p>精确计算优化收益</p>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon stats-icon">
+                <i class="el-icon-data-line"></i>
+              </div>
+              <div class="feature-content">
+                <h4>优化效果统计</h4>
+                <p>全面展示优化成果</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="action-button-wrapper">
+            <el-button 
+              type="primary" 
+              size="large"
+              @click="startOptimization"
+              :loading="optimizationLoading"
+              icon="el-icon-video-play"
+              class="start-button"
+            >
+              {{ optimizationLoading ? '正在分析优化方案...' : '开始优化分析' }}
+            </el-button>
+            <p class="button-hint" v-if="!optimizationLoading">
+              <i class="el-icon-info"></i> 点击按钮启动智能分析引擎
+            </p>
+          </div>
+        </div>
+      </el-card>
+
       <!-- 优化结果汇总卡片 -->
-      <el-card class="summary-card" v-if="optimizationSummary">
+      <el-card class="summary-card" v-if="optimizationSummary && showOptimizationResults">
         <template #header>
           <div class="card-header">
             <i class="el-icon-data-analysis"></i>
@@ -53,7 +122,7 @@
       </el-card>
 
       <!-- 优化结果详细数据 -->
-      <el-card class="data-card">
+      <el-card class="data-card" v-if="showOptimizationResults">
         <template #header>
           <div class="card-header">
             <i class="el-icon-s-order"></i>
@@ -146,7 +215,7 @@
       </el-card>
 
       <!-- 按订单分组的优化统计 -->
-      <el-card class="order-stats-card" v-if="optimizationSummary && optimizationSummary.orderGroups">
+      <el-card class="order-stats-card" v-if="optimizationSummary && optimizationSummary.orderGroups && showOptimizationResults">
         <template #header>
           <div class="card-header">
             <i class="el-icon-pie-chart"></i>
@@ -177,6 +246,25 @@
           </div>
         </div>
       </el-card>
+
+      <!-- 操作按钮区域 -->
+      <div class="action-buttons" v-if="showOptimizationResults">
+        <el-button 
+          type="primary" 
+          size="medium"
+          @click="goToHome"
+          icon="el-icon-house"
+        >
+          返回主页面
+        </el-button>
+        <el-button 
+          size="medium"
+          @click="goBack"
+          icon="el-icon-back"
+        >
+          返回上一步
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -193,6 +281,8 @@ export default {
       nodeType: '',
       modelRunBatch: '',
       loading: false,
+      optimizationLoading: false,
+      showOptimizationResults: false,
       optimizationData: [],
       optimizationSummary: null
     };
@@ -211,12 +301,65 @@ export default {
       modelRunBatch: this.modelRunBatch
     });
 
-    // 自动加载优化数据
-    this.loadOptimizationData();
+    // 不再自动加载优化数据，等待用户点击按钮
   },
   methods: {
     goBack() {
       this.$router.go(-1);
+    },
+
+    /**
+     * 返回主页面
+     */
+    goToHome() {
+      console.log('🏠 返回主页面');
+      this.$router.push({
+        name: 'Dashbord',
+        path: '/home'
+      });
+    },
+
+    /**
+     * 开始采购优化分析
+     */
+    async startOptimization() {
+      try {
+        this.optimizationLoading = true;
+        console.log('🚀 开始采购优化分析');
+
+        // 显示开始分析的消息
+        this.$message({
+          message: '正在启动智能采购优化分析...',
+          type: 'info',
+          duration: 1000
+        });
+
+        // 模拟1秒加载时间
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 加载优化数据
+        await this.loadOptimizationData();
+
+        // 显示优化结果
+        this.showOptimizationResults = true;
+
+        console.log('✅ 采购优化分析完成');
+        this.$message({
+          message: '采购优化分析完成！为您找到了最佳的供应商优化方案',
+          type: 'success',
+          duration: 3000
+        });
+
+      } catch (error) {
+        console.error('❌ 采购优化分析失败:', error);
+        this.$message({
+          message: '采购优化分析失败，请重试',
+          type: 'error',
+          duration: 3000
+        });
+      } finally {
+        this.optimizationLoading = false;
+      }
     },
 
     /**
@@ -313,6 +456,7 @@ export default {
 }
 
 /* 卡片通用样式 */
+.optimization-action-card,
 .summary-card,
 .data-card,
 .order-stats-card {
@@ -489,5 +633,243 @@ export default {
   .price-comparison {
     font-size: 11px;
   }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-buttons .el-button {
+    width: 100%;
+  }
+  
+  /* 优化操作卡片移动端样式 */
+  .optimization-action-content {
+    padding: 30px 20px;
+  }
+  
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 36px;
+  }
+  
+  .action-title {
+    font-size: 22px;
+  }
+  
+  .action-subtitle {
+    font-size: 14px;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .feature-card {
+    padding: 20px 15px;
+  }
+  
+  .feature-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+  
+  .start-button {
+    min-width: 100%;
+    font-size: 16px;
+    height: 50px;
+  }
+  
+  .button-hint {
+    font-size: 12px;
+  }
+}
+
+/* 优化操作卡片样式 */
+.optimization-action-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+}
+
+.optimization-action-content {
+  padding: 40px 30px;
+}
+
+/* 标题区域样式 */
+.action-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.header-icon {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 48px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.action-title {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  color: #303133;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.action-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #909399;
+  line-height: 1.6;
+}
+
+/* 功能特性网格 */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.feature-card {
+  background: white;
+  padding: 25px 20px;
+  border-radius: 12px;
+  border: 2px solid #e4e7ed;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.feature-card:hover {
+  border-color: #409eff;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(64, 158, 255, 0.15);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 15px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+}
+
+.supplier-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cost-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stats-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.feature-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #303133;
+  font-weight: 600;
+}
+
+.feature-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #909399;
+  line-height: 1.5;
+}
+
+/* 操作按钮区域 */
+.action-button-wrapper {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.start-button {
+  min-width: 240px;
+  height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.start-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+}
+
+.start-button:active {
+  transform: translateY(-1px);
+}
+
+.button-hint {
+  margin: 15px 0 0 0;
+  font-size: 13px;
+  color: #909399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.button-hint i {
+  font-size: 14px;
+  color: #409eff;
+}
+
+/* 操作按钮样式 */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+  padding: 20px 0;
+}
+
+.action-buttons .el-button {
+  min-width: 140px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>
