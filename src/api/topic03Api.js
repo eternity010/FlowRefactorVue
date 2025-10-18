@@ -695,6 +695,49 @@ class Topic03Api {
 
     return await this.get('/api/topic03/customers', params);
   }
+
+  /**
+   * 获取优化指标数据
+   * @param {Object} options - 查询选项
+   * @param {string} options.sortBy - 排序字段
+   * @param {string} options.sortOrder - 排序方向
+   * @param {number} options.limit - 数据限制数量
+   * @returns {Promise<Object>} 优化指标数据
+   */
+  async getOptimizationMetrics(options = {}) {
+    const params = {
+      sort_by: options.sortBy || 'customer_id',
+      sort_order: options.sortOrder || 'asc',
+      limit: options.limit || 1000
+    };
+
+    return await this.get('/api/topic03/optimization-metrics', params);
+  }
+
+  /**
+   * 获取销售-客户匹配度数据
+   * @param {Object} options - 查询选项
+   * @param {string} options.groupBy - 分组方式：'owner' 或 'customer'
+   * @param {string} options.ownerName - 指定销售人员名称（可选）
+   * @param {number} options.customerId - 指定客户ID（可选）
+   * @param {number} options.limit - 数据限制数量
+   * @returns {Promise<Object>} 销售-客户匹配度数据
+   */
+  async getSalesCustomerMatch(options = {}) {
+    const params = {
+      group_by: options.groupBy || 'owner',
+      limit: options.limit || 10000
+    };
+
+    if (options.ownerName) {
+      params.owner_name = options.ownerName;
+    }
+    if (options.customerId) {
+      params.customer_id = options.customerId;
+    }
+
+    return await this.get('/api/topic03/sales-customer-match', params);
+  }
 }
 
 // 创建并导出API实例

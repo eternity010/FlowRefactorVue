@@ -13,6 +13,8 @@ class Topic03Service {
     this.equipmentTableName = 'dm_topic0302_output_equipment_2';
     this.customerBaseTableName = 'dm_topic0304_input_customer_base';
     this.leadTableName = 'dm_topic0304_input_lead';
+    this.optimizationMetricsTableName = 'dm_topic0306_output_optimization_metrics';
+    this.salesCustomerMatchTableName = 'dm_topic0306_output_sales_customer_match';
   }
 
   /**
@@ -2244,6 +2246,189 @@ class Topic03Service {
       return {
         success: false,
         error: error.message || '获取客户列表失败'
+      };
+    }
+  }
+
+  /**
+   * 获取优化指标数据
+   * @param {Object} options - 查询选项
+   * @returns {Promise<Object>} 查询结果
+   */
+  async getOptimizationMetrics(options = {}) {
+    try {
+      console.log('📊 获取优化指标数据');
+      
+      const { 
+        sortBy = 'customer_id',
+        sortOrder = 'asc',
+        limit = 1000
+      } = options;
+
+      const validSortFields = [
+        'customer_id', 'customer_name', 'lead_conversion_prob', 
+        'avg_task_per_lead', 'assignment_cost', 'overdue_ratio'
+      ];
+      const orderField = validSortFields.includes(sortBy) ? sortBy : 'customer_id';
+      const orderDirection = ['asc', 'desc'].includes(sortOrder.toLowerCase()) ? sortOrder.toUpperCase() : 'ASC';
+
+      const sql = `
+        SELECT 
+          customer_id,
+          customer_name,
+          lead_conversion_prob,
+          avg_task_per_lead,
+          assignment_cost,
+          overdue_ratio
+        FROM ${this.optimizationMetricsTableName}
+        ORDER BY ${orderField} ${orderDirection}
+        LIMIT ${parseInt(limit)}
+      `;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return {
+        success: true,
+        data: (result.data || []).map(item => ({
+          ...item,
+          lead_conversion_prob: parseFloat(item.lead_conversion_prob || 0),
+          avg_task_per_lead: parseFloat(item.avg_task_per_lead || 0),
+          assignment_cost: parseFloat(item.assignment_cost || 0),
+          overdue_ratio: parseFloat(item.overdue_ratio || 0)
+        }))
+      };
+
+    } catch (error) {
+      console.error('获取优化指标数据失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取优化指标数据失败'
+      };
+    }
+  }
+
+  /**
+   * 获取销售-客户匹配度数据
+   * @param {Object} options - 查询选项
+   * @param {string} options.groupBy - 分组方式：'owner' 或 'customer'
+   * @param {string} options.ownerName - 指定销售人员名称（可选）
+   * @param {number} options.customerId - 指定客户ID（可选）
+   * @returns {Promise<Object>} 包含匹配度数据的结果对象
+   */
+  async getSalesCustomerMatch(options = {}) {
+    try {
+      console.log('📊 获取销售-客户匹配度数据');
+      
+      const { 
+        groupBy = 'owner',
+        ownerName = null,
+        customerId = null,
+        limit = 10000
+      } = options;
+
+      let sql = `
+        SELECT 
+          owner_name,
+          customer_id,
+          customer_name,
+          sales_customer_match
+        FROM ${this.salesCustomerMatchTableName}
+        WHERE 1=1
+      `;
+
+      // 添加过滤条件
+      if (ownerName) {
+        sql += ` AND owner_name = '${ownerName}'`;
+      }
+      if (customerId) {
+        sql += ` AND customer_id = ${parseInt(customerId)}`;
+      }
+
+      sql += ` ORDER BY owner_name, sales_customer_match DESC LIMIT ${parseInt(limit)}`;
+
+      const result = await this.mysqlService.query(sql);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const rawData = (result.data || []).map(item => ({
+        ...item,
+        sales_customer_match: parseFloat(item.sales_customer_match || 0)
+      }));
+
+      // 根据groupBy参数进行数据分组和统计
+      if (groupBy === 'owner') {
+        // 按销售人员分组
+        const groupedData = {};
+        
+        rawData.forEach(item => {
+          if (!groupedData[item.owner_name]) {
+            groupedData[item.owner_name] = {
+              owner_name: item.owner_name,
+              customers: [],
+              statistics: {
+                total_customers: 0,
+                avg_match_score: 0,
+                high_match_count: 0,  // 匹配度 >= 0.8
+                medium_match_count: 0, // 0.6 <= 匹配度 < 0.8
+                low_match_count: 0,   // 匹配度 < 0.6
+                max_match_score: 0,
+                min_match_score: 1
+              }
+            };
+          }
+
+          const match = item.sales_customer_match;
+          groupedData[item.owner_name].customers.push({
+            customer_id: item.customer_id,
+            customer_name: item.customer_name,
+            match_score: match
+          });
+
+          // 更新统计信息
+          const stats = groupedData[item.owner_name].statistics;
+          stats.total_customers++;
+          if (match >= 0.8) stats.high_match_count++;
+          else if (match >= 0.6) stats.medium_match_count++;
+          else stats.low_match_count++;
+          
+          stats.max_match_score = Math.max(stats.max_match_score, match);
+          stats.min_match_score = Math.min(stats.min_match_score, match);
+        });
+
+        // 计算平均匹配度
+        Object.values(groupedData).forEach(owner => {
+          const totalScore = owner.customers.reduce((sum, c) => sum + c.match_score, 0);
+          owner.statistics.avg_match_score = owner.customers.length > 0 
+            ? totalScore / owner.customers.length 
+            : 0;
+          
+          // 排序客户列表（按匹配度降序）
+          owner.customers.sort((a, b) => b.match_score - a.match_score);
+        });
+
+        return {
+          success: true,
+          data: Object.values(groupedData)
+        };
+      } else {
+        // 返回原始数据
+        return {
+          success: true,
+          data: rawData
+        };
+      }
+
+    } catch (error) {
+      console.error('获取销售-客户匹配度数据失败:', error);
+      return {
+        success: false,
+        error: error.message || '获取销售-客户匹配度数据失败'
       };
     }
   }

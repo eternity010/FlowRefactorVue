@@ -199,14 +199,8 @@
                   </div>
                   <div class="info-item">
                     <span class="info-label">逾期：</span>
-                    <span class="info-value" :class="{ 'overdue-warning': customer.overdue_amount > 0 }">
+                    <span class="info-value">
                       {{ formatMoney(customer.overdue_amount) }}万
-                      <el-tag 
-                        v-if="customer.overdue_amount > 0" 
-                        type="warning" 
-                        size="mini">
-                        ⚠️
-                      </el-tag>
                     </span>
                   </div>
                 </div>
@@ -239,6 +233,36 @@
             background>
           </el-pagination>
         </div>
+
+        <!-- 下一步操作区域 -->
+        <div class="next-step-section">
+          <el-card class="next-step-card">
+            <div class="next-step-content">
+              <div class="next-step-info">
+                <h4>
+                  <i class="el-icon-right"></i>
+                  下一步：进行人员和客户的匹配度分析
+                </h4>
+                <p>基于当前客户数据，进行人员与客户的匹配度分析</p>
+                <div class="next-step-summary">
+                  <span>当前批次：{{ selectedBatch }}</span>
+                  <span class="separator">|</span>
+                  <span>客户总数：{{ customersData.pagination.total }}个</span>
+                </div>
+              </div>
+              <div class="next-step-actions">
+                <el-button 
+                  type="primary" 
+                  size="medium"
+                  @click="goToNextStep"
+                  :disabled="!customersData || customersData.pagination.total === 0">
+                  <i class="el-icon-d-arrow-right"></i>
+                  进入下一步
+                </el-button>
+              </div>
+            </div>
+          </el-card>
+        </div>
       </div>
       
       <!-- 演示提示 -->
@@ -256,6 +280,123 @@
         </el-alert>
       </div>
     </div>
+    
+    <!-- 客户线索详情侧边弹框 -->
+    <el-drawer
+      :visible.sync="drawerVisible"
+      :with-header="false"
+      :size="600"
+      direction="rtl"
+      class="customer-leads-drawer">
+      
+      <div v-if="selectedCustomer" class="drawer-content">
+        <!-- 弹框头部 -->
+        <div class="drawer-header">
+          <div class="customer-info-header">
+            <h3>
+              <i class="el-icon-user"></i>
+              {{ selectedCustomer.customer_name }}
+            </h3>
+            <el-tag 
+              :type="getCustomerTypeColor(selectedCustomer.customer_type)" 
+              size="small">
+              {{ selectedCustomer.customer_type }}
+            </el-tag>
+          </div>
+          <div class="customer-basic-info">
+            <span>{{ selectedCustomer.customer_code }}</span>
+            <span class="separator">|</span>
+            <span>{{ selectedCustomer.biz_owner_name || '未指定负责人' }}</span>
+          </div>
+        </div>
+        
+        <!-- 线索列表 -->
+        <div class="drawer-body">
+          <div class="leads-section-header">
+            <h4>
+              <i class="el-icon-lightning"></i>
+              客户线索
+            </h4>
+            <el-button 
+              @click="refreshCustomerLeads" 
+              type="text" 
+              size="small"
+              :loading="leadsLoading">
+              <i class="el-icon-refresh"></i>
+              刷新
+            </el-button>
+          </div>
+          
+          <!-- 加载状态 -->
+          <div v-if="leadsLoading" class="leads-loading">
+            <el-loading text="正在加载线索信息..." />
+          </div>
+          
+          <!-- 线索列表 -->
+          <div v-else-if="customerLeads && customerLeads.length > 0" class="leads-list-drawer">
+            <div 
+              v-for="lead in customerLeads" 
+              :key="lead.id" 
+              class="lead-item">
+              <div class="lead-item-header">
+                <div class="lead-title-row">
+                  <span class="lead-code">{{ lead.lead_code }}</span>
+                  <span class="lead-title">{{ lead.lead_title }}</span>
+                </div>
+                <el-tag 
+                  :type="getLeadStatusColor(lead.lead_status)" 
+                  size="mini">
+                  {{ lead.lead_status || '未知状态' }}
+                </el-tag>
+              </div>
+              
+              <div class="lead-item-meta">
+                <div class="meta-row">
+                  <span class="meta-label">类型：</span>
+                  <span class="meta-value">{{ lead.lead_type || '未分类' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">来源：</span>
+                  <span class="meta-value">{{ lead.lead_source || '未知' }}</span>
+                </div>
+              </div>
+              
+              <div v-if="lead.lead_detail" class="lead-item-detail">
+                <div class="detail-label">详情：</div>
+                <div class="detail-content">{{ lead.lead_detail }}</div>
+              </div>
+              
+              <div class="lead-item-time">
+                <i class="el-icon-time"></i>
+                {{ formatDateTime(lead.create_time) }}
+              </div>
+            </div>
+          </div>
+          
+          <!-- 无线索状态 -->
+          <div v-else class="no-leads-drawer">
+            <el-empty 
+              description="该客户暂无线索信息" 
+              image-size="120">
+              <template #image>
+                <i class="el-icon-document-remove" style="font-size: 120px; color: #c0c4cc;"></i>
+              </template>
+            </el-empty>
+          </div>
+        </div>
+        
+        <!-- 弹框底部 -->
+        <div class="drawer-footer">
+          <el-button @click="drawerVisible = false">关闭</el-button>
+          <el-button 
+            type="primary" 
+            @click="viewMoreLeadDetails"
+            :disabled="!customerLeads || customerLeads.length === 0">
+            查看更多详情
+          </el-button>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -279,6 +420,12 @@ export default {
       customersData: null,
       currentPage: 1,
       pageSize: 20,
+      
+      // 弹框相关状态
+      drawerVisible: false,
+      selectedCustomer: null,
+      customerLeads: null,
+      leadsLoading: false,
       
       // 筛选条件
       selectedBatch: '20251013A',
@@ -422,10 +569,83 @@ export default {
     },
 
     // 查看客户详情
-    viewCustomerDetails(customer) {
+    async viewCustomerDetails(customer) {
       console.log('👁️ 查看客户详情:', customer);
-      this.$message.info(`点击查看客户 ${customer.customer_name} 的详细信息`);
-      // 这里可以跳转到客户详情页面或弹出详情对话框
+      
+      // 设置选中的客户
+      this.selectedCustomer = customer;
+      this.customerLeads = null;
+      this.drawerVisible = true;
+      
+      // 加载客户线索
+      await this.loadCustomerLeads(customer.id);
+    },
+
+    // 加载客户线索
+    async loadCustomerLeads(customerId) {
+      try {
+        this.leadsLoading = true;
+        
+        console.log('🔄 开始加载客户线索:', customerId);
+
+        const result = await topic03Api.getCustomerLeads(customerId, {
+          modelRunBatch: this.selectedBatch,
+          pageSize: 50 // 弹框中显示更多线索
+        });
+
+        if (result.success) {
+          this.customerLeads = result.data.leads || [];
+          console.log('✅ 客户线索加载成功:', this.customerLeads);
+          
+          if (this.customerLeads.length === 0) {
+            this.$message.info('该客户暂无线索信息');
+          }
+        } else {
+          throw new Error(result.error || '获取客户线索失败');
+        }
+      } catch (error) {
+        console.error('❌ 加载客户线索失败:', error);
+        this.$message.error(error.message || '加载客户线索失败');
+        this.customerLeads = [];
+      } finally {
+        this.leadsLoading = false;
+      }
+    },
+
+    // 刷新客户线索
+    async refreshCustomerLeads() {
+      if (!this.selectedCustomer) return;
+      await this.loadCustomerLeads(this.selectedCustomer.id);
+    },
+
+    // 查看更多线索详情
+    viewMoreLeadDetails() {
+      console.log('📋 查看更多线索详情');
+      this.$message.info('功能开发中，敬请期待');
+      // 这里可以跳转到专门的线索详情页面
+    },
+
+    // 跳转到下一步
+    goToNextStep() {
+      console.log('🚀 跳转到人员和客户匹配度分析页面');
+      
+      // 构建路由参数
+      const params = {
+        batch: this.selectedBatch,
+        customerCount: this.customersData ? this.customersData.pagination.total : 0,
+        pageSize: this.pageSize,
+        fromNodeId: this.nodeId,
+        fromNodeTitle: this.nodeTitle,
+        fromNodeType: this.nodeType
+      };
+      
+      // 跳转到MarketingRefactor2页面
+      this.$router.push({
+        name: 'MarketingRefactor2',
+        query: params
+      });
+      
+      this.$message.success('正在进入人员和客户匹配度分析阶段...');
     },
 
     // 获取客户类型统计
@@ -734,11 +954,6 @@ export default {
   color: #303133;
 }
 
-.overdue-warning {
-  color: #f56c6c !important;
-  font-weight: 600;
-}
-
 .customer-address {
   font-size: 12px;
   color: #909399;
@@ -763,6 +978,261 @@ export default {
 .pagination-wrapper {
   margin-top: 24px;
   text-align: center;
+}
+
+/* 下一步操作区域样式 */
+.next-step-section {
+  margin-top: 32px;
+}
+
+.next-step-card {
+  border: 2px solid #e6f7ff;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f6ffed 0%, #f0f9ff 100%);
+}
+
+.next-step-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.next-step-info h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1890ff;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.next-step-info h4 i {
+  color: #52c41a;
+}
+
+.next-step-info p {
+  font-size: 14px;
+  color: #595959;
+  margin: 0 0 8px 0;
+}
+
+.next-step-summary {
+  font-size: 13px;
+  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.next-step-summary .separator {
+  color: #d9d9d9;
+}
+
+.next-step-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* 客户线索弹框样式 */
+.customer-leads-drawer {
+  z-index: 3000;
+}
+
+.drawer-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e4e7ed;
+  background-color: #fafbfc;
+}
+
+.customer-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.customer-info-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.customer-info-header i {
+  color: #409eff;
+}
+
+.customer-basic-info {
+  font-size: 14px;
+  color: #909399;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.separator {
+  color: #c0c4cc;
+}
+
+.drawer-body {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.leads-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.leads-section-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leads-section-header i {
+  color: #e6a23c;
+}
+
+.leads-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.leads-list-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lead-item {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafbfc;
+  border-left: 4px solid #e6a23c;
+  transition: all 0.3s ease;
+}
+
+.lead-item:hover {
+  background-color: #f5f7fa;
+  border-left-color: #409eff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lead-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.lead-title-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lead-code {
+  font-size: 14px;
+  color: #409eff;
+  font-weight: 600;
+}
+
+.lead-title {
+  font-size: 16px;
+  color: #303133;
+  font-weight: 500;
+}
+
+.lead-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+}
+
+.meta-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.meta-value {
+  font-size: 13px;
+  color: #303133;
+}
+
+.lead-item-detail {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #f0f2f5;
+  border-radius: 6px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.detail-content {
+  font-size: 14px;
+  color: #303133;
+  line-height: 1.5;
+}
+
+.lead-item-time {
+  font-size: 12px;
+  color: #909399;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lead-item-time i {
+  color: #c0c4cc;
+}
+
+.no-leads-drawer {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.drawer-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e4e7ed;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #fafbfc;
 }
 
 /* 响应式设计 */
@@ -853,6 +1323,49 @@ export default {
   
   .pagination-wrapper {
     margin-top: 16px;
+  }
+
+  /* 移动端弹框样式调整 */
+  .drawer-header {
+    padding: 16px 20px;
+  }
+  
+  .customer-info-header h3 {
+    font-size: 18px;
+  }
+  
+  .drawer-body {
+    padding: 16px 20px;
+  }
+  
+  .leads-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .leads-section-header h4 {
+    font-size: 15px;
+  }
+  
+  .lead-item {
+    padding: 12px;
+  }
+  
+  .lead-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .lead-title {
+    font-size: 15px;
+  }
+  
+  .drawer-footer {
+    padding: 12px 20px;
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>

@@ -3103,6 +3103,43 @@ app.get('/api/topic03/customers', async (req, res) => {
   }
 });
 
+// 获取优化指标数据
+app.get('/api/topic03/optimization-metrics', async (req, res) => {
+  try {
+    const { sort_by, sort_order, limit } = req.query;
+
+    const options = {
+      sortBy: sort_by || 'customer_id',
+      sortOrder: sort_order || 'asc',
+      limit: parseInt(limit) || 1000
+    };
+
+    const result = await topic03Service.getOptimizationMetrics(options);
+    sendResponse(res, result, '获取优化指标数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
+// 获取销售-客户匹配度数据
+app.get('/api/topic03/sales-customer-match', async (req, res) => {
+  try {
+    const { group_by, owner_name, customer_id, limit } = req.query;
+
+    const options = {
+      groupBy: group_by || 'owner',
+      ownerName: owner_name || null,
+      customerId: customer_id ? parseInt(customer_id) : null,
+      limit: parseInt(limit) || 10000
+    };
+
+    const result = await topic03Service.getSalesCustomerMatch(options);
+    sendResponse(res, result, '获取销售-客户匹配度数据失败');
+  } catch (error) {
+    sendError(res, error);
+  }
+});
+
 // ================================
 // Topic03 火车装配人员匹配API路由
 // ================================
