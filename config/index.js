@@ -11,7 +11,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // 维修记录API专用代理 - 必须放在 /api 之前，因为webpack按顺序匹配
+      // 营销重构API专用代理 - 必须放在 /api 之前，因为webpack按顺序匹配
+      '/api/marketing': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        logLevel: 'debug'
+      },
+      // 维修记录API专用代理
       '/api/maintenance': {
         target: 'http://localhost:5000',
         changeOrigin: true,

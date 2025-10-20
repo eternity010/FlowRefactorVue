@@ -189,8 +189,8 @@
                 <p>基于客户数据结果，分析人员与客户的匹配度</p>
               </div>
               <div class="next-analysis-actions">
-                <el-button 
-                  type="warning" 
+                <el-button
+                  type="info"
                   size="medium"
                   @click="analyzeStaffMatching"
                   :loading="staffAnalysisLoading">
@@ -312,8 +312,8 @@
                 </div>
               </div>
               <div class="final-next-step-actions">
-                <el-button 
-                  type="warning" 
+                <el-button
+                  type="info"
                   size="medium"
                   @click="goToNextStep"
                   :loading="nextStepLoading">
@@ -866,8 +866,8 @@ export default {
 
 .next-analysis-card {
   border-radius: 8px;
-  border: 2px solid #faad14;
-  background: linear-gradient(135deg, #fff7e6 0%, #fff1b8 100%);
+  border: 2px solid #d9d9d9;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }
 
 .next-analysis-content {
@@ -880,7 +880,7 @@ export default {
 .next-analysis-info h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #fa8c16;
+  color: #595959;
   margin: 0 0 8px 0;
   display: flex;
   align-items: center;
@@ -888,12 +888,12 @@ export default {
 }
 
 .next-analysis-info h4 i {
-  color: #52c41a;
+  color: #bfbfbf;
 }
 
 .next-analysis-info p {
   font-size: 14px;
-  color: #8c5a00;
+  color: #8c8c8c;
   margin: 0;
 }
 
@@ -1315,8 +1315,8 @@ export default {
 
 .final-next-step-card {
   border-radius: 8px;
-  border: 2px solid #faad14;
-  background: linear-gradient(135deg, #fff7e6 0%, #fff1b8 100%);
+  border: 2px solid #d9d9d9;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }
 
 .final-next-step-content {
@@ -1329,7 +1329,7 @@ export default {
 .final-next-step-info h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #fa8c16;
+  color: #595959;
   margin: 0 0 8px 0;
   display: flex;
   align-items: center;
@@ -1337,12 +1337,12 @@ export default {
 }
 
 .final-next-step-info h4 i {
-  color: #52c41a;
+  color: #bfbfbf;
 }
 
 .final-next-step-info p {
   font-size: 14px;
-  color: #8c5a00;
+  color: #8c8c8c;
   margin: 0 0 8px 0;
 }
 
@@ -1351,7 +1351,7 @@ export default {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #faad14;
+  color: #bfbfbf;
   font-weight: 500;
 }
 
